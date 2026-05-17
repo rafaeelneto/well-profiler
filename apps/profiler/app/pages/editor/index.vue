@@ -30,75 +30,10 @@ const tabs = computed(() => [
     shortLabel: t('editor.tabs.summary'),
   },
 ]);
-
-const viewOptions = computed(() => [
-  {
-    value: 'perfil',
-    label: t('editor.viewProfile'),
-    icon: 'ph:chart-bar-horizontal-duotone',
-  },
-  { value: 'dados', label: t('editor.viewData'), icon: 'ph:table-duotone' },
-]);
 </script>
 
 <template>
-  <!-- ─── Mobile sticky header (hidden on desktop) ──────────────────── -->
-  <div
-    class="lg:hidden sticky top-0 z-40 bg-surface-0 border-b border-surface-200/60"
-  >
-    <!-- Row 1: top bar -->
-    <div class="flex items-center gap-3 px-4 py-3">
-      <button
-        class="size-8 rounded-full border border-surface-200 flex items-center justify-center text-content-400 hover:text-content-0 hover:border-surface-300 transition-colors shrink-0"
-        :aria-label="t('editor.back')"
-      >
-        <Icon name="ph:arrow-left" class="size-4" />
-      </button>
-
-      <div class="flex flex-col min-w-0 flex-1">
-        <span class="kicker leading-none mb-0.5">{{ t('editor.well') }}</span>
-        <span
-          class="font-semibold text-[15px] text-content-0 truncate leading-tight"
-          >P4 — Exemplo</span
-        >
-      </div>
-
-      <button
-        class="size-8 rounded-full border border-surface-200 flex items-center justify-center text-content-400 hover:text-content-0 hover:border-surface-300 transition-colors shrink-0"
-        :aria-label="t('editor.menu')"
-      >
-        <Icon name="ph:dots-three-vertical" class="size-4" />
-      </button>
-    </div>
-
-    <!-- Row 2: status bar -->
-    <div class="flex items-center gap-2 px-4 pb-2.5">
-      <span class="size-1.5 rounded-full bg-primary-500 shrink-0" />
-      <span
-        class="font-mono text-[10px] tracking-[0.12em] uppercase text-content-400"
-      >
-        {{ t('editor.status.saved') }} · 160 M · 15
-        {{ t('editor.status.layers').toUpperCase() }}
-      </span>
-    </div>
-
-    <!-- Row 3: Perfil / Dados view toggle -->
-    <div class="flex items-center gap-2 px-4 pb-3">
-      <SelectButton
-        v-model="mobileView"
-        :options="viewOptions"
-        option-value="value"
-        :option-label="() => ''"
-        data-key="value"
-        :allow-empty="false"
-      >
-        <template #option="{ option }">
-          <Icon :name="option.icon" class="size-3.5 shrink-0" />
-          {{ option.label }}
-        </template>
-      </SelectButton>
-    </div>
-  </div>
+  <Header v-model:mobile-view="mobileView" />
 
   <!-- ─── Content row: flex-row container for all panes ────────────── -->
   <div class="flex flex-1 min-h-0 overflow-hidden">
