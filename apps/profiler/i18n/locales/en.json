@@ -183,7 +183,18 @@
     },
     "status": {
       "saved": "Saved",
+      "unsaved": "Unsaved",
       "layers": "Layers"
+    },
+    "shareDialog": {
+      "title": "Share well",
+      "copyJson": "Copy JSON",
+      "copyJsonDesc": "Copy raw .well data to clipboard",
+      "downloadWell": "Download .well",
+      "downloadWellDesc": "Download the profile as a file",
+      "copyLink": "Copy as link",
+      "copyLinkDesc": "Share a deep link to this well",
+      "comingSoon": "Soon"
     },
     "zoom": {
       "in": "Zoom in",

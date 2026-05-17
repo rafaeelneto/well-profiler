@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import Header from './_components/Header.vue';
+
 definePageMeta({ layout: 'editor' });
 
 const { t } = useI18n();

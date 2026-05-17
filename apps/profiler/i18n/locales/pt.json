@@ -183,7 +183,18 @@
     },
     "status": {
       "saved": "Salvo",
+      "unsaved": "Não salvo",
       "layers": "Camadas"
+    },
+    "shareDialog": {
+      "title": "Compartilhar poço",
+      "copyJson": "Copiar JSON",
+      "copyJsonDesc": "Copiar dados .well brutos para a área de transferência",
+      "downloadWell": "Baixar .well",
+      "downloadWellDesc": "Baixar o perfil como arquivo",
+      "copyLink": "Copiar como link",
+      "copyLinkDesc": "Compartilhar um link direto para este poço",
+      "comingSoon": "Em breve"
     },
     "zoom": {
       "in": "Ampliar",

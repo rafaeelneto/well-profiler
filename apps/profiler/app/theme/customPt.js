@@ -48,6 +48,8 @@ const customPt = {
     root: 'font-mono text-sm rounded-[var(--radius-sm)] focus:shadow-[inset_0_0_0_1.5px_var(--w-primary-500)]',
   },
   dialog: {
+    root: 'font-display backdrop-blur-2xl backdrop-saturate-150',
+    title: 'font-mono tracking-tight',
     header: options => {
       const hasHeader =
         options.props.header || 'header' in options.instance.$slots;
@@ -55,14 +57,8 @@ const customPt = {
         class: hasHeader ? 'justify-between' : 'justify-end',
       };
     },
-    mask: options => {
-      const hasHeader = options.props.mask || 'mask' in options.instance.$slots;
-      if (!hasHeader) {
-        return {};
-      }
-      return {
-        class: () => 'backdrop-blur-sm bg-black/30',
-      };
+    mask: {
+      class: 'backdrop-blur-[3px] bg-surface-900/10 dark:bg-surface-950/30',
     },
   },
 };

@@ -1,10 +1,15 @@
 <script setup lang="ts">
 import { useDark } from '@vueuse/core';
+import ShareProfile from '~/components/ShareProfile.vue';
 
 const props = defineProps<{ mobileView: 'perfil' | 'dados' }>();
-const emit = defineEmits<{ 'update:mobileView': [value: 'perfil' | 'dados'] }>();
+const emit = defineEmits<{
+  'update:mobileView': [value: 'perfil' | 'dados'];
+}>();
 
 const { t } = useI18n();
+const store = useProfileStore();
+const { download } = useProfileExport();
 
 const isDark = useDark({
   selector: 'html',
@@ -13,6 +18,40 @@ const isDark = useDark({
   valueLight: '',
 });
 
+// ── Store-derived computeds ─────────────────────────────────────────
+const hasWell = computed(() => !!store.well);
+const wellName = computed(() => store.well?.name ?? '—');
+const depthDisplay = computed(() =>
+  store.maxDepth > 0 ? `${store.maxDepth} M` : '—',
+);
+const totalLayers = computed(
+  () => store.totalGeologicLayers + store.totalConstructiveLayers,
+);
+
+// ── Open ────────────────────────────────────────────────────────────
+const fileInputRef = ref<HTMLInputElement | null>(null);
+
+function openFile() {
+  fileInputRef.value?.click();
+}
+
+async function onFileSelected(event: Event) {
+  const input = event.target as HTMLInputElement;
+  const file = input.files?.[0];
+  if (!file) return;
+  store.loadWell(await file.text());
+  input.value = '';
+}
+
+// ── Save ────────────────────────────────────────────────────────────
+function saveFile() {
+  download();
+}
+
+// ── Share dialog ────────────────────────────────────────────────────
+const shareVisible = ref(false);
+
+// ── Pass-through ────────────────────────────────────────────────────
 const togglePt = {
   root: {
     class: [
@@ -31,6 +70,7 @@ const actionBtnPt = {
       'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[13px] font-medium',
       'text-content-400 hover:text-content-0 hover:bg-surface-100',
       'transition-colors duration-150 cursor-pointer border-none bg-transparent',
+      'disabled:opacity-40 disabled:cursor-not-allowed disabled:pointer-events-none',
     ],
   },
 };
@@ -43,6 +83,14 @@ const viewOptions = computed(() => [
   },
   { value: 'dados', label: t('editor.viewData'), icon: 'ph:table-duotone' },
 ]);
+
+onMounted(() => {
+  console.log('Editor mounted, store state:', store.well);
+  setTimeout(() => {
+    console.log('Simulating well load after 6 seconds...');
+    store.well.name = 'Example Well';
+  }, 6000);
+});
 </script>
 
 <template>
@@ -72,16 +120,25 @@ const viewOptions = computed(() => [
         <span class="kicker shrink-0">{{ t('editor.well') }}</span>
         <span
           class="font-semibold text-[15px] text-content-0 truncate leading-tight"
-          >P4 — Exemplo</span
         >
+          {{ wellName }}
+        </span>
       </div>
       <div class="flex items-center gap-1.5 mt-0.5">
         <span class="w-1.5 h-1.5 rounded-full bg-primary-500 shrink-0" />
         <span
           class="font-mono text-[10px] tracking-[0.12em] uppercase text-content-400"
         >
-          {{ t('editor.status.saved') }} · 160 M · 15
-          {{ t('editor.status.layers').toUpperCase() }}
+          <template v-if="hasWell">
+            {{
+              store.isDirty
+                ? t('editor.status.unsaved')
+                : t('editor.status.saved')
+            }}
+            · {{ depthDisplay }} · {{ totalLayers }}
+            {{ t('editor.status.layers').toUpperCase() }}
+          </template>
+          <template v-else>—</template>
         </span>
       </div>
     </div>
@@ -90,17 +147,34 @@ const viewOptions = computed(() => [
 
     <!-- Action buttons -->
     <div class="flex items-center gap-0.5">
-      <Button :label="t('editor.save')" unstyled :pt="actionBtnPt">
+      <Button
+        :label="t('editor.save')"
+        :disabled="!hasWell"
+        unstyled
+        :pt="actionBtnPt"
+        @click="saveFile"
+      >
         <template #icon>
           <Icon name="ph:floppy-disk-duotone" class="size-4 shrink-0" />
         </template>
       </Button>
-      <Button :label="t('editor.open')" unstyled :pt="actionBtnPt">
+      <Button
+        :label="t('editor.open')"
+        unstyled
+        :pt="actionBtnPt"
+        @click="openFile"
+      >
         <template #icon>
           <Icon name="ph:folder-open-duotone" class="size-4 shrink-0" />
         </template>
       </Button>
-      <Button :label="t('editor.share')" unstyled :pt="actionBtnPt">
+      <Button
+        :label="t('editor.share')"
+        :disabled="!hasWell"
+        unstyled
+        :pt="actionBtnPt"
+        @click="shareVisible = true"
+      >
         <template #icon>
           <Icon name="ph:share-network-duotone" class="size-4 shrink-0" />
         </template>
@@ -126,17 +200,12 @@ const viewOptions = computed(() => [
           name="heroicons:sun"
           class="size-4 shrink-0"
         />
-        <Icon
-          v-else
-          key="moon"
-          name="heroicons:moon"
-          class="size-4 shrink-0"
-        />
+        <Icon v-else key="moon" name="heroicons:moon" class="size-4 shrink-0" />
       </Transition>
     </ToggleButton>
 
     <!-- Export PDF (primary CTA) -->
-    <Button :label="t('editor.exportPdf')" size="small">
+    <Button :label="t('editor.exportPdf')" :disabled="!hasWell" size="small">
       <template #icon>
         <Icon name="ph:file-pdf-duotone" class="size-4 shrink-0" />
       </template>
@@ -149,19 +218,21 @@ const viewOptions = computed(() => [
   >
     <!-- Row 1: top bar -->
     <div class="flex items-center gap-3 px-4 py-3">
-      <button
+      <NuxtLink
+        to="/"
         class="size-8 rounded-full border border-surface-200 flex items-center justify-center text-content-400 hover:text-content-0 hover:border-surface-300 transition-colors shrink-0"
         :aria-label="t('editor.back')"
       >
         <Icon name="ph:arrow-left" class="size-4" />
-      </button>
+      </NuxtLink>
 
       <div class="flex flex-col min-w-0 flex-1">
         <span class="kicker leading-none mb-0.5">{{ t('editor.well') }}</span>
         <span
           class="font-semibold text-[15px] text-content-0 truncate leading-tight"
-          >P4 — Exemplo</span
         >
+          {{ wellName }}
+        </span>
       </div>
 
       <button
@@ -178,8 +249,16 @@ const viewOptions = computed(() => [
       <span
         class="font-mono text-[10px] tracking-[0.12em] uppercase text-content-400"
       >
-        {{ t('editor.status.saved') }} · 160 M · 15
-        {{ t('editor.status.layers').toUpperCase() }}
+        <template v-if="hasWell">
+          {{
+            store.isDirty
+              ? t('editor.status.unsaved')
+              : t('editor.status.saved')
+          }}
+          · {{ depthDisplay }} · {{ totalLayers }}
+          {{ t('editor.status.layers').toUpperCase() }}
+        </template>
+        <template v-else>—</template>
       </span>
     </div>
 
@@ -201,4 +280,18 @@ const viewOptions = computed(() => [
       </SelectButton>
     </div>
   </div>
+
+  <!-- ─── Share dialog ──────────────────────────────────────────────── -->
+  <ShareProfile v-model="shareVisible" />
+
+  <!-- ─── Hidden file input ─────────────────────────────────────────── -->
+  <ClientOnly>
+    <input
+      ref="fileInputRef"
+      type="file"
+      accept=".well,.json"
+      class="sr-only"
+      @change="onFileSelected"
+    />
+  </ClientOnly>
 </template>

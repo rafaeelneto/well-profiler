@@ -99,9 +99,9 @@ export const useProfileStore = defineStore(
       _flushQueue();
     }
 
-    const well = computed<RenderableWell | null>(() => {
-      const w = renderableWell.value;
-      if (!w) return null;
+    const well = computed<Well>(() => {
+      const w = _well.value;
+      if (!w) return {} as Well;
       return makeDeepProxy(w, [], _queueUpdate);
     });
 
