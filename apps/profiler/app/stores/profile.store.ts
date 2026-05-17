@@ -1,4 +1,3 @@
-import { useDebounceFn } from '@vueuse/core';
 import type { Well } from '@welldot/core';
 import { WellSchema, deserializeWell, isWellEmpty } from '@welldot/core';
 import type { RenderableWell } from '@welldot/render';
@@ -11,7 +10,7 @@ import {
 } from '@welldot/utils';
 import type { Draft } from 'immer';
 import { defineStore } from 'pinia';
-import { computed, ref } from 'vue';
+import { computed, markRaw, ref } from 'vue';
 import { makeDeepProxy } from '~/utils/state';
 
 // ─── Stable render-key registry ──────────────────────────────────────────────
@@ -40,6 +39,22 @@ function stripKeys<T extends object>(items: T[]): T[] {
   });
 }
 
+function emptyWell(): Well {
+  return {
+    version: 2,
+    bore_hole: [],
+    well_case: [],
+    reduction: [],
+    well_screen: [],
+    surface_case: [],
+    hole_fill: [],
+    cement_pad: { type: '', width: 0, thickness: 0, length: 0 },
+    lithology: [],
+    fractures: [],
+    caves: [],
+  };
+}
+
 // ─── Store ────────────────────────────────────────────────────────────────────
 
 export const useProfileStore = defineStore(
@@ -55,7 +70,7 @@ export const useProfileStore = defineStore(
       canUndo,
       canRedo,
       historySize,
-    } = useImmer<Well | null>(null);
+    } = useImmer<Well>(emptyWell());
 
     const errors = ref<Record<string, string>>({});
     const isDirty = ref(false);
@@ -65,7 +80,7 @@ export const useProfileStore = defineStore(
     // edits: unmodified elements keep their key, modified ones get a new one.
     const renderableWell = computed<RenderableWell | null>(() => {
       const w = _well.value;
-      if (!w) return null;
+      if (!w) return emptyWell() as RenderableWell;
       return {
         ...w,
         lithology: withKeys(w.lithology),
@@ -80,29 +95,10 @@ export const useProfileStore = defineStore(
       };
     });
 
-    // ── Public well — renderable read, mutable via proxy ──────────────────
-    // Recipes from rapid successive proxy sets are queued and flushed together
-    // in a single updateWell call (one undo entry per burst of mutations).
-    // get: store.well.value.name
-    // set: store.well.value.name = 'x'
-    //      store.well.value.hydrodynamic_events[1].steps.static_level = 12.3
-    const _recipeQueue: ((draft: Draft<Well>) => void)[] = [];
-    const _flushQueue = useDebounceFn(() => {
-      const recipes = _recipeQueue.splice(0);
-      updateWell(draft => {
-        for (const r of recipes) r(draft);
-      });
-    }, 200);
-
-    function _queueUpdate(recipe: (draft: Draft<Well>) => void): void {
-      _recipeQueue.push(recipe);
-      _flushQueue();
-    }
-
     const well = computed<Well>(() => {
       const w = _well.value;
       if (!w) return {} as Well;
-      return makeDeepProxy(w, [], _queueUpdate);
+      return markRaw(makeDeepProxy(w, [], updateWell));
     });
 
     // ── Measurements — lazy computed, never blocking ───────────────────────
@@ -280,7 +276,7 @@ export const useProfileStore = defineStore(
 
     /** Clear the current profile and reset all state. */
     function clear(): void {
-      _reset(null);
+      _reset(emptyWell());
       errors.value = {};
       isDirty.value = false;
     }

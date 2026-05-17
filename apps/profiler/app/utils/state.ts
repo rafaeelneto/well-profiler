@@ -22,14 +22,24 @@ export function makeDeepProxy<T extends object>(
 ): T {
   return new Proxy(target, {
     get(obj, key) {
+      // Tell Vue's reactive system to leave this proxy alone (equivalent to markRaw).
+      // Without this, reactive() wraps the proxy in a second Proxy, which breaks
+      // path tracking and causes double-triggering of effects.
+      if (key === '__v_skip') return true;
       if (typeof key === 'symbol') return Reflect.get(obj, key);
       const value = Reflect.get(obj, key);
       if (value !== null && typeof value === 'object')
-        return makeDeepProxy(value as object, [...path, key as string], updater);
+        return makeDeepProxy(
+          value as object,
+          [...path, key as string],
+          updater,
+        );
       return value;
     },
     set(_, key, value) {
-      if (typeof key === 'symbol') return false;
+      // Symbol sets (e.g. Vue internals) pass through silently — returning false
+      // would throw a TypeError in strict mode.
+      if (typeof key === 'symbol') return true;
       updater(draft => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         let node: any = draft;

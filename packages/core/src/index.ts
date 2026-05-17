@@ -89,7 +89,6 @@ export { FGDC_TEXTURES_OPTIONS } from './utils/fgdc.textures';
 export type { Well as Profile } from './types/well.types';
 
 // Units conversion utilities
-export type { DmsCoordinate } from './utils/units';
 export {
   cubicMeterPerHourToLitersPerSecond,
   cubicMeterPerHourToUsGallonsPerMinute,
@@ -110,3 +109,4 @@ export {
   squareMeterPerSecondToSquareMeterPerDay,
   usGallonsPerMinuteToCubicMeterPerHour,
 } from './utils/units';
+export type { DmsCoordinate } from './utils/units';
