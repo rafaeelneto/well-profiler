@@ -47,6 +47,20 @@ const customPt = {
   inputtext: {
     root: 'font-mono text-sm rounded-[var(--radius-sm)] focus:shadow-[inset_0_0_0_1.5px_var(--w-primary-500)]',
   },
+  select: {
+    root: 'font-display',
+    label: 'font-display',
+    overlay: 'font-display',
+    option: 'font-display',
+  },
+  datepicker: {
+    panel: 'font-display',
+    title: 'font-display font-semibold tracking-tight',
+    selectMonth: 'font-display',
+    selectYear: 'font-display',
+    weekDay: 'font-display text-xs uppercase tracking-wide',
+    day: 'font-mono text-sm',
+  },
   dialog: {
     root: 'font-display backdrop-blur-2xl backdrop-saturate-150',
     title: 'font-mono tracking-tight',

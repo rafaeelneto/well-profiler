@@ -299,6 +299,149 @@ const MyPreset = definePreset(Aura, {
         radius: '999px',
       },
     },
+    select: {
+      overlay: {
+        borderRadius: '0.75rem',
+      },
+      colorScheme: {
+        light: {
+          overlay: {
+            background: '{surface.0}',
+            borderColor: '{surface.200}',
+            color: '{content.0}',
+            shadow:
+              '0 8px 32px -4px rgba(14,30,51,0.14), 0 1px 6px -1px rgba(14,30,51,0.07)',
+          },
+          option: {
+            color: '{content.0}',
+            focusBackground: '{surface.100}',
+            focusColor: '{content.0}',
+            selectedBackground: '{primary.50}',
+            selectedColor: '{primary.700}',
+            selectedFocusBackground: '{primary.100}',
+            selectedFocusColor: '{primary.700}',
+          },
+        },
+        dark: {
+          overlay: {
+            background: '{surface.100}',
+            borderColor: '{surface.200}',
+            color: '{content.0}',
+            shadow:
+              '0 8px 32px -4px rgba(0,0,0,0.45), 0 1px 6px -1px rgba(0,0,0,0.28)',
+          },
+          option: {
+            color: '{content.0}',
+            focusBackground: '{surface.200}',
+            focusColor: '{content.0}',
+            selectedBackground: '{surface.200}',
+            selectedColor: '{content.0}',
+            selectedFocusBackground: '{surface.300}',
+            selectedFocusColor: '{content.0}',
+          },
+        },
+      },
+    },
+    datepicker: {
+      panel: {
+        borderRadius: '0.75rem',
+        padding: '0.5rem',
+      },
+      header: {
+        padding: '0.5rem 0.75rem 0.25rem',
+      },
+      title: {
+        fontWeight: '600',
+      },
+      colorScheme: {
+        light: {
+          panel: {
+            background: '{surface.0}',
+            borderColor: '{surface.200}',
+            color: '{content.0}',
+            shadow:
+              '0 8px 32px -4px rgba(14,30,51,0.14), 0 1px 6px -1px rgba(14,30,51,0.07)',
+          },
+          header: {
+            background: '{surface.0}',
+            borderColor: '{surface.100}',
+            color: '{content.0}',
+          },
+          selectMonth: {
+            color: '{content.0}',
+            hoverBackground: '{surface.100}',
+            hoverColor: '{content.0}',
+          },
+          selectYear: {
+            color: '{content.0}',
+            hoverBackground: '{surface.100}',
+            hoverColor: '{content.0}',
+          },
+          weekDay: {
+            color: '{content.400}',
+          },
+          date: {
+            color: '{content.0}',
+            hoverColor: '{content.0}',
+            hoverBackground: '{surface.100}',
+            selectedBackground: '{primary.600}',
+            selectedColor: '{content.950}',
+            rangeSelectedBackground: '{primary.100}',
+            rangeSelectedColor: '{primary.700}',
+          },
+          today: {
+            background: '{surface.100}',
+            color: '{primary.600}',
+          },
+          buttonbar: {
+            borderColor: '{surface.100}',
+          },
+        },
+        dark: {
+          panel: {
+            background: '{surface.100}',
+            borderColor: '{surface.200}',
+            color: '{content.0}',
+            shadow:
+              '0 8px 32px -4px rgba(0,0,0,0.45), 0 1px 6px -1px rgba(0,0,0,0.28)',
+          },
+          header: {
+            background: '{surface.100}',
+            borderColor: '{surface.200}',
+            color: '{content.0}',
+          },
+          selectMonth: {
+            color: '{content.0}',
+            hoverBackground: '{surface.200}',
+            hoverColor: '{content.0}',
+          },
+          selectYear: {
+            color: '{content.0}',
+            hoverBackground: '{surface.200}',
+            hoverColor: '{content.0}',
+          },
+          weekDay: {
+            color: '{content.400}',
+          },
+          date: {
+            color: '{content.0}',
+            hoverColor: '{content.0}',
+            hoverBackground: '{surface.200}',
+            selectedBackground: '{primary.500}',
+            selectedColor: '{content.950}',
+            rangeSelectedBackground: '{primary.900}',
+            rangeSelectedColor: '{primary.200}',
+          },
+          today: {
+            background: '{surface.200}',
+            color: '{primary.400}',
+          },
+          buttonbar: {
+            borderColor: '{surface.200}',
+          },
+        },
+      },
+    },
     button: {
       root: {
         borderRadius: '999px',
