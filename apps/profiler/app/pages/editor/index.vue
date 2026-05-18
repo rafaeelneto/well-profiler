@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import Header from './_components/Header.vue';
+import TabGeneral from './_components/tabs/TabGeneral.vue';
 
 definePageMeta({ layout: 'editor' });
 
@@ -121,7 +122,8 @@ const tabs = computed(() => [
         </TabList>
         <TabPanels>
           <TabPanel v-for="tab in tabs" :key="tab.value" :value="tab.value">
-            <div class="flex items-center justify-center h-32 p-6">
+            <TabGeneral v-if="tab.value === '0'" />
+            <div v-else class="flex items-center justify-center h-32 p-6">
               <span class="font-mono text-xs text-content-400">
                 {{ tab.label }} — content placeholder
               </span>

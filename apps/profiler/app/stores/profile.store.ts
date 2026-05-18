@@ -42,16 +42,19 @@ function stripKeys<T extends object>(items: T[]): T[] {
 function emptyWell(): Well {
   return {
     version: 2,
+    location: { lat: 0, lng: 0, elevation: 0 },
     bore_hole: [],
     well_case: [],
     reduction: [],
     well_screen: [],
     surface_case: [],
     hole_fill: [],
-    cement_pad: { type: '', width: 0, thickness: 0, length: 0 },
     lithology: [],
     fractures: [],
     caves: [],
+    hydrodynamic_events: [],
+    aquifer_analysis: [],
+    history_logs: [],
   };
 }
 

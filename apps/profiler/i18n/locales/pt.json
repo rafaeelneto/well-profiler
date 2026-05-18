@@ -164,6 +164,17 @@
     "liveTitle": "live preview",
     "liveSub": "perfil gerado ao vivo"
   },
+  "units": {
+    "length": "Comprimento",
+    "diameter": "Diâmetro",
+    "coordinates": "Coordenadas",
+    "m": "Metros (m)",
+    "ft": "Pés (ft)",
+    "mm": "Milímetros (mm)",
+    "inches": "Polegadas (in)",
+    "DD": "Graus Decimais",
+    "DMS": "Graus Min. Seg."
+  },
   "editor": {
     "well": "Poço",
     "save": "Salvar",
@@ -200,6 +211,36 @@
       "in": "Ampliar",
       "out": "Reduzir",
       "fit": "Ajustar"
+    },
+    "general": {
+      "generalInfo": "Informações Gerais",
+      "location": "Localização",
+      "observations": "Observações",
+      "name": "Nome",
+      "driller": "Perfurador",
+      "constructionDate": "Data de Construção",
+      "wellType": "Tipo de Poço",
+      "coordinates": "Coordenadas",
+      "coordinatesLabel": "Formato de Coordenadas",
+      "dd": "DD",
+      "dms": "DMS",
+      "latitude": "Latitude",
+      "longitude": "Longitude",
+      "elevation": "Elevação (m)",
+      "clickOrDragPin": "Clique no mapa ou arraste o pino",
+      "latPlaceholderDd": "-23.512533",
+      "latPlaceholderDms": "23°30'45.12\"S",
+      "lngPlaceholderDd": "-48.503900",
+      "lngPlaceholderDms": "48°30'14.04\"O",
+      "observationsLabel": "Observações",
+      "freeNotes": "Notas livres",
+      "metadata": "Metadados",
+      "wellTypes": {
+        "deepTubular": "Tubular profundo",
+        "shallowTubular": "Tubular raso",
+        "artesian": "Artesiano",
+        "handDug": "Escavado"
+      }
     }
   }
 }

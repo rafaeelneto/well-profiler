@@ -164,6 +164,17 @@
     "liveTitle": "live preview",
     "liveSub": "generated live profile"
   },
+  "units": {
+    "length": "Length",
+    "diameter": "Diameter",
+    "coordinates": "Coordinates",
+    "m": "Meters (m)",
+    "ft": "Feet (ft)",
+    "mm": "Millimeters (mm)",
+    "inches": "Inches (in)",
+    "DD": "Decimal Degrees",
+    "DMS": "Deg. Min. Sec."
+  },
   "editor": {
     "well": "Well",
     "save": "Save",
@@ -200,6 +211,36 @@
       "in": "Zoom in",
       "out": "Zoom out",
       "fit": "Fit"
+    },
+    "general": {
+      "generalInfo": "General Information",
+      "location": "Location",
+      "observations": "Observations",
+      "name": "Name",
+      "driller": "Driller",
+      "constructionDate": "Construction Date",
+      "wellType": "Well Type",
+      "coordinates": "Coordinates",
+      "coordinatesLabel": "Coordinate Format",
+      "dd": "DD",
+      "dms": "DMS",
+      "latitude": "Latitude",
+      "longitude": "Longitude",
+      "elevation": "Elevation (m)",
+      "clickOrDragPin": "Click the map or drag the pin",
+      "latPlaceholderDd": "-23.512533",
+      "latPlaceholderDms": "23°30'45.12\"S",
+      "lngPlaceholderDd": "-48.503900",
+      "lngPlaceholderDms": "48°30'14.04\"W",
+      "observationsLabel": "Observations",
+      "freeNotes": "Free notes",
+      "metadata": "Metadata",
+      "wellTypes": {
+        "deepTubular": "Deep tubular",
+        "shallowTubular": "Shallow tubular",
+        "artesian": "Artesian",
+        "handDug": "Hand dug"
+      }
     }
   }
 }
