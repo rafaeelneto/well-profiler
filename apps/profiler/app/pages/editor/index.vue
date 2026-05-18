@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import Header from './_components/Header.vue';
 import TabGeneral from './_components/tabs/TabGeneral.vue';
+import TabConstruction from './_components/tabs/TabConstruction.vue';
+import TabGeological from './_components/tabs/TabGeological.vue';
+import TabSummary from './_components/tabs/TabSummary.vue';
 
 definePageMeta({ layout: 'editor' });
 
@@ -121,14 +124,10 @@ const tabs = computed(() => [
           </Tab>
         </TabList>
         <TabPanels>
-          <TabPanel v-for="tab in tabs" :key="tab.value" :value="tab.value">
-            <TabGeneral v-if="tab.value === '0'" />
-            <div v-else class="flex items-center justify-center h-32 p-6">
-              <span class="font-mono text-xs text-content-400">
-                {{ tab.label }} — content placeholder
-              </span>
-            </div>
-          </TabPanel>
+          <TabPanel value="0"><TabGeneral /></TabPanel>
+          <TabPanel value="1"><TabConstruction /></TabPanel>
+          <TabPanel value="2"><TabGeological /></TabPanel>
+          <TabPanel value="3"><TabSummary /></TabPanel>
         </TabPanels>
       </Tabs>
     </div>
