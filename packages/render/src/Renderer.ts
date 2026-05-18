@@ -192,9 +192,6 @@ export class WellRenderer {
       .append('g')
       .attr('class', this.classes.highlights.fracturesGroup);
 
-    construction
-      .append('g')
-      .attr('class', this.classes.constructionLabels.group);
     construction.append('g').attr('class', this.classes.cementPad.group);
     construction.append('g').attr('class', this.classes.boreHole.group);
     construction.append('g').attr('class', this.classes.surfaceCase.group);
@@ -202,6 +199,9 @@ export class WellRenderer {
     construction.append('g').attr('class', this.classes.wellCase.group);
     construction.append('g').attr('class', this.classes.wellScreen.group);
     construction.append('g').attr('class', this.classes.conflict.group);
+    construction
+      .append('g')
+      .attr('class', this.classes.constructionLabels.group);
     construction
       .append('g')
       .attr('class', this.classes.highlights.constructionGroup);
