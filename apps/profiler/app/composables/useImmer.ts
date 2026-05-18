@@ -2,12 +2,18 @@ import {
   applyPatches,
   enablePatches,
   produceWithPatches,
+  setAutoFreeze,
   type Draft,
   type Patch,
 } from 'immer';
 import { computed, ref, shallowRef } from 'vue';
 
 enablePatches();
+// Immer freezes output by default. Frozen objects have non-configurable/non-writable
+// properties, which causes JS Proxy invariant violations inside makeDeepProxy's get
+// trap (it returns a wrapped proxy instead of the actual value). Disabling freeze
+// avoids this while keeping all produce/patch semantics intact.
+setAutoFreeze(false);
 
 export interface UseImmerOptions {
   maxHistory?: number;

@@ -83,14 +83,6 @@ const viewOptions = computed(() => [
   },
   { value: 'dados', label: t('editor.viewData'), icon: 'ph:table-duotone' },
 ]);
-
-onMounted(() => {
-  console.log('Editor mounted, store state:', store.well);
-  setTimeout(() => {
-    console.log('Simulating well load after 6 seconds...');
-    store.well.name = 'Example Well';
-  }, 6000);
-});
 </script>
 
 <template>
