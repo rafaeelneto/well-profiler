@@ -3,7 +3,7 @@ import * as pdfMake from 'pdfmake/build/pdfmake';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts';
 import { encode as encodeQR } from 'uqr';
 
-import { SvgInfo, infoType } from '../../../src_old/types/profile2Export.types';
+import { infoType, SvgInfo } from '../../../src_old/types/profile2Export.types';
 
 import { Profile } from '@/src/types/profile.types';
 
@@ -14,9 +14,9 @@ import { DeepPartial, RenderConfig, WellRenderer } from '@welldot/render';
 import { calculateHoleFillVolume } from '@welldot/utils';
 import {
   A4_SVG_HEIGHT,
+  buildSvgProfiles,
   PDF_CONTENT_WIDTH,
   PDF_MARGINS,
-  buildSvgProfiles,
 } from './buildSvgProfiles';
 
 const numberFormater = new Intl.NumberFormat('pt-BR', {
@@ -83,6 +83,68 @@ function qrSvg(text: string, sizePt: number): string {
     )
     .join('');
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${sizePt} ${sizePt}"><rect width="${sizePt}" height="${sizePt}" fill="white"/><g fill="#222">${rects}</g></svg>`;
+}
+
+function buildFooterContent(breakPages = true) {
+  return {
+    // ...(breakPages ? { text: '  ' } : {}),
+    stack: [
+      {
+        canvas: [
+          {
+            type: 'line',
+            x1: 0,
+            y1: 0,
+            x2: 535,
+            y2: 0,
+            lineWidth: 0.5,
+            lineColor: '#cccccc',
+          },
+        ],
+        margin: [0, 0, 0, 5],
+      },
+      {
+        columns: [
+          {
+            text: `.well v1 - ${format(new Date(), 'yyyy-MM-dd')}`,
+            font: 'jetBrainsMono',
+            fontSize: 7,
+            color: '#404040',
+            width: 84,
+            alignment: 'left',
+          },
+          {
+            text: 'wellprofiler.com',
+            font: 'spaceGrotesk',
+            fontSize: 7,
+            color: '#494949',
+            alignment: 'center',
+            width: '*',
+          },
+          {
+            columns: [
+              {
+                text: 'veja esse\nperfil online',
+                font: 'spaceGrotesk',
+                fontSize: 7,
+                color: '#494949',
+                alignment: 'right',
+                width: 46,
+              },
+              {
+                svg: qrSvg('https://wellprofiler.com', 34),
+                width: 34,
+                height: 34,
+              },
+            ],
+            columnGap: 4,
+            width: 84,
+          },
+        ],
+      },
+    ],
+    margin: breakPages ? [30, 10, 30, 10] : [0, 0, 0, 0],
+  };
 }
 
 function base64ToBlob(base64String, contentType = '') {
@@ -255,9 +317,15 @@ export const exportPdfProfile = async (
       width: 595.28,
       height: breakPages ? 841.89 : 'auto',
     },
-    pageMargins: [MARGIN, MARGIN + 10, MARGIN, MARGIN + 30],
+    pageMargins: [
+      MARGIN,
+      MARGIN + (breakPages ? 10 : 0),
+      MARGIN,
+      MARGIN + (breakPages ? 30 : 0),
+    ],
+
     header: (currentPage: any, _pageCount: any, pageSize: any) => {
-      // you can apply any logic and return any valid pdfmake element
+      console.log('header', { currentPage, pageSize });
       return [
         {
           stack: [
@@ -330,64 +398,8 @@ export const exportPdfProfile = async (
       ];
     },
     footer: (_currentPage: any, _pageCount: any) => {
-      return {
-        stack: [
-          {
-            canvas: [
-              {
-                type: 'line',
-                x1: 0,
-                y1: 0,
-                x2: 535,
-                y2: 0,
-                lineWidth: 0.5,
-                lineColor: '#cccccc',
-              },
-            ],
-            margin: [0, 0, 0, 5],
-          },
-          {
-            columns: [
-              {
-                text: `.well v1 - ${format(new Date(), 'yyyy-MM-dd')}`,
-                font: 'jetBrainsMono',
-                fontSize: 7,
-                color: '#404040',
-                width: 84,
-                alignment: 'left',
-              },
-              {
-                text: 'wellprofiler.com',
-                font: 'spaceGrotesk',
-                fontSize: 7,
-                color: '#494949',
-                alignment: 'center',
-                width: '*',
-              },
-              {
-                columns: [
-                  {
-                    text: 'veja esse\nperfil online',
-                    font: 'spaceGrotesk',
-                    fontSize: 7,
-                    color: '#494949',
-                    alignment: 'right',
-                    width: 46,
-                  },
-                  {
-                    svg: qrSvg('https://wellprofiler.com', 34),
-                    width: 34,
-                    height: 34,
-                  },
-                ],
-                columnGap: 4,
-                width: 84,
-              },
-            ],
-          },
-        ],
-        margin: [30, 10, 30, 10],
-      };
+      if (!breakPages) return undefined;
+      return buildFooterContent();
     },
     styles: {
       title: {
@@ -914,6 +926,10 @@ export const exportPdfProfile = async (
     });
   }
 
+  if (!breakPages) {
+    content.push(buildFooterContent(false));
+  }
+
   docDefinition.content = content;
 
   // @ts-ignore
@@ -946,8 +962,9 @@ export const innerRenderPdf = async (
     renderConfig,
   );
 
+  // console.log('Generated docDefinition for printing:', docDefinition);
+
   try {
-    const pdfDocGenerator = pdfMake.createPdf(docDefinition);
     const pdfDataUrl = await pdfMake.createPdf(docDefinition).getDataUrl();
 
     const blobUrl = base64ToBlob(pdfDataUrl, 'application/pdf');
@@ -985,6 +1002,7 @@ export const printPdf = async (
     metadataPosition,
     renderConfig,
   );
+  // console.log('Generated docDefinition for printing:', docDefinition);
   // @ts-ignore
   const pdfDocGenerator = pdfMake.createPdf(docDefinition);
   pdfDocGenerator.print();
