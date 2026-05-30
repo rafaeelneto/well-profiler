@@ -12,7 +12,7 @@ const viewport = useViewport();
 
 const isMobile = computed(() => viewport.isLessThan('lg'));
 const mobileView = ref<'perfil' | 'dados'>('dados');
-const activeTabKey = ref<string>('0');
+const activeTabKey = ref<string>('1');
 
 const tabs = computed(() => [
   {

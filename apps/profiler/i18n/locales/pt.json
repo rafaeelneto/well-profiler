@@ -212,6 +212,18 @@
       "out": "Reduzir",
       "fit": "Ajustar"
     },
+    "construction": {
+      "tag": "Construtivo · Poço",
+      "boreHole": {
+        "title": "Poço (Sondagem)",
+        "from": "De (m)",
+        "to": "Até (m)",
+        "diameter": "Diâm. (mm)",
+        "drillingMethod": "Método",
+        "addRow": "Adicionar trecho",
+        "empty": "Nenhum trecho cadastrado"
+      }
+    },
     "general": {
       "generalInfo": "Informações Gerais",
       "location": "Localização",

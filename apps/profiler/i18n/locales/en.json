@@ -212,6 +212,18 @@
       "out": "Zoom out",
       "fit": "Fit"
     },
+    "construction": {
+      "tag": "Construction · Well",
+      "boreHole": {
+        "title": "Bore Hole",
+        "from": "From (m)",
+        "to": "To (m)",
+        "diameter": "Diam. (mm)",
+        "drillingMethod": "Method",
+        "addRow": "Add bore hole",
+        "empty": "No bore hole intervals yet"
+      }
+    },
     "general": {
       "generalInfo": "General Information",
       "location": "Location",
