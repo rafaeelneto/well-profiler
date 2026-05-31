@@ -29,6 +29,7 @@ const boreHoleColumns = computed<WellGridColumn[]>(() => [
     prop: 'drilling_method',
     label: t('editor.construction.boreHole.drillingMethod'),
     type: 'text',
+    stretch: true,
   },
 ]);
 
@@ -68,9 +69,6 @@ function reorderBoreHole(from: number, to: number) {
       @change="updateBoreHole"
       @reorder="reorderBoreHole"
     >
-      <template #empty>
-        {{ t('editor.construction.boreHole.empty') }}
-      </template>
     </WellDataGrid>
     <Button
       :label="t('editor.construction.boreHole.addRow')"
