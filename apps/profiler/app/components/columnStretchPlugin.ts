@@ -2,7 +2,7 @@ import type { ColumnProp, DimensionCols } from '@revolist/revogrid';
 import type { PluginProviders } from '@revolist/vue3-datagrid';
 import { BasePlugin } from '@revolist/vue3-datagrid';
 
-const MIN_SIZE = 50;
+const FALLBACK_MIN_SIZE = 50;
 const DEFAULT_COL_SIZE = 150;
 
 /**
@@ -10,9 +10,9 @@ const DEFAULT_COL_SIZE = 150;
  * column filling all horizontal space left over by the other columns.
  *
  * Usage:
- *   plugins: [columnStretchPlugin('myProp')]
+ *   plugins: [columnStretchPlugin('myProp', 120)]
  */
-export function columnStretchPlugin(stretchProp: ColumnProp) {
+export function columnStretchPlugin(stretchProp: ColumnProp, minSize = FALLBACK_MIN_SIZE) {
   return class extends BasePlugin {
     private ro: ResizeObserver;
     private raf: number | null = null;
@@ -48,7 +48,7 @@ export function columnStretchPlugin(stretchProp: ColumnProp) {
         .filter(c => c.prop !== stretchProp)
         .reduce((sum, c) => sum + (c.size ?? DEFAULT_COL_SIZE), 0);
 
-      const newSize = Math.max(MIN_SIZE, gridWidth - otherWidth);
+      const newSize = Math.max(minSize, gridWidth - otherWidth);
       if (newSize === target.size) return;
 
       const type = (target.pin ?? 'rgCol') as DimensionCols;

@@ -37,6 +37,8 @@ export interface WellGridColumn {
   pin?: 'colPinStart' | 'colPinEnd';
   /** Stretch this column to absorb all remaining grid width */
   stretch?: boolean;
+  /** Minimum width (px) for a stretch column (default 50) */
+  minSize?: number;
 }
 
 // ─── Props / Emits ────────────────────────────────────────────────────────────
@@ -65,9 +67,8 @@ const gridEditors = {
   number: VGridVueEditor(GridNumberEditor),
 };
 
-const stretchProp = computed(
-  () => props.columns.find(c => c.stretch)?.prop ?? null,
-);
+const stretchCol = computed(() => props.columns.find(c => c.stretch) ?? null);
+const stretchProp = computed(() => stretchCol.value?.prop ?? null);
 
 const gridStretch = computed(() => stretchProp.value === null);
 
@@ -86,7 +87,7 @@ const plugins = computed(() => {
     },
   ];
   if (stretchProp.value !== null) {
-    list.push(columnStretchPlugin(stretchProp.value));
+    list.push(columnStretchPlugin(stretchProp.value, stretchCol.value?.minSize));
   }
   return list;
 });

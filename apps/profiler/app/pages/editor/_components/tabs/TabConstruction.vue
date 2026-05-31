@@ -30,6 +30,7 @@ const boreHoleColumns = computed<WellGridColumn[]>(() => [
     label: t('editor.construction.boreHole.drillingMethod'),
     type: 'text',
     stretch: true,
+    minSize: 200,
   },
 ]);
 
