@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import VGrid, {
   BasePlugin,
+  VGridVueEditor,
   type PluginProviders,
 } from '@revolist/vue3-datagrid';
+import GridTextEditor from './GridTextEditor.vue';
+import GridNumberEditor from './GridNumberEditor.vue';
 import { columnStretchPlugin } from './columnStretchPlugin';
 import type {
   AfterEditEvent,
@@ -11,7 +14,6 @@ import type {
   CellTemplateProp,
   HyperFunc,
   VNode,
-  FocusedEvent,
 } from '@revolist/revogrid';
 
 // ─── Public column-definition interface ──────────────────────────────────────
@@ -57,6 +59,11 @@ const emit = defineEmits<{
 }>();
 
 // ─── Row drag handle (left row-header) ───────────────────────────────────────
+
+const gridEditors = {
+  text: VGridVueEditor(GridTextEditor),
+  number: VGridVueEditor(GridNumberEditor),
+};
 
 const stretchProp = computed(
   () => props.columns.find(c => c.stretch)?.prop ?? null,
@@ -172,6 +179,8 @@ const gridHeight = computed(() => {
 
 function handleAfterEdit(event: CustomEvent<AfterEditEvent>) {
   const detail = event.detail;
+
+  console.log(event.detail);
   // Narrow to single-cell edit (BeforeSaveDataDetails has rowIndex + prop)
   if (!('rowIndex' in detail)) return;
   const { rowIndex, prop, val } = detail as BeforeSaveDataDetails;
@@ -197,6 +206,7 @@ function handleRowOrderChanged(
           :stretch="gridStretch"
           :source="gridSource"
           :columns="revoColumns"
+          :editors="gridEditors"
           :plugins="plugins"
           :range="true"
           can-drag
@@ -226,11 +236,15 @@ function handleRowOrderChanged(
    Token map: --font-mono, --color-surface-*, --color-content-*, --color-primary-*
    ────────────────────────────────────────────────────────────────────────── */
 
+revogr-attribution {
+  display: none !important;
+}
+
 revo-grid {
   --revo-grid-font: var(--font-mono);
   --revo-border-color: var(--color-surface-200);
-  font-family: var(--font-mono);
-  font-size: 11px;
+  font-family: var(--font-mono) !important;
+  font-size: 11px !important;
   color: var(--color-content-0);
   border: 1px solid var(--color-surface-200);
   border-radius: 8px;
@@ -281,19 +295,46 @@ revo-grid .rgCell.num {
   font-variant-numeric: tabular-nums;
 }
 
-/* In-cell editor */
-revo-grid .rgCell input,
-revo-grid input.edit-input-field {
+/* ── PrimeVue cell editors ────────────────────────────────────────────────── */
+
+/* Editor renders in revogr-edit which is a portal outside revo-grid */
+revogr-edit input {
+  font-family: var(--font-mono) !important;
+  font-size: 11px !important;
+  color: var(--color-content-0) !important;
+}
+
+/* InputText root IS the <input>; InputNumber pcInput root is also the <input> */
+revo-grid .well-cell-input {
   width: 100%;
   height: 100%;
-  border: 0;
-  outline: 0;
-  background: var(--color-surface-0);
-  font: inherit;
-  font-family: var(--font-mono);
-  color: var(--color-content-0);
-  padding: 0 8px;
-  box-shadow: inset 0 0 0 1.5px var(--color-primary-500);
+  border: none !important;
+  border-radius: 0 !important;
+  background: var(--color-surface-0) !important;
+  box-shadow: inset 0 0 0 1.5px var(--color-primary-500) !important;
+  font-family: var(--font-mono) !important;
+  font-size: 11px !important;
+  color: var(--color-content-0) !important;
+  padding: 0 8px !important;
+  outline: none !important;
+}
+
+/* InputNumber wrapper div must fill the cell */
+revo-grid .well-cell-input-number {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: stretch;
+  text-align: right !important;
+}
+
+revogr-edit .well-cell-input-number input {
+  text-align: right !important;
+}
+
+/* Numeric cells — right-align */
+revo-grid .rgCell.num .well-cell-input {
+  text-align: left;
 }
 
 /* Focus ring */
