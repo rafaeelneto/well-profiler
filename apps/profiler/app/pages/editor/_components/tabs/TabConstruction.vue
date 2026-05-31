@@ -69,12 +69,8 @@ function reorderBoreHole(from: number, to: number) {
       @delete="deleteBoreHole"
       @change="updateBoreHole"
       @reorder="reorderBoreHole"
+      :add-label="t('editor.construction.boreHole.addRow')"
     >
     </WellDataGrid>
-    <Button
-      :label="t('editor.construction.boreHole.addRow')"
-      outlined
-      @click="addBoreHole"
-    />
   </div>
 </template>

@@ -47,6 +47,8 @@ const props = defineProps<{
   /** Reactive array from the store (via deep-proxy or plain copy). */
   rows: Record<string, unknown>[];
   columns: WellGridColumn[];
+  /** Label for the add-row button */
+  addLabel?: string;
 }>();
 
 const emit = defineEmits<{
@@ -87,7 +89,9 @@ const plugins = computed(() => {
     },
   ];
   if (stretchProp.value !== null) {
-    list.push(columnStretchPlugin(stretchProp.value, stretchCol.value?.minSize));
+    list.push(
+      columnStretchPlugin(stretchProp.value, stretchCol.value?.minSize),
+    );
   }
   return list;
 });
@@ -223,6 +227,18 @@ function handleRowOrderChanged(
         </template>
       </ClientOnly>
     </div>
+
+    <Button
+      unstyled
+      class="well-grid-add-btn"
+      type="button"
+      @click="emit('add')"
+      :label="addLabel ?? 'Add row'"
+    >
+      <template #icon>
+        <Icon name="ph:plus" />
+      </template>
+    </Button>
   </div>
 </template>
 
@@ -233,6 +249,41 @@ function handleRowOrderChanged(
 </style>
 
 <style>
+/* ── Welldot design tokens ────────────────────────────────────────────────
+   Light and dark values for all tokens used by the grid below.
+   --accent-soft is tuned for row hover/selected fills — readable in both modes.
+   ────────────────────────────────────────────────────────────────────────── */
+
+:root {
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --font-display: 'Space Grotesk', system-ui, sans-serif;
+  --color-surface-0: #ffffff;
+  --color-surface-50: #f6f4ee;
+  --color-surface-100: #ebe7da;
+  --color-surface-200: #d8dde3;
+  --color-surface-300: #b9c0c8;
+  --color-content-0: #0e1e33;
+  --color-content-300: #2b3d56;
+  --color-content-500: #6a7588;
+  --color-primary-500: oklch(48% 0.13 235);
+  --color-primary-soft: oklch(96% 0.02 235);
+  --accent-soft: oklch(96% 0.02 235);
+}
+
+[data-theme='dark'] {
+  --color-surface-0: #131922;
+  --color-surface-50: rgba(36, 48, 68, 0.4);
+  --color-surface-100: #243049;
+  --color-surface-200: #2a3344;
+  --color-surface-300: #3d4a60;
+  --color-content-0: #e8eef5;
+  --color-content-300: #b6c1d0;
+  --color-content-500: #7888a0;
+  --color-primary-500: oklch(72% 0.13 235);
+  --color-primary-soft: oklch(28% 0.06 235);
+  --accent-soft: oklch(28% 0.06 235);
+}
+
 /* ── RevoGrid → welldot theme ─────────────────────────────────────────────
    Token map: --font-mono, --color-surface-*, --color-content-*, --color-primary-*
    ────────────────────────────────────────────────────────────────────────── */
@@ -275,14 +326,14 @@ revo-grid .rgCell {
   color: var(--color-content-0);
 }
 
-/* Row states */
+/* Row states — --accent-soft is tuned for legibility in both light and dark */
 revo-grid .rgRow:hover .rgCell {
-  background: color-mix(in srgb, var(--color-primary-500) 5%, transparent);
+  background: var(--accent-soft);
 }
 
 revo-grid .rgRow.focused-rgRow .rgCell,
 revo-grid .rgRow[selected] .rgCell {
-  background: color-mix(in srgb, var(--color-primary-500) 5%, transparent);
+  background: var(--accent-soft);
 }
 
 /* Accent rail on first cell of selected row */
@@ -410,5 +461,48 @@ revo-grid .well-grid-delete-btn:hover {
   opacity: 1;
   color: oklch(50% 0.2 25);
   background-color: color-mix(in srgb, oklch(50% 0.2 25) 8%, transparent);
+}
+
+/* ── Add-row button ──────────────────────────────────────────────────────── */
+
+.well-grid-add-btn {
+  align-self: flex-start;
+  margin-top: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+
+  padding: 6px 14px;
+  min-height: 32px;
+  border-radius: 999px;
+  border: 1px dashed var(--color-surface-300);
+  background: var(--color-surface-50);
+  color: var(--color-content-300);
+
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition:
+    background 120ms ease,
+    color 120ms ease,
+    border-color 120ms ease;
+}
+
+.well-grid-add-btn:hover {
+  background: var(--color-surface-100);
+  color: var(--color-content-0);
+  border-color: var(--color-content-0);
+}
+
+.well-grid-add-btn:active {
+  transform: translateY(0.5px);
+}
+
+.well-grid-add-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--color-primary-soft);
+  border-color: var(--color-primary-500);
 }
 </style>
