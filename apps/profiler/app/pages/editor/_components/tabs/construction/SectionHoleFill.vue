@@ -35,6 +35,7 @@ const holeFillColumns = computed<WellGridColumn[]>(() => [
   {
     prop: 'type',
     label: t('editor.construction.holeFill.type'),
+    type: 'select',
     size: 150,
     options: holeFillTypeOptions.value,
   },

@@ -8,6 +8,7 @@ import VGrid, {
 import GridTextEditor from './GridTextEditor.vue';
 import GridNumberEditor from './GridNumberEditor.vue';
 import GridUnitEditor from './GridUnitEditor.vue';
+import GridSelectEditor from './GridSelectEditor.vue';
 import { metersToFeet, mmToInches } from '@welldot/core';
 import { columnStretchPlugin } from './columnStretchPlugin';
 import type {
@@ -22,15 +23,13 @@ import type {
 // ─── Public column-definition interface ──────────────────────────────────────
 // Consumers import this type to declare columns for any well feature array.
 
-export interface WellGridColumn {
+type WellGridColumnBase = {
   /** Object key on the row model */
   prop: string;
   /** Pre-translated header label */
   label: string;
   /** Column width in px (default 150) */
   size?: number;
-  /** Input type — drives default editor */
-  type?: 'text' | 'number';
   /** Prevent editing */
   readonly?: boolean;
   /** Override the RevoGrid editor key */
@@ -44,9 +43,11 @@ export interface WellGridColumn {
   stretch?: boolean;
   /** Minimum width (px) for a stretch column (default 50) */
   minSize?: number;
-  /** Render an inline <select> for this column instead of a text editor */
-  options?: Array<{ label: string; value: string }>;
-}
+};
+
+export type WellGridColumn =
+  | (WellGridColumnBase & { type?: 'text' | 'number' })
+  | (WellGridColumnBase & { type: 'select'; options: Array<{ label: string; value: string }> });
 
 // ─── Props / Emits ────────────────────────────────────────────────────────────
 
@@ -80,12 +81,27 @@ function unitEditorFactory(unitType: 'length' | 'diameter') {
   });
 }
 
-const gridEditors = {
-  text: VGridVueEditor(GridTextEditor),
-  number: VGridVueEditor(GridNumberEditor),
-  length: VGridVueEditor(unitEditorFactory('length')),
-  diameter: VGridVueEditor(unitEditorFactory('diameter')),
-};
+function selectEditorFactory(options: Array<{ label: string; value: string }>) {
+  return defineComponent({
+    props: ['val', 'save', 'close'],
+    setup: (p: any) => () => h(GridSelectEditor, { ...p, options }),
+  });
+}
+
+const gridEditors = computed(() => {
+  const editors: Record<string, unknown> = {
+    text: VGridVueEditor(GridTextEditor),
+    number: VGridVueEditor(GridNumberEditor),
+    length: VGridVueEditor(unitEditorFactory('length')),
+    diameter: VGridVueEditor(unitEditorFactory('diameter')),
+  };
+  for (const col of props.columns) {
+    if (col.type === 'select') {
+      editors[`select_${col.prop}`] = VGridVueEditor(selectEditorFactory(col.options));
+    }
+  }
+  return editors;
+});
 
 const stretchCol = computed(() => props.columns.find(c => c.stretch) ?? null);
 const stretchProp = computed(() => stretchCol.value?.prop ?? null);
@@ -119,15 +135,22 @@ const revoColumns = computed<ColumnRegular[]>(() => {
   const onDelete = (rowIndex: number) => emit('delete', rowIndex);
 
   const dataCols: ColumnRegular[] = props.columns.map(col => {
+    const unit = col.unitType === 'length'
+      ? uiStore.lengthUnit
+      : col.unitType === 'diameter'
+        ? uiStore.diameterUnit
+        : null;
     const revoCol: ColumnRegular = {
       prop: col.prop,
-      name: col.label,
+      name: unit ? `${col.label} (${unit})` : col.label,
       autoSize: !col.size && !col.stretch,
       size: col.size,
       readonly: col.readonly ?? false,
       editor: col.readonly
         ? undefined
-        : (col.unitType ?? col.editor ?? (col.type === 'number' ? 'number' : 'text')),
+        : col.type === 'select'
+          ? `select_${col.prop}`
+          : (col.unitType ?? col.editor ?? (col.type === 'number' ? 'number' : 'text')),
       pin: col.pin,
       cellProperties:
         col.type === 'number' || col.unitType
@@ -178,28 +201,17 @@ const revoColumns = computed<ColumnRegular[]>(() => {
       };
     }
 
-    if (col.options) {
+    if (col.type === 'select') {
       const opts = col.options;
-      const prop = col.prop;
-      revoCol.readonly = true;
-      revoCol.editor = undefined;
       revoCol.cellTemplate = (
         _h: HyperFunc<VNode>,
         cellProps: CellTemplateProp,
       ) => {
+        const match = opts.find(o => o.value === cellProps.value);
         return _h(
-          'select',
-          {
-            class: 'well-grid-select-cell',
-            value: cellProps.value,
-            onChange: (e: Event) => {
-              emit('change', cellProps.rowIndex, prop, (e.target as HTMLSelectElement).value);
-            },
-            onClick: (e: MouseEvent) => e.stopPropagation(),
-          },
-          opts.map(opt =>
-            _h('option', { value: opt.value, selected: cellProps.value === opt.value }, opt.label),
-          ),
+          'span',
+          { class: 'well-grid-cell-formatted' },
+          match?.label ?? String(cellProps.value ?? ''),
         );
       };
     }
@@ -538,25 +550,29 @@ revo-grid .well-grid-delete-btn:hover {
   background-color: color-mix(in srgb, oklch(50% 0.2 25) 8%, transparent);
 }
 
-/* ── Inline select (enum columns) ────────────────────────────────────────── */
+/* ── PrimeVue Select editor (enum columns) ───────────────────────────────── */
 
-revo-grid .well-grid-select-cell {
+revogr-edit .well-cell-select.p-select {
   width: 100%;
   height: 100%;
   border: none;
-  background: transparent;
+  border-radius: 0;
+  background: var(--color-surface-0);
+  box-shadow: inset 0 0 0 1.5px var(--color-primary-500);
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+revogr-edit .well-cell-select .p-select-label {
+  padding: 0 8px;
   font-family: var(--font-mono);
   font-size: 11px;
   color: var(--color-content-0);
-  padding: 0 8px;
-  cursor: pointer;
-  appearance: none;
-  -webkit-appearance: none;
-  outline: none;
 }
 
-revo-grid .well-grid-select-cell:focus {
-  box-shadow: inset 0 0 0 1.5px var(--color-primary-500);
+revogr-edit .well-cell-select .p-select-dropdown {
+  width: 24px;
+  color: var(--color-content-500);
 }
 
 /* ── Add-row button ──────────────────────────────────────────────────────── */

@@ -232,9 +232,9 @@
       "boreHole": {
         "title": "Bore Hole",
         "tag": "BORE HOLE",
-        "from": "From (m)",
-        "to": "To (m)",
-        "diameter": "Diam. (mm)",
+        "from": "From",
+        "to": "To",
+        "diameter": "Diam.",
         "drillingMethod": "Method",
         "addRow": "Add bore hole",
         "empty": "No bore hole intervals yet"
@@ -242,26 +242,26 @@
       "surfaceCase": {
         "title": "Surface Casing",
         "tag": "SURFACE CASING",
-        "from": "From (m)",
-        "to": "To (m)",
-        "diameter": "Diam. (mm)",
+        "from": "From",
+        "to": "To",
+        "diameter": "Diam.",
         "addRow": "Add surface casing"
       },
       "wellCase": {
         "title": "Casing",
         "tag": "CASING",
-        "from": "From (m)",
-        "to": "To (m)",
-        "diameter": "Diam. (mm)",
+        "from": "From",
+        "to": "To",
+        "diameter": "Diam.",
         "type": "Type / Material",
         "addRow": "Add casing"
       },
       "wellScreen": {
         "title": "Screen",
         "tag": "SCREEN",
-        "from": "From (m)",
-        "to": "To (m)",
-        "diameter": "Diam. (mm)",
+        "from": "From",
+        "to": "To",
+        "diameter": "Diam.",
         "screenSlot": "Slot (mm)",
         "type": "Type",
         "addRow": "Add screen"
@@ -269,9 +269,9 @@
       "holeFill": {
         "title": "Hole Fill",
         "tag": "GROUTING · PRE-FILTER",
-        "from": "From (m)",
-        "to": "To (m)",
-        "diameter": "Diam. (mm)",
+        "from": "From",
+        "to": "To",
+        "diameter": "Diam.",
         "type": "Type",
         "description": "Description",
         "addRow": "Add fill interval",
