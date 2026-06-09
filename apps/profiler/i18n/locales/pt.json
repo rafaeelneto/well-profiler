@@ -214,14 +214,71 @@
     },
     "construction": {
       "tag": "Construtivo · Poço",
+      "wellhead": {
+        "title": "Boca do Poço",
+        "tag": "Superfície · Estruturas",
+        "cementPad": "Laje de Proteção Sanitária",
+        "type": "Tipo",
+        "width": "Largura (m)",
+        "length": "Comprimento (m)",
+        "thickness": "Espessura (m)",
+        "typeOptions": {
+          "concrete": "Concreto",
+          "reinforcedConcrete": "Concreto Armado",
+          "cement": "Cimento",
+          "mortar": "Argamassa"
+        }
+      },
       "boreHole": {
         "title": "Poço (Sondagem)",
+        "tag": "FURO",
         "from": "De (m)",
         "to": "Até (m)",
         "diameter": "Diâm. (mm)",
         "drillingMethod": "Método",
         "addRow": "Adicionar trecho",
         "empty": "Nenhum trecho cadastrado"
+      },
+      "surfaceCase": {
+        "title": "Tubo de Boca",
+        "tag": "REVEST. DE SUPERFÍCIE",
+        "from": "De (m)",
+        "to": "Até (m)",
+        "diameter": "Diâm. (mm)",
+        "addRow": "Adicionar trecho"
+      },
+      "wellCase": {
+        "title": "Revestimento",
+        "tag": "TUBULAÇÃO",
+        "from": "De (m)",
+        "to": "Até (m)",
+        "diameter": "Diâm. (mm)",
+        "type": "Tipo / Material",
+        "addRow": "Adicionar revestimento"
+      },
+      "wellScreen": {
+        "title": "Filtro",
+        "tag": "FILTROS",
+        "from": "De (m)",
+        "to": "Até (m)",
+        "diameter": "Diâm. (mm)",
+        "screenSlot": "Slot (mm)",
+        "type": "Tipo",
+        "addRow": "Adicionar filtro"
+      },
+      "holeFill": {
+        "title": "Espaço Anular",
+        "tag": "CIMENTAÇÃO · PRÉ-FILTRO",
+        "from": "De (m)",
+        "to": "Até (m)",
+        "diameter": "Diâm. (mm)",
+        "type": "Tipo",
+        "description": "Descrição",
+        "addRow": "Adicionar intervalo",
+        "typeOptions": {
+          "gravelPack": "Pré-filtro",
+          "seal": "Cimentação"
+        }
       }
     },
     "general": {

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { h, defineComponent } from 'vue';
 import VGrid, {
   BasePlugin,
   VGridVueEditor,
@@ -6,6 +7,8 @@ import VGrid, {
 } from '@revolist/vue3-datagrid';
 import GridTextEditor from './GridTextEditor.vue';
 import GridNumberEditor from './GridNumberEditor.vue';
+import GridUnitEditor from './GridUnitEditor.vue';
+import { metersToFeet, mmToInches } from '@welldot/core';
 import { columnStretchPlugin } from './columnStretchPlugin';
 import type {
   AfterEditEvent,
@@ -32,6 +35,8 @@ export interface WellGridColumn {
   readonly?: boolean;
   /** Override the RevoGrid editor key */
   editor?: string;
+  /** Unit-aware column — auto-converts to/from canonical units (m ↔ ft, mm ↔ inches) */
+  unitType?: 'length' | 'diameter';
   /** Display-only formatter — bypasses the editor */
   formatter?: (value: unknown, row: Record<string, unknown>) => string;
   pin?: 'colPinStart' | 'colPinEnd';
@@ -39,6 +44,8 @@ export interface WellGridColumn {
   stretch?: boolean;
   /** Minimum width (px) for a stretch column (default 50) */
   minSize?: number;
+  /** Render an inline <select> for this column instead of a text editor */
+  options?: Array<{ label: string; value: string }>;
 }
 
 // ─── Props / Emits ────────────────────────────────────────────────────────────
@@ -62,11 +69,22 @@ const emit = defineEmits<{
   reorder: [from: number, to: number];
 }>();
 
-// ─── Row drag handle (left row-header) ───────────────────────────────────────
+const uiStore = useUiStore();
+
+// ─── Editor registry ──────────────────────────────────────────────────────────
+
+function unitEditorFactory(unitType: 'length' | 'diameter') {
+  return defineComponent({
+    props: ['val', 'save', 'close'],
+    setup: (p: any) => () => h(GridUnitEditor, { ...p, unitType }),
+  });
+}
 
 const gridEditors = {
   text: VGridVueEditor(GridTextEditor),
   number: VGridVueEditor(GridNumberEditor),
+  length: VGridVueEditor(unitEditorFactory('length')),
+  diameter: VGridVueEditor(unitEditorFactory('diameter')),
 };
 
 const stretchCol = computed(() => props.columns.find(c => c.stretch) ?? null);
@@ -109,10 +127,12 @@ const revoColumns = computed<ColumnRegular[]>(() => {
       readonly: col.readonly ?? false,
       editor: col.readonly
         ? undefined
-        : (col.editor ?? (col.type === 'number' ? 'number' : 'text')),
+        : (col.unitType ?? col.editor ?? (col.type === 'number' ? 'number' : 'text')),
       pin: col.pin,
       cellProperties:
-        col.type === 'number' ? () => ({ class: 'num' }) : undefined,
+        col.type === 'number' || col.unitType
+          ? () => ({ class: 'num' })
+          : undefined,
     };
 
     if (col.formatter) {
@@ -125,6 +145,61 @@ const revoColumns = computed<ColumnRegular[]>(() => {
           'span',
           { class: 'well-grid-cell-formatted' },
           fmt(cellProps.value, cellProps.model as Record<string, unknown>),
+        );
+      };
+    }
+
+    if (col.unitType) {
+      const unitType = col.unitType;
+      const unit = unitType === 'length' ? uiStore.lengthUnit : uiStore.diameterUnit;
+      revoCol.cellTemplate = (
+        _h: HyperFunc<VNode>,
+        cellProps: CellTemplateProp,
+      ) => {
+        const raw = cellProps.value;
+        if (raw === null || raw === undefined || raw === '') {
+          return _h('span', { class: 'well-grid-cell-formatted' }, '—');
+        }
+        const canonical = Number(raw);
+        if (isNaN(canonical)) {
+          return _h('span', { class: 'well-grid-cell-formatted' }, '—');
+        }
+        let display: number;
+        if (unitType === 'length') {
+          display = unit === 'ft' ? metersToFeet(canonical) : canonical;
+        } else {
+          display = unit === 'inches' ? mmToInches(canonical) : canonical;
+        }
+        return _h(
+          'span',
+          { class: 'well-grid-cell-formatted' },
+          `${Number(display.toFixed(4))} ${unit}`,
+        );
+      };
+    }
+
+    if (col.options) {
+      const opts = col.options;
+      const prop = col.prop;
+      revoCol.readonly = true;
+      revoCol.editor = undefined;
+      revoCol.cellTemplate = (
+        _h: HyperFunc<VNode>,
+        cellProps: CellTemplateProp,
+      ) => {
+        return _h(
+          'select',
+          {
+            class: 'well-grid-select-cell',
+            value: cellProps.value,
+            onChange: (e: Event) => {
+              emit('change', cellProps.rowIndex, prop, (e.target as HTMLSelectElement).value);
+            },
+            onClick: (e: MouseEvent) => e.stopPropagation(),
+          },
+          opts.map(opt =>
+            _h('option', { value: opt.value, selected: cellProps.value === opt.value }, opt.label),
+          ),
         );
       };
     }
@@ -461,6 +536,27 @@ revo-grid .well-grid-delete-btn:hover {
   opacity: 1;
   color: oklch(50% 0.2 25);
   background-color: color-mix(in srgb, oklch(50% 0.2 25) 8%, transparent);
+}
+
+/* ── Inline select (enum columns) ────────────────────────────────────────── */
+
+revo-grid .well-grid-select-cell {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: transparent;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--color-content-0);
+  padding: 0 8px;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  outline: none;
+}
+
+revo-grid .well-grid-select-cell:focus {
+  box-shadow: inset 0 0 0 1.5px var(--color-primary-500);
 }
 
 /* ── Add-row button ──────────────────────────────────────────────────────── */

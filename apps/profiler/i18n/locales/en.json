@@ -214,14 +214,71 @@
     },
     "construction": {
       "tag": "Construction · Well",
+      "wellhead": {
+        "title": "Wellhead",
+        "tag": "Surface · Structures",
+        "cementPad": "Sanitary Protection Slab",
+        "type": "Type",
+        "width": "Width (m)",
+        "length": "Length (m)",
+        "thickness": "Thickness (m)",
+        "typeOptions": {
+          "concrete": "Concrete",
+          "reinforcedConcrete": "Reinforced Concrete",
+          "cement": "Cement",
+          "mortar": "Mortar"
+        }
+      },
       "boreHole": {
         "title": "Bore Hole",
+        "tag": "BORE HOLE",
         "from": "From (m)",
         "to": "To (m)",
         "diameter": "Diam. (mm)",
         "drillingMethod": "Method",
         "addRow": "Add bore hole",
         "empty": "No bore hole intervals yet"
+      },
+      "surfaceCase": {
+        "title": "Surface Casing",
+        "tag": "SURFACE CASING",
+        "from": "From (m)",
+        "to": "To (m)",
+        "diameter": "Diam. (mm)",
+        "addRow": "Add surface casing"
+      },
+      "wellCase": {
+        "title": "Casing",
+        "tag": "CASING",
+        "from": "From (m)",
+        "to": "To (m)",
+        "diameter": "Diam. (mm)",
+        "type": "Type / Material",
+        "addRow": "Add casing"
+      },
+      "wellScreen": {
+        "title": "Screen",
+        "tag": "SCREEN",
+        "from": "From (m)",
+        "to": "To (m)",
+        "diameter": "Diam. (mm)",
+        "screenSlot": "Slot (mm)",
+        "type": "Type",
+        "addRow": "Add screen"
+      },
+      "holeFill": {
+        "title": "Hole Fill",
+        "tag": "GROUTING · PRE-FILTER",
+        "from": "From (m)",
+        "to": "To (m)",
+        "diameter": "Diam. (mm)",
+        "type": "Type",
+        "description": "Description",
+        "addRow": "Add fill interval",
+        "typeOptions": {
+          "gravelPack": "Gravel Pack",
+          "seal": "Seal"
+        }
       }
     },
     "general": {

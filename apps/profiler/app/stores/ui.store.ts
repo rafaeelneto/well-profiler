@@ -1,18 +1,18 @@
-import { defineStore } from 'pinia'
-import type { LengthUnits, DiameterUnits } from '@welldot/core'
+import type { DiameterUnits, LengthUnits } from '@welldot/core';
+import { defineStore } from 'pinia';
 
-export type CoordinateFormat = 'DD' | 'DMS'
+export type CoordinateFormat = 'DD' | 'DMS';
 
 export const useUiStore = defineStore(
   'ui',
   () => {
-    const lengthUnit = ref<LengthUnits>('m')
-    const diameterUnit = ref<DiameterUnits>('mm')
-    const coordinateFormat = ref<CoordinateFormat>('DD')
+    const lengthUnit = ref<LengthUnits>('m');
+    const diameterUnit = ref<DiameterUnits>('mm');
+    const coordinateFormat = ref<CoordinateFormat>('DD');
 
-    return { lengthUnit, diameterUnit, coordinateFormat }
+    return { lengthUnit, diameterUnit, coordinateFormat };
   },
   {
     persist: { key: 'welldot_ui' },
   },
-)
+);
