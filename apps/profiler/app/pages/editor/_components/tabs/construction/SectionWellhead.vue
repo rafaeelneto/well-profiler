@@ -1,6 +1,17 @@
 <script setup lang="ts">
 const { t } = useI18n();
 const profileStore = useProfileStore();
+const uiStore = useUiStore();
+
+const widthLabel = computed(
+  () => `${t('editor.construction.wellhead.width')} (${uiStore.lengthUnit})`,
+);
+const lengthLabel = computed(
+  () => `${t('editor.construction.wellhead.length')} (${uiStore.lengthUnit})`,
+);
+const thicknessLabel = computed(
+  () => `${t('editor.construction.wellhead.thickness')} (${uiStore.lengthUnit})`,
+);
 
 const hasCementPad = computed(
   () => (profileStore.well.cement_pad?.thickness ?? 0) > 0,
@@ -87,18 +98,20 @@ const cementPadTypeOptions = computed(() => [
       </Field>
 
       <div class="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-4">
-        <Field :label="t('editor.construction.wellhead.width')">
-          <InputNumber
+        <Field :label="widthLabel">
+          <UnitInput
+            unit-type="length"
             v-model="profileStore.well.cement_pad!.width"
-            :max-fraction-digits="4"
+            :min="0"
             class="w-full"
             :pt="{ pcInput: { root: 'w-full font-mono text-sm' } }"
           />
         </Field>
-        <Field :label="t('editor.construction.wellhead.length')">
-          <InputNumber
+        <Field :label="lengthLabel">
+          <UnitInput
+            unit-type="length"
             v-model="profileStore.well.cement_pad!.length"
-            :max-fraction-digits="4"
+            :min="0"
             class="w-full"
             :pt="{ pcInput: { root: 'w-full font-mono text-sm' } }"
           />
@@ -106,10 +119,11 @@ const cementPadTypeOptions = computed(() => [
       </div>
 
       <div class="grid grid-cols-2 gap-4">
-        <Field :label="t('editor.construction.wellhead.thickness')">
-          <InputNumber
+        <Field :label="thicknessLabel">
+          <UnitInput
+            unit-type="length"
             v-model="profileStore.well.cement_pad!.thickness"
-            :max-fraction-digits="4"
+            :min="0"
             class="w-full"
             :pt="{ pcInput: { root: 'w-full font-mono text-sm' } }"
           />

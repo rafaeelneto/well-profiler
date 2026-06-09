@@ -69,6 +69,10 @@ const lngPlaceholder = computed(() =>
     ? t('editor.general.lngPlaceholderDms')
     : t('editor.general.lngPlaceholderDd'),
 );
+
+const elevationLabel = computed(
+  () => `${t('editor.general.elevation')} (${uiStore.lengthUnit})`,
+);
 </script>
 
 <template>
@@ -116,8 +120,9 @@ const lngPlaceholder = computed(() =>
         />
       </Field>
 
-      <Field :label="t('editor.general.elevation')">
-        <InputNumber
+      <Field :label="elevationLabel">
+        <UnitInput
+          unit-type="length"
           v-model="elevation"
           class="w-full"
           :max-fraction-digits="3"
