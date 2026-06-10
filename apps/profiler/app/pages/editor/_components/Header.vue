@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useDark } from '@vueuse/core';
 import ShareProfile from '~/components/ShareProfile.vue';
+import SettingsModal from '~/components/SettingsModal.vue';
 
 const props = defineProps<{ mobileView: 'perfil' | 'dados' }>();
 const emit = defineEmits<{
@@ -10,13 +10,6 @@ const emit = defineEmits<{
 const { t } = useI18n();
 const store = useProfileStore();
 const { download } = useProfileExport();
-
-const isDark = useDark({
-  selector: 'html',
-  attribute: 'class',
-  valueDark: 'dark-mode',
-  valueLight: '',
-});
 
 // ── Store-derived computeds ─────────────────────────────────────────
 const hasWell = computed(() => !!store.well);
@@ -51,19 +44,10 @@ function saveFile() {
 // ── Share dialog ────────────────────────────────────────────────────
 const shareVisible = ref(false);
 
-// ── Pass-through ────────────────────────────────────────────────────
-const togglePt = {
-  root: {
-    class: [
-      'size-8 rounded-lg border flex items-center justify-center cursor-pointer',
-      'transition-colors duration-200 outline-none',
-      'focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-1',
-      'border-surface-200 text-content-400',
-      'hover:border-surface-300 hover:text-content-0',
-    ],
-  },
-};
+// ── Settings dialog ─────────────────────────────────────────────────
+const settingsVisible = ref(false);
 
+// ── Pass-through ────────────────────────────────────────────────────
 const actionBtnPt = {
   root: {
     class: [
@@ -171,30 +155,20 @@ const viewOptions = computed(() => [
           <Icon name="ph:share-network-duotone" class="size-4 shrink-0" />
         </template>
       </Button>
+      <Button
+        :label="t('editor.settings.title')"
+        unstyled
+        :pt="actionBtnPt"
+        @click="settingsVisible = true"
+      >
+        <template #icon>
+          <Icon name="ph:gear-six-duotone" class="size-4 shrink-0" />
+        </template>
+      </Button>
     </div>
 
     <!-- Divider -->
     <div class="w-px h-5 bg-surface-200/80 shrink-0" />
-
-    <!-- Dark mode toggle -->
-    <ToggleButton
-      v-model="isDark"
-      :on-label="''"
-      :off-label="''"
-      :aria-label="isDark ? t('nav.theme.light') : t('nav.theme.dark')"
-      unstyled
-      :pt="togglePt"
-    >
-      <Transition name="icon-rotate" mode="out-in">
-        <Icon
-          v-if="isDark"
-          key="sun"
-          name="heroicons:sun"
-          class="size-4 shrink-0"
-        />
-        <Icon v-else key="moon" name="heroicons:moon" class="size-4 shrink-0" />
-      </Transition>
-    </ToggleButton>
 
     <!-- Export PDF (primary CTA) -->
     <Button :label="t('editor.exportPdf')" :disabled="!hasWell" size="small">
@@ -229,9 +203,10 @@ const viewOptions = computed(() => [
 
       <button
         class="size-8 rounded-full border border-surface-200 flex items-center justify-center text-content-400 hover:text-content-0 hover:border-surface-300 transition-colors shrink-0"
-        :aria-label="t('editor.menu')"
+        :aria-label="t('editor.settings.title')"
+        @click="settingsVisible = true"
       >
-        <Icon name="ph:dots-three-vertical" class="size-4" />
+        <Icon name="ph:gear-six-duotone" class="size-4" />
       </button>
     </div>
 
@@ -275,6 +250,9 @@ const viewOptions = computed(() => [
 
   <!-- ─── Share dialog ──────────────────────────────────────────────── -->
   <ShareProfile v-model="shareVisible" />
+
+  <!-- ─── Settings dialog ───────────────────────────────────────────── -->
+  <SettingsModal v-model="settingsVisible" />
 
   <!-- ─── Hidden file input ─────────────────────────────────────────── -->
   <ClientOnly>

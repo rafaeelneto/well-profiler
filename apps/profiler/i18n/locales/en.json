@@ -183,6 +183,23 @@
     "exportPdf": "Export PDF",
     "back": "Back",
     "menu": "Menu",
+    "settings": {
+      "title": "Settings",
+      "units": {
+        "title": "Units",
+        "length": "Length",
+        "diameter": "Diameter"
+      },
+      "coordinates": {
+        "title": "Coordinates",
+        "format": "Format"
+      },
+      "appearance": {
+        "title": "Appearance",
+        "theme": "Theme",
+        "language": "Language"
+      }
+    },
     "viewProfile": "Profile",
     "viewData": "Data",
     "tabs": {

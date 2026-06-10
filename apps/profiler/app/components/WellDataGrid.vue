@@ -47,7 +47,10 @@ type WellGridColumnBase = {
 
 export type WellGridColumn =
   | (WellGridColumnBase & { type?: 'text' | 'number' })
-  | (WellGridColumnBase & { type: 'select'; options: Array<{ label: string; value: string }> });
+  | (WellGridColumnBase & {
+      type: 'select';
+      options: Array<{ label: string; value: string }>;
+    });
 
 // ─── Props / Emits ────────────────────────────────────────────────────────────
 
@@ -97,7 +100,9 @@ const gridEditors = computed(() => {
   };
   for (const col of props.columns) {
     if (col.type === 'select') {
-      editors[`select_${col.prop}`] = VGridVueEditor(selectEditorFactory(col.options));
+      editors[`select_${col.prop}`] = VGridVueEditor(
+        selectEditorFactory(col.options),
+      );
     }
   }
   return editors;
@@ -135,11 +140,12 @@ const revoColumns = computed<ColumnRegular[]>(() => {
   const onDelete = (rowIndex: number) => emit('delete', rowIndex);
 
   const dataCols: ColumnRegular[] = props.columns.map(col => {
-    const unit = col.unitType === 'length'
-      ? uiStore.lengthUnit
-      : col.unitType === 'diameter'
-        ? uiStore.diameterUnit
-        : null;
+    const unit =
+      col.unitType === 'length'
+        ? uiStore.lengthUnit
+        : col.unitType === 'diameter'
+          ? uiStore.diameterUnit
+          : null;
     const revoCol: ColumnRegular = {
       prop: col.prop,
       name: unit ? `${col.label} (${unit})` : col.label,
@@ -150,7 +156,9 @@ const revoColumns = computed<ColumnRegular[]>(() => {
         ? undefined
         : col.type === 'select'
           ? `select_${col.prop}`
-          : (col.unitType ?? col.editor ?? (col.type === 'number' ? 'number' : 'text')),
+          : (col.unitType ??
+            col.editor ??
+            (col.type === 'number' ? 'number' : 'text')),
       pin: col.pin,
       cellProperties:
         col.type === 'number' || col.unitType
@@ -174,7 +182,8 @@ const revoColumns = computed<ColumnRegular[]>(() => {
 
     if (col.unitType) {
       const unitType = col.unitType;
-      const unit = unitType === 'length' ? uiStore.lengthUnit : uiStore.diameterUnit;
+      const unit =
+        unitType === 'length' ? uiStore.lengthUnit : uiStore.diameterUnit;
       revoCol.cellTemplate = (
         _h: HyperFunc<VNode>,
         cellProps: CellTemplateProp,
@@ -336,41 +345,6 @@ function handleRowOrderChanged(
 </style>
 
 <style>
-/* ── Welldot design tokens ────────────────────────────────────────────────
-   Light and dark values for all tokens used by the grid below.
-   --accent-soft is tuned for row hover/selected fills — readable in both modes.
-   ────────────────────────────────────────────────────────────────────────── */
-
-:root {
-  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
-  --font-display: 'Space Grotesk', system-ui, sans-serif;
-  --color-surface-0: #ffffff;
-  --color-surface-50: #f6f4ee;
-  --color-surface-100: #ebe7da;
-  --color-surface-200: #d8dde3;
-  --color-surface-300: #b9c0c8;
-  --color-content-0: #0e1e33;
-  --color-content-300: #2b3d56;
-  --color-content-500: #6a7588;
-  --color-primary-500: oklch(48% 0.13 235);
-  --color-primary-soft: oklch(96% 0.02 235);
-  --accent-soft: oklch(96% 0.02 235);
-}
-
-[data-theme='dark'] {
-  --color-surface-0: #131922;
-  --color-surface-50: rgba(36, 48, 68, 0.4);
-  --color-surface-100: #243049;
-  --color-surface-200: #2a3344;
-  --color-surface-300: #3d4a60;
-  --color-content-0: #e8eef5;
-  --color-content-300: #b6c1d0;
-  --color-content-500: #7888a0;
-  --color-primary-500: oklch(72% 0.13 235);
-  --color-primary-soft: oklch(28% 0.06 235);
-  --accent-soft: oklch(28% 0.06 235);
-}
-
 /* ── RevoGrid → welldot theme ─────────────────────────────────────────────
    Token map: --font-mono, --color-surface-*, --color-content-*, --color-primary-*
    ────────────────────────────────────────────────────────────────────────── */
