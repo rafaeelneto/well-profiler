@@ -4,6 +4,7 @@ import SectionBoreHole from './construction/SectionBoreHole.vue';
 import SectionSurfaceCase from './construction/SectionSurfaceCase.vue';
 import SectionHoleFill from './construction/SectionHoleFill.vue';
 import SectionWellCase from './construction/SectionWellCase.vue';
+import SectionReduction from './construction/SectionReduction.vue';
 import SectionWellScreen from './construction/SectionWellScreen.vue';
 </script>
 
@@ -21,6 +22,7 @@ import SectionWellScreen from './construction/SectionWellScreen.vue';
 
     <SectionHoleFill />
     <SectionWellCase />
+    <SectionReduction />
     <SectionWellScreen />
   </div>
 </template>
