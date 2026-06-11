@@ -3,6 +3,7 @@ import { h, defineComponent } from 'vue';
 import VGrid, {
   BasePlugin,
   VGridVueEditor,
+  VGridVueTemplate,
   type PluginProviders,
 } from '@revolist/vue3-datagrid';
 import GridTextEditor from './GridTextEditor.vue';
@@ -10,15 +11,18 @@ import GridNumberEditor from './GridNumberEditor.vue';
 import GridUnitEditor from './GridUnitEditor.vue';
 import GridSelectEditor from './GridSelectEditor.vue';
 import GridColorPickerEditor from './GridColorPickerEditor.vue';
-import { metersToFeet, mmToInches } from '@welldot/core';
+import GridUnitCell from './GridUnitCell.vue';
+import GridColorCell from './GridColorCell.vue';
+import GridSelectCell from './GridSelectCell.vue';
+import GridFormattedCell from './GridFormattedCell.vue';
 import { columnStretchPlugin } from './columnStretchPlugin';
+import GridDeleteCell from './GridDeleteCell.vue';
 import type {
   AfterEditEvent,
   BeforeSaveDataDetails,
+  ColumnProp,
   ColumnRegular,
-  CellTemplateProp,
-  HyperFunc,
-  VNode,
+  FocusAfterRenderEvent,
 } from '@revolist/revogrid';
 
 // ─── Public column-definition interface ──────────────────────────────────────
@@ -136,19 +140,79 @@ const plugins = computed(() => {
   }
   return list;
 });
+// ─── Column kinds ──────────────────────────────────────────────────────────
+// Declares how each column "kind" renders and edits, mirroring `gridEditors`.
+// `resolveColumnKind` decides which kind a column declaration maps to.
+
+type ColumnKind =
+  | 'text'
+  | 'number'
+  | 'length'
+  | 'diameter'
+  | 'color'
+  | 'select'
+  | 'formatted';
+
+interface ColumnKindDef {
+  editor?: (col: WellGridColumn) => string;
+  numeric?: boolean;
+  cellTemplate?: (col: WellGridColumn) => ColumnRegular['cellTemplate'];
+}
+
+const columnKinds: Record<ColumnKind, ColumnKindDef> = {
+  text: {},
+  number: { numeric: true },
+  length: {
+    editor: () => 'length',
+    numeric: true,
+    cellTemplate: () => VGridVueTemplate(GridUnitCell, { unitType: 'length' }),
+  },
+  diameter: {
+    editor: () => 'diameter',
+    numeric: true,
+    cellTemplate: () =>
+      VGridVueTemplate(GridUnitCell, { unitType: 'diameter' }),
+  },
+  color: {
+    editor: () => 'color',
+    cellTemplate: () => VGridVueTemplate(GridColorCell),
+  },
+  select: {
+    editor: col => `select_${col.prop}`,
+    cellTemplate: col =>
+      VGridVueTemplate(GridSelectCell, {
+        options: (col as Extract<WellGridColumn, { type: 'select' }>).options,
+      }),
+  },
+  formatted: {
+    cellTemplate: col =>
+      VGridVueTemplate(GridFormattedCell, { formatter: col.formatter }),
+  },
+};
+
+function resolveColumnKind(col: WellGridColumn): ColumnKind {
+  if (col.type === 'select') return 'select';
+  if (col.type === 'color') return 'color';
+  if (col.unitType) return col.unitType;
+  if (col.formatter) return 'formatted';
+  return col.type === 'number' ? 'number' : 'text';
+}
+
+const unitLabels: Record<'length' | 'diameter', () => string> = {
+  length: () => uiStore.lengthUnit,
+  diameter: () => uiStore.diameterUnit,
+};
+
 // ─── Column definitions ───────────────────────────────────────────────────────
 
 const revoColumns = computed<ColumnRegular[]>(() => {
   const onDelete = (rowIndex: number) => emit('delete', rowIndex);
 
   const dataCols: ColumnRegular[] = props.columns.map(col => {
-    const unit =
-      col.unitType === 'length'
-        ? uiStore.lengthUnit
-        : col.unitType === 'diameter'
-          ? uiStore.diameterUnit
-          : null;
-    const revoCol: ColumnRegular = {
+    const kind = columnKinds[resolveColumnKind(col)];
+    const unit = col.unitType ? unitLabels[col.unitType]() : null;
+
+    return {
       prop: col.prop,
       name: unit ? `${col.label} (${unit})` : col.label,
       autoSize: !col.size && !col.stretch,
@@ -156,96 +220,13 @@ const revoColumns = computed<ColumnRegular[]>(() => {
       readonly: col.readonly ?? false,
       editor: col.readonly
         ? undefined
-        : col.type === 'select'
-          ? `select_${col.prop}`
-          : col.type === 'color'
-            ? 'color'
-            : (col.unitType ??
-              col.editor ??
-              (col.type === 'number' ? 'number' : 'text')),
+        : (kind.editor?.(col) ??
+          col.editor ??
+          (col.type === 'number' ? 'number' : 'text')),
       pin: col.pin,
-      cellProperties:
-        col.type === 'number' || col.unitType
-          ? () => ({ class: 'num' })
-          : undefined,
+      cellProperties: kind.numeric ? () => ({ class: 'num' }) : undefined,
+      cellTemplate: kind.cellTemplate?.(col),
     };
-
-    if (col.formatter) {
-      const fmt = col.formatter;
-      revoCol.cellTemplate = (
-        _h: HyperFunc<VNode>,
-        cellProps: CellTemplateProp,
-      ) => {
-        return _h(
-          'span',
-          { class: 'well-grid-cell-formatted' },
-          fmt(cellProps.value, cellProps.model as Record<string, unknown>),
-        );
-      };
-    }
-
-    if (col.unitType) {
-      const unitType = col.unitType;
-      const unit =
-        unitType === 'length' ? uiStore.lengthUnit : uiStore.diameterUnit;
-      revoCol.cellTemplate = (
-        _h: HyperFunc<VNode>,
-        cellProps: CellTemplateProp,
-      ) => {
-        const raw = cellProps.value;
-        if (raw === null || raw === undefined || raw === '') {
-          return _h('span', { class: 'well-grid-cell-formatted' }, '—');
-        }
-        const canonical = Number(raw);
-        if (isNaN(canonical)) {
-          return _h('span', { class: 'well-grid-cell-formatted' }, '—');
-        }
-        let display: number;
-        if (unitType === 'length') {
-          display = unit === 'ft' ? metersToFeet(canonical) : canonical;
-        } else {
-          display = unit === 'inches' ? mmToInches(canonical) : canonical;
-        }
-        return _h(
-          'span',
-          { class: 'well-grid-cell-formatted' },
-          `${Number(display.toFixed(4))} ${unit}`,
-        );
-      };
-    }
-
-    if (col.type === 'color') {
-      revoCol.cellTemplate = (
-        _h: HyperFunc<VNode>,
-        cellProps: CellTemplateProp,
-      ) => {
-        const value = (cellProps.value as string) ?? '';
-        return _h('span', { class: 'well-grid-cell-color' }, [
-          _h('span', {
-            class: 'well-grid-color-swatch',
-            style: { backgroundColor: value },
-          }),
-          _h('span', {}, value),
-        ]);
-      };
-    }
-
-    if (col.type === 'select') {
-      const opts = col.options;
-      revoCol.cellTemplate = (
-        _h: HyperFunc<VNode>,
-        cellProps: CellTemplateProp,
-      ) => {
-        const match = opts.find(o => o.value === cellProps.value);
-        return _h(
-          'span',
-          { class: 'well-grid-cell-formatted' },
-          match?.label ?? String(cellProps.value ?? ''),
-        );
-      };
-    }
-
-    return revoCol;
   });
 
   const deleteCol: ColumnRegular = {
@@ -255,15 +236,9 @@ const revoColumns = computed<ColumnRegular[]>(() => {
     readonly: true,
     pin: 'colPinEnd',
     cellProperties: () => ({ class: 'well-grid-delete-cell' }),
-    cellTemplate: (h: HyperFunc<VNode>, cellProps: CellTemplateProp) =>
-      h('button', {
-        class: 'well-grid-delete-btn',
-        type: 'button',
-        onClick: (e: MouseEvent) => {
-          e.stopPropagation();
-          onDelete(cellProps.rowIndex);
-        },
-      }),
+    cellTemplate: VGridVueTemplate(GridDeleteCell, {
+      requestDelete: onDelete,
+    }),
   };
 
   return [
@@ -314,11 +289,68 @@ function handleRowOrderChanged(
   console.log('Row order changed:', event.detail);
   emit('reorder', event.detail.from, event.detail.to);
 }
+
+// ─── Click-on-focused-cell → enter edit mode ───────────────────────────────
+// `afterfocus` only fires when focus moves to a new cell. A click that
+// triggers such a focus change is suppressed; a second click on the cell
+// that's already focused enters edit mode for it.
+
+const gridContainerRef = ref<HTMLElement | null>(null);
+const focusedCell = ref<{
+  rowIndex: number;
+  colIndex: number;
+  prop: ColumnProp;
+} | null>(null);
+let suppressNextClick = false;
+
+function handleAfterFocus(event: CustomEvent<FocusAfterRenderEvent>) {
+  const { rowIndex, colIndex, column } = event.detail;
+  focusedCell.value = column ? { rowIndex, colIndex, prop: column.prop } : null;
+  suppressNextClick = true;
+}
+
+function handleGridMousedown() {
+  suppressNextClick = false;
+}
+
+function handleGridClick(event: MouseEvent) {
+  if (suppressNextClick) {
+    suppressNextClick = false;
+    return;
+  }
+  const cell = focusedCell.value;
+  if (!cell) return;
+
+  const target = (event.target as HTMLElement).closest<HTMLElement>(
+    '[data-rgrow][data-rgcol]',
+  );
+  if (!target) return;
+  if (
+    Number(target.dataset.rgrow) !== cell.rowIndex ||
+    Number(target.dataset.rgcol) !== cell.colIndex
+  ) {
+    return;
+  }
+
+  const col = props.columns.find(c => c.prop === cell.prop);
+  if (!col || col.readonly) return;
+
+  const gridEl = gridContainerRef.value?.querySelector('revo-grid') as
+    | HTMLRevoGridElement
+    | undefined;
+  gridEl?.setCellEdit(cell.rowIndex, cell.prop);
+}
 </script>
 
 <template>
   <div class="well-data-grid-wrapper flex flex-col">
-    <div v-show="rows.length > 0" class="well-grid-container">
+    <div
+      v-show="rows.length > 0"
+      ref="gridContainerRef"
+      class="well-grid-container"
+      @mousedown.capture="handleGridMousedown"
+      @click="handleGridClick"
+    >
       <ClientOnly>
         <VGrid
           class="well-data-grid"
@@ -333,6 +365,7 @@ function handleRowOrderChanged(
           can-drag
           theme="compact"
           @afteredit="handleAfterEdit"
+          @afterfocus="handleAfterFocus"
           @roworderchanged="handleRowOrderChanged"
         />
 
@@ -569,24 +602,19 @@ revogr-edit .well-cell-select .p-select-dropdown {
   color: var(--color-content-500);
 }
 
-/* ── Color column (cell + editor trigger) ────────────────────────────────── */
+/* ── Color editor trigger ─────────────────────────────────────────────────── */
 
-revo-grid .well-grid-cell-color,
 revogr-edit .well-cell-color-trigger {
   display: flex;
   align-items: center;
   gap: 6px;
   width: 100%;
   height: 100%;
-}
-
-revogr-edit .well-cell-color-trigger {
   padding: 0 8px;
   box-shadow: inset 0 0 0 1.5px var(--color-primary-500);
   background: var(--color-surface-0);
 }
 
-.well-grid-color-swatch,
 .well-cell-color-swatch {
   display: inline-block;
   width: 12px;

@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { metersToFeet, feetToMeters, mmToInches, inchesToMm } from '@welldot/core'
-
 const props = defineProps<{
   val?: unknown
   save: (value: any, preventFocus?: boolean) => void
@@ -8,27 +6,9 @@ const props = defineProps<{
   unitType: 'length' | 'diameter'
 }>()
 
-const uiStore = useUiStore()
-
-const displayUnit = computed(() =>
-  props.unitType === 'length' ? uiStore.lengthUnit : uiStore.diameterUnit,
-)
+const { unit: displayUnit, toDisplay, toCanonical } = useUnitDisplay(props.unitType)
 
 const suffix = computed(() => ` ${displayUnit.value}`)
-
-function toDisplay(canonical: number): number {
-  if (props.unitType === 'length') {
-    return uiStore.lengthUnit === 'ft' ? metersToFeet(canonical) : canonical
-  }
-  return uiStore.diameterUnit === 'inches' ? mmToInches(canonical) : canonical
-}
-
-function toCanonical(display: number): number {
-  if (props.unitType === 'length') {
-    return uiStore.lengthUnit === 'ft' ? feetToMeters(display) : display
-  }
-  return uiStore.diameterUnit === 'inches' ? inchesToMm(display) : display
-}
 
 const numRef = ref<{ $el: HTMLElement } | null>(null)
 
