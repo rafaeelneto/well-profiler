@@ -308,6 +308,40 @@
         }
       }
     },
+    "geological": {
+      "tag": "Geológico · Poço",
+      "lithology": {
+        "title": "Litologia",
+        "tag": "LITOLOGIA",
+        "from": "De",
+        "to": "Até",
+        "color": "Cor",
+        "texture": "Textura",
+        "geologicUnit": "Geol.",
+        "aquiferUnit": "Aquífero",
+        "description": "Descrição",
+        "addRow": "Adicionar camada"
+      },
+      "fractures": {
+        "title": "Fraturas",
+        "tag": "FRATURAS",
+        "depth": "Prof.",
+        "dip": "Merg.",
+        "azimuth": "Azim.",
+        "waterIntake": "Água",
+        "description": "Descrição",
+        "addRow": "Adicionar fratura"
+      },
+      "caves": {
+        "title": "Cavernas",
+        "tag": "CAVERNAS",
+        "from": "De",
+        "to": "Até",
+        "waterIntake": "Água",
+        "description": "Descrição",
+        "addRow": "Adicionar caverna"
+      }
+    },
     "general": {
       "generalInfo": "Informações Gerais",
       "location": "Localização",

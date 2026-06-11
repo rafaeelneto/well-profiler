@@ -308,6 +308,40 @@
         }
       }
     },
+    "geological": {
+      "tag": "Geological · Well",
+      "lithology": {
+        "title": "Lithology",
+        "tag": "LITHOLOGY",
+        "from": "From",
+        "to": "To",
+        "color": "Color",
+        "texture": "Texture",
+        "geologicUnit": "Geol.",
+        "aquiferUnit": "Aquifer",
+        "description": "Description",
+        "addRow": "Add layer"
+      },
+      "fractures": {
+        "title": "Fractures",
+        "tag": "FRACTURES",
+        "depth": "Depth",
+        "dip": "Dip",
+        "azimuth": "Azimuth",
+        "waterIntake": "Water",
+        "description": "Description",
+        "addRow": "Add fracture"
+      },
+      "caves": {
+        "title": "Caves",
+        "tag": "CAVES",
+        "from": "From",
+        "to": "To",
+        "waterIntake": "Water",
+        "description": "Description",
+        "addRow": "Add cave"
+      }
+    },
     "general": {
       "generalInfo": "General Information",
       "location": "Location",

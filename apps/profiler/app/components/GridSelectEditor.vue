@@ -33,6 +33,7 @@ function onKeydown(e: KeyboardEvent) {
     option-label="label"
     option-value="value"
     append-to="body"
+    :filter="options.length > 8"
     :pt="{
       root: 'well-cell-select',
       label: 'flex items-center',
