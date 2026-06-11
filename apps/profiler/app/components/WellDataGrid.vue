@@ -9,6 +9,7 @@ import GridTextEditor from './GridTextEditor.vue';
 import GridNumberEditor from './GridNumberEditor.vue';
 import GridUnitEditor from './GridUnitEditor.vue';
 import GridSelectEditor from './GridSelectEditor.vue';
+import GridColorPickerEditor from './GridColorPickerEditor.vue';
 import { metersToFeet, mmToInches } from '@welldot/core';
 import { columnStretchPlugin } from './columnStretchPlugin';
 import type {
@@ -46,7 +47,7 @@ type WellGridColumnBase = {
 };
 
 export type WellGridColumn =
-  | (WellGridColumnBase & { type?: 'text' | 'number' })
+  | (WellGridColumnBase & { type?: 'text' | 'number' | 'color' })
   | (WellGridColumnBase & {
       type: 'select';
       options: Array<{ label: string; value: string }>;
@@ -95,6 +96,7 @@ const gridEditors = computed(() => {
   const editors: Record<string, unknown> = {
     text: VGridVueEditor(GridTextEditor),
     number: VGridVueEditor(GridNumberEditor),
+    color: VGridVueEditor(GridColorPickerEditor),
     length: VGridVueEditor(unitEditorFactory('length')),
     diameter: VGridVueEditor(unitEditorFactory('diameter')),
   };
@@ -156,9 +158,11 @@ const revoColumns = computed<ColumnRegular[]>(() => {
         ? undefined
         : col.type === 'select'
           ? `select_${col.prop}`
-          : (col.unitType ??
-            col.editor ??
-            (col.type === 'number' ? 'number' : 'text')),
+          : col.type === 'color'
+            ? 'color'
+            : (col.unitType ??
+              col.editor ??
+              (col.type === 'number' ? 'number' : 'text')),
       pin: col.pin,
       cellProperties:
         col.type === 'number' || col.unitType
@@ -207,6 +211,22 @@ const revoColumns = computed<ColumnRegular[]>(() => {
           { class: 'well-grid-cell-formatted' },
           `${Number(display.toFixed(4))} ${unit}`,
         );
+      };
+    }
+
+    if (col.type === 'color') {
+      revoCol.cellTemplate = (
+        _h: HyperFunc<VNode>,
+        cellProps: CellTemplateProp,
+      ) => {
+        const value = (cellProps.value as string) ?? '';
+        return _h('span', { class: 'well-grid-cell-color' }, [
+          _h('span', {
+            class: 'well-grid-color-swatch',
+            style: { backgroundColor: value },
+          }),
+          _h('span', {}, value),
+        ]);
       };
     }
 
@@ -547,6 +567,39 @@ revogr-edit .well-cell-select .p-select-label {
 revogr-edit .well-cell-select .p-select-dropdown {
   width: 24px;
   color: var(--color-content-500);
+}
+
+/* ── Color column (cell + editor trigger) ────────────────────────────────── */
+
+revo-grid .well-grid-cell-color,
+revogr-edit .well-cell-color-trigger {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  height: 100%;
+}
+
+revogr-edit .well-cell-color-trigger {
+  padding: 0 8px;
+  box-shadow: inset 0 0 0 1.5px var(--color-primary-500);
+  background: var(--color-surface-0);
+}
+
+.well-grid-color-swatch,
+.well-cell-color-swatch {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+  border-radius: 3px;
+  border: 1px solid var(--color-surface-300);
+}
+
+.well-cell-color-hex {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--color-content-0);
 }
 
 /* ── Add-row button ──────────────────────────────────────────────────────── */
