@@ -371,6 +371,65 @@
         "artesian": "Artesian",
         "handDug": "Hand dug"
       }
+    },
+    "summary": {
+      "tag": "Overview · Volumes",
+      "kpis": {
+        "depth": "Total Depth",
+        "layers": "Layers",
+        "screen": "Screen"
+      },
+      "boreHole": {
+        "title": "Bore Hole",
+        "tag": "DRILLING",
+        "diameter": "Diam.",
+        "from": "From",
+        "to": "To",
+        "length": "Length",
+        "total": "Drilled depth"
+      },
+      "surfaceCase": {
+        "title": "Surface Casing",
+        "tag": "SURFACE CASING",
+        "diameter": "Diam.",
+        "from": "From",
+        "to": "To",
+        "length": "Length",
+        "total": "Total"
+      },
+      "casing": {
+        "title": "Casing",
+        "tag": "CASING · SCREEN",
+        "type": "Type",
+        "diameter": "Diam.",
+        "from": "From",
+        "to": "To",
+        "length": "Length",
+        "kindCase": "Casing",
+        "kindScreen": "Screen",
+        "total": "Total cased length"
+      },
+      "holeFill": {
+        "title": "Annular Space",
+        "tag": "GROUTING · PRE-FILTER",
+        "description": "Description",
+        "diameter": "Diam.",
+        "from": "From",
+        "to": "To",
+        "volume": "Volume",
+        "groupSeal": "Seal",
+        "groupGravelPack": "Pre-filter",
+        "groupTotal": "{group} · total volume"
+      },
+      "lithology": {
+        "title": "Lithology",
+        "tag": "BY GEOLOGIC UNIT",
+        "unit": "Unit",
+        "layers": "Layers",
+        "from": "From",
+        "to": "To",
+        "thickness": "Thickness"
+      }
     }
   }
 }

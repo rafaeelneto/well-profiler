@@ -371,6 +371,65 @@
         "artesian": "Artesiano",
         "handDug": "Escavado"
       }
+    },
+    "summary": {
+      "tag": "Visão geral · Volumes",
+      "kpis": {
+        "depth": "Prof. Total",
+        "layers": "Camadas",
+        "screen": "Filtro"
+      },
+      "boreHole": {
+        "title": "Furo",
+        "tag": "PERFURAÇÃO",
+        "diameter": "Diâm.",
+        "from": "De",
+        "to": "Até",
+        "length": "Trecho",
+        "total": "Profundidade perfurada"
+      },
+      "surfaceCase": {
+        "title": "Tubo de Boca",
+        "tag": "REVEST. SUPERFÍCIE",
+        "diameter": "Diâm.",
+        "from": "De",
+        "to": "Até",
+        "length": "Trecho",
+        "total": "Total"
+      },
+      "casing": {
+        "title": "Revestimento",
+        "tag": "TUBULAÇÃO · FILTROS",
+        "type": "Tipo",
+        "diameter": "Diâm.",
+        "from": "De",
+        "to": "Até",
+        "length": "Trecho",
+        "kindCase": "Revestimento",
+        "kindScreen": "Filtro",
+        "total": "Total revestido"
+      },
+      "holeFill": {
+        "title": "Espaço Anular",
+        "tag": "CIMENTAÇÃO · PRÉ-FILTRO",
+        "description": "Descrição",
+        "diameter": "Diâm.",
+        "from": "De",
+        "to": "Até",
+        "volume": "Volume",
+        "groupSeal": "Selo",
+        "groupGravelPack": "Pré-filtro",
+        "groupTotal": "{group} · volume total"
+      },
+      "lithology": {
+        "title": "Litologia",
+        "tag": "POR UNIDADE GEOLÓGICA",
+        "unit": "Unidade",
+        "layers": "Camadas",
+        "from": "De",
+        "to": "Até",
+        "thickness": "Espessura"
+      }
     }
   }
 }

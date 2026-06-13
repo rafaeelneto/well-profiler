@@ -125,16 +125,66 @@ export function calculateCylindricVolume(
 }
 
 /**
+ * Calculates the net annular volume of a single hole-fill segment, accounting
+ * for the space taken by casings and screens that overlap it.
+ *
+ * The gross cylindrical volume of the fill annulus is computed first. Any
+ * well-case or well-screen section that overlaps the fill interval is then
+ * subtracted (clipped to the overlapping length) to yield the true net volume.
+ *
+ * The result is in **cubic meters (m³)** — diameters are converted from mm
+ * internally via {@link calculateCylindricVolume}.
+ *
+ * @param fill - The hole-fill segment to compute the volume of.
+ * @param profile - The well providing the well_case/well_screen sections to
+ *   subtract.
+ * @returns Net volume (m³) of `fill`, possibly negative if its diameter is
+ *   smaller than an overlapping casing/screen.
+ */
+export function calculateHoleFillSegmentVolume(
+  fill: HoleFill,
+  profile: Well,
+): number {
+  const { well_case: wellCase, well_screen: wellScreen } = profile;
+
+  let outerVolume = calculateCylindricVolume(
+    fill.diameter,
+    fill.to - fill.from,
+  );
+
+  for (let i = 0; i < wellCase.length; i++) {
+    const wC = wellCase[i] as DepthRange;
+
+    if (!(wC.from > fill.to || wC.to < fill.from)) {
+      let { from, to } = fill;
+      if (wC.from > fill.from) from = wC.from;
+      if (wC.to < fill.to) to = wC.to;
+
+      outerVolume -= calculateCylindricVolume(wC.diameter, to - from);
+    }
+  }
+
+  for (let i = 0; i < wellScreen.length; i++) {
+    const wS = wellScreen[i] as DepthRange;
+
+    if (!(wS.from > fill.to || wS.to < fill.from)) {
+      let { from, to } = fill;
+      if (wS.from > fill.from) from = wS.from;
+      if (wS.to < fill.to) to = wS.to;
+
+      outerVolume -= calculateCylindricVolume(wS.diameter, to - from);
+    }
+  }
+
+  return outerVolume;
+}
+
+/**
  * Calculates the net annular volume occupied by a specific hole-fill type,
  * accounting for the space taken by casings and screens inside the fill zone.
  *
- * For each hole-fill segment of the requested type, the gross cylindrical
- * volume of the fill annulus is computed first. Any well-case or well-screen
- * section that overlaps the fill interval is then subtracted to yield the true
- * net fill volume.
- *
- * The result is in **cubic meters (m³)** — diameters are converted from mm
- * internally via {@link calculateCilindricVolume}.
+ * Sums {@link calculateHoleFillSegmentVolume} over every hole-fill segment of
+ * the requested type.
  *
  * @param type - Fill category to sum: `'gravel_pack'` or `'seal'`.
  * @param profile - The well whose fill volumes are being calculated.
@@ -144,43 +194,12 @@ export function calculateHoleFillVolume(
   type: HoleFill['type'],
   profile: Well,
 ): number {
-  let volume = 0;
-
-  const { well_case: wellCase, well_screen: wellScreen } = profile;
-
-  const holeFillType = profile.hole_fill.filter(el => el.type === type);
-
-  holeFillType.forEach(el => {
-    let outerVolume = calculateCylindricVolume(el.diameter, el.to - el.from);
-
-    for (let i = 0; i < wellCase.length; i++) {
-      const wC = wellCase[i] as DepthRange;
-
-      if (!(wC.from > el.to || wC.to < el.from)) {
-        let { from, to } = el;
-        if (wC.from > el.from) from = wC.from;
-        if (wC.to < el.to) to = wC.to;
-
-        outerVolume -= calculateCylindricVolume(wC.diameter, to - from);
-      }
-    }
-
-    for (let i = 0; i < wellScreen.length; i++) {
-      const wS = wellScreen[i] as DepthRange;
-
-      if (!(wS.from > el.to || wS.to < el.from)) {
-        let { from, to } = el;
-        if (wS.from > el.from) from = wS.from;
-        if (wS.to < el.to) to = wS.to;
-
-        outerVolume -= calculateCylindricVolume(wS.diameter, to - from);
-      }
-    }
-
-    volume += outerVolume;
-  });
-
-  return volume;
+  return profile.hole_fill
+    .filter(el => el.type === type)
+    .reduce(
+      (volume, el) => volume + calculateHoleFillSegmentVolume(el, profile),
+      0,
+    );
 }
 
 // ─── Derived hydrodynamic parameter computations ──────────────────────────────

@@ -20,6 +20,7 @@ import {
   calculateCylindricVolume,
   calculateDrawdown,
   calculateFormationLoss,
+  calculateHoleFillSegmentVolume,
   calculateHoleFillVolume,
   calculateHydraulicConductivity,
   calculateSpecificCapacity,
@@ -357,6 +358,74 @@ describe('calculateCylindricVolume', () => {
   });
 });
 
+// ─── calculateHoleFillSegmentVolume ───────────────────────────────────────────
+
+describe('calculateHoleFillSegmentVolume', () => {
+  it('computes the gross cylinder volume when no inner sections overlap', () => {
+    const fill = makeHoleFill({
+      from: 0,
+      to: 10,
+      diameter: 200,
+      type: 'gravel_pack',
+    });
+    const well: Well = { ...emptyWell(), hole_fill: [fill] };
+    expect(calculateHoleFillSegmentVolume(fill, well)).toBeCloseTo(
+      calculateCylindricVolume(200, 10),
+      10,
+    );
+  });
+
+  it('subtracts an overlapping well_case, clipped to the overlap length', () => {
+    // fill: 0–10, casing: 5–10 → overlap = 5m
+    const fill = makeHoleFill({
+      from: 0,
+      to: 10,
+      diameter: 200,
+      type: 'gravel_pack',
+    });
+    const casing = makeWellCase({ from: 5, to: 10, diameter: 100 });
+    const well: Well = {
+      ...emptyWell(),
+      hole_fill: [fill],
+      well_case: [casing],
+    };
+    const expected =
+      calculateCylindricVolume(200, 10) - calculateCylindricVolume(100, 5);
+    expect(calculateHoleFillSegmentVolume(fill, well)).toBeCloseTo(
+      expected,
+      10,
+    );
+  });
+
+  it('sums to the same total as calculateHoleFillVolume across multiple segments', () => {
+    const fillA = makeHoleFill({
+      from: 0,
+      to: 10,
+      diameter: 200,
+      type: 'gravel_pack',
+    });
+    const fillB = makeHoleFill({
+      from: 10,
+      to: 20,
+      diameter: 250,
+      type: 'gravel_pack',
+    });
+    const casing = makeWellCase({ from: 0, to: 20, diameter: 100 });
+    const well: Well = {
+      ...emptyWell(),
+      hole_fill: [fillA, fillB],
+      well_case: [casing],
+    };
+    const expectedTotal =
+      calculateHoleFillSegmentVolume(fillA, well) +
+      calculateHoleFillSegmentVolume(fillB, well);
+    expect(calculateHoleFillVolume('gravel_pack', well)).toBeCloseTo(
+      expectedTotal,
+      10,
+    );
+  });
+});
+
 // ─── calculateHoleFillVolume ──────────────────────────────────────────────────
 
 describe('calculateHoleFillVolume', () => {
@@ -683,15 +752,31 @@ describe('calculateHydraulicConductivity', () => {
 
 // ─── Query utility factories ──────────────────────────────────────────────────
 
-function makeSpotMeasurement(datetime: string, static_level: number): HydrodynamicEvent {
-  return { id: crypto.randomUUID(), type: 'spot_measurement', datetime, static_level } as HydrodynamicEvent;
+function makeSpotMeasurement(
+  datetime: string,
+  static_level: number,
+): HydrodynamicEvent {
+  return {
+    id: crypto.randomUUID(),
+    type: 'spot_measurement',
+    datetime,
+    static_level,
+  } as HydrodynamicEvent;
 }
 
 function makeAirliftEvent(datetime: string): HydrodynamicEvent {
-  return { id: crypto.randomUUID(), type: 'airlift', datetime, flow_rate: 10 } as HydrodynamicEvent;
+  return {
+    id: crypto.randomUUID(),
+    type: 'airlift',
+    datetime,
+    flow_rate: 10,
+  } as HydrodynamicEvent;
 }
 
-function makeAquiferAnalysisEntry(datetime: string, fields: Partial<AquiferAnalysis>): AquiferAnalysis {
+function makeAquiferAnalysisEntry(
+  datetime: string,
+  fields: Partial<AquiferAnalysis>,
+): AquiferAnalysis {
   return { datetime, ...fields } as AquiferAnalysis;
 }
 
@@ -747,21 +832,33 @@ describe('getLatestStaticLevel', () => {
 
 describe('getLatestAquiferAnalysisField', () => {
   it('returns undefined when aquifer_analysis is absent', () => {
-    expect(getLatestAquiferAnalysisField(emptyWell(), 'transmissivity')).toBeUndefined();
+    expect(
+      getLatestAquiferAnalysisField(emptyWell(), 'transmissivity'),
+    ).toBeUndefined();
   });
 
   it('returns undefined when no entry has the requested field', () => {
     const well: Well = {
       ...emptyWell(),
-      aquifer_analysis: [makeAquiferAnalysisEntry('2024-01-01T00:00:00Z', { storativity: 0.001 })],
+      aquifer_analysis: [
+        makeAquiferAnalysisEntry('2024-01-01T00:00:00Z', {
+          storativity: 0.001,
+        }),
+      ],
     };
-    expect(getLatestAquiferAnalysisField(well, 'transmissivity')).toBeUndefined();
+    expect(
+      getLatestAquiferAnalysisField(well, 'transmissivity'),
+    ).toBeUndefined();
   });
 
   it('returns the field value from a single matching entry', () => {
     const well: Well = {
       ...emptyWell(),
-      aquifer_analysis: [makeAquiferAnalysisEntry('2024-01-01T00:00:00Z', { transmissivity: 42 })],
+      aquifer_analysis: [
+        makeAquiferAnalysisEntry('2024-01-01T00:00:00Z', {
+          transmissivity: 42,
+        }),
+      ],
     };
     expect(getLatestAquiferAnalysisField(well, 'transmissivity')).toBe(42);
   });
@@ -770,8 +867,12 @@ describe('getLatestAquiferAnalysisField', () => {
     const well: Well = {
       ...emptyWell(),
       aquifer_analysis: [
-        makeAquiferAnalysisEntry('2024-01-01T00:00:00Z', { transmissivity: 100 }),
-        makeAquiferAnalysisEntry('2024-06-01T00:00:00Z', { transmissivity: 200 }),
+        makeAquiferAnalysisEntry('2024-01-01T00:00:00Z', {
+          transmissivity: 100,
+        }),
+        makeAquiferAnalysisEntry('2024-06-01T00:00:00Z', {
+          transmissivity: 200,
+        }),
       ],
     };
     expect(getLatestAquiferAnalysisField(well, 'transmissivity')).toBe(200);
@@ -780,9 +881,16 @@ describe('getLatestAquiferAnalysisField', () => {
   it('is typed as number | undefined for a numeric field', () => {
     const well: Well = {
       ...emptyWell(),
-      aquifer_analysis: [makeAquiferAnalysisEntry('2024-01-01T00:00:00Z', { transmissivity: 50 })],
+      aquifer_analysis: [
+        makeAquiferAnalysisEntry('2024-01-01T00:00:00Z', {
+          transmissivity: 50,
+        }),
+      ],
     };
-    const result: number | undefined = getLatestAquiferAnalysisField(well, 'transmissivity');
+    const result: number | undefined = getLatestAquiferAnalysisField(
+      well,
+      'transmissivity',
+    );
     expect(result).toBe(50);
   });
 });
