@@ -222,8 +222,6 @@ const horizonProps = computed(() =>
       </div>
     </div>
   </div>
-
-  <!-- ── §II · Intenção ──────────────────────────────────────────────────── -->
   <section
     class="manifesto-bg relative py-14 lg:py-20 border-b border-surface-200/60 overflow-hidden"
   >
