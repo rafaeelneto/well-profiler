@@ -39,11 +39,7 @@ const togglePt = {
           to="/"
           class="flex items-center gap-2.5 font-bold text-base tracking-tight text-content-0 no-underline"
         >
-          <div
-            class="w-6.5 h-6.5 rounded-full bg-linear-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white font-mono text-[10px] font-semibold"
-          >
-            wd
-          </div>
+          <Icon name="welldot:logo" class="size-6.5 shrink-0" />
           welldot
         </NuxtLink>
 
