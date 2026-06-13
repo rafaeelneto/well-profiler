@@ -74,7 +74,7 @@ function isLastRow(groupIndex: number, rowIndex: number) {
             {{ row.cells[col.key] }}
           </td>
         </tr>
-        <tr v-if="group.total" class="bg-primary-50">
+        <tr v-if="group.total" class="bg-primary-50 dark:bg-primary-500/10">
           <td
             :colspan="group.total.colspan"
             class="border-t border-surface-200 px-3 py-2 font-sans text-xs font-medium text-content-0"
@@ -82,7 +82,7 @@ function isLastRow(groupIndex: number, rowIndex: number) {
             {{ group.total.label }}
           </td>
           <td
-            class="border-t border-surface-200 px-3 py-2 text-right font-mono text-[11px] text-primary-600"
+            class="border-t border-surface-200 px-3 py-2 text-right font-mono text-[11px] text-primary-600 dark:text-primary-400"
           >
             {{ group.total.value }}
           </td>
