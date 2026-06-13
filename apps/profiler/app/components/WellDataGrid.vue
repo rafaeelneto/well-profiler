@@ -411,6 +411,11 @@ function handleGridClick(event: MouseEvent) {
 </template>
 
 <style scoped>
+.well-data-grid-wrapper {
+  --accent-soft: color-mix(in srgb, var(--color-primary-500) 12%, transparent);
+  --color-primary-soft: color-mix(in srgb, var(--color-primary-500) 25%, transparent);
+}
+
 .well-data-grid :deep(.header-rgRow) {
   height: v-bind('`${HEADER_H}px`');
 }
@@ -427,7 +432,22 @@ revogr-attribution {
 
 revo-grid {
   --revo-grid-font: var(--font-mono);
-  --revo-border-color: var(--color-surface-200);
+  --revo-grid-background: var(--color-surface-0);
+  --revo-grid-foreground: var(--color-content-0);
+  --revo-grid-text: var(--color-content-0);
+  --revo-grid-divider: var(--color-surface-200);
+  --revo-grid-border: var(--color-surface-200);
+  --revo-grid-header-bg: var(--color-surface-50);
+  --revo-grid-header-color: var(--color-content-500);
+  --revo-grid-header-border: var(--color-surface-200);
+  --revo-grid-cell-border: var(--color-surface-200);
+  --revo-grid-focused-bg: var(--accent-soft);
+  --revo-grid-row-hover: var(--accent-soft);
+  --revo-grid-row-headers-bg: var(--color-surface-50);
+  --revo-grid-row-headers-color: var(--color-content-500);
+  --revo-grid-cell-disabled-bg: var(--color-surface-100);
+  --revo-grid-primary: var(--color-primary-500);
+  --revo-grid-primary-transparent: var(--color-primary-soft);
   font-family: var(--font-mono) !important;
   font-size: 11px !important;
   color: var(--color-content-0);
