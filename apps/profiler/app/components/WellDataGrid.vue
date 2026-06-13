@@ -17,6 +17,7 @@ import GridSelectCell from './GridSelectCell.vue';
 import GridFormattedCell from './GridFormattedCell.vue';
 import { columnStretchPlugin } from './columnStretchPlugin';
 import GridDeleteCell from './GridDeleteCell.vue';
+import GridCheckboxCell from './GridCheckboxCell.vue';
 import type {
   AfterEditEvent,
   BeforeSaveDataDetails,
@@ -52,7 +53,7 @@ type WellGridColumnBase = {
 };
 
 export type WellGridColumn =
-  | (WellGridColumnBase & { type?: 'text' | 'number' | 'color' })
+  | (WellGridColumnBase & { type?: 'text' | 'number' | 'color' | 'checkbox' })
   | (WellGridColumnBase & {
       type: 'select';
       options: Array<{ label: string; value: string }>;
@@ -152,11 +153,14 @@ type ColumnKind =
   | 'diameter'
   | 'color'
   | 'select'
-  | 'formatted';
+  | 'formatted'
+  | 'checkbox';
 
 interface ColumnKindDef {
   editor?: (col: WellGridColumn) => string;
   numeric?: boolean;
+  readonly?: boolean;
+  cellProperties?: (col: WellGridColumn) => ColumnRegular['cellProperties'];
   cellTemplate?: (col: WellGridColumn) => ColumnRegular['cellTemplate'];
 }
 
@@ -189,11 +193,22 @@ const columnKinds: Record<ColumnKind, ColumnKindDef> = {
     cellTemplate: col =>
       VGridVueTemplate(GridFormattedCell, { formatter: col.formatter }),
   },
+  checkbox: {
+    readonly: true,
+    cellProperties: () => () => ({ class: 'well-grid-checkbox-cell' }),
+    cellTemplate: col =>
+      VGridVueTemplate(GridCheckboxCell, {
+        prop: col.prop,
+        onToggle: (rowIndex: number, prop: string, value: boolean) =>
+          emit('change', rowIndex, prop, value),
+      }),
+  },
 };
 
 function resolveColumnKind(col: WellGridColumn): ColumnKind {
   if (col.type === 'select') return 'select';
   if (col.type === 'color') return 'color';
+  if (col.type === 'checkbox') return 'checkbox';
   if (col.unitType) return col.unitType;
   if (col.formatter) return 'formatted';
   return col.type === 'number' ? 'number' : 'text';
@@ -212,20 +227,23 @@ const revoColumns = computed<ColumnRegular[]>(() => {
   const dataCols: ColumnRegular[] = props.columns.map(col => {
     const kind = columnKinds[resolveColumnKind(col)];
     const unit = col.unitType ? unitLabels[col.unitType]() : null;
+    const readonly = col.readonly ?? kind.readonly ?? false;
 
     return {
       prop: col.prop,
       name: unit ? `${col.label} (${unit})` : col.label,
       autoSize: !col.size && !col.stretch,
       size: col.size,
-      readonly: col.readonly ?? false,
-      editor: col.readonly
+      readonly,
+      editor: readonly
         ? undefined
         : (kind.editor?.(col) ??
           col.editor ??
           (col.type === 'number' ? 'number' : 'text')),
       pin: col.pin,
-      cellProperties: kind.numeric ? () => ({ class: 'num' }) : undefined,
+      cellProperties:
+        kind.cellProperties?.(col) ??
+        (kind.numeric ? () => ({ class: 'num' }) : undefined),
       cellTemplate: kind.cellTemplate?.(col),
     };
   });
@@ -460,6 +478,13 @@ revo-grid .rgRow[selected] .rgCell:first-child {
 revo-grid .rgCell.num {
   justify-content: flex-end;
   font-variant-numeric: tabular-nums;
+}
+
+/* Checkbox columns — readonly for RevoGrid, but interactive via the cell
+   template, so suppress the default "disabled" overlay. */
+revo-grid .rgCell.disabled.well-grid-checkbox-cell {
+  background-color: transparent;
+  --revo-grid-cell-disabled-bg: transparent;
 }
 
 /* ── PrimeVue cell editors ────────────────────────────────────────────────── */
