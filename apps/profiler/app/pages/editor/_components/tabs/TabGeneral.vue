@@ -41,13 +41,6 @@ const wellTypeOptions = computed(() => [
   { label: t('editor.general.wellTypes.artesian'), value: 'artesian' },
   { label: t('editor.general.wellTypes.handDug'), value: 'hand_dug' },
 ]);
-
-onMounted(() => {
-  // Ensure location is initialized for the LocationPicker
-  setTimeout(() => {
-    updateLocationField('lat', 12.212);
-  }, 6000);
-});
 </script>
 
 <template>

@@ -7,11 +7,12 @@ const lng = defineModel<number>('lng', { required: true });
 const mapEl = useTemplateRef<HTMLElement>('mapEl');
 let map: Map | null = null;
 let marker: Marker | null = null;
+let resizeObserver: ResizeObserver | null = null;
 
 function updateCoordinate(coord: 'lat' | 'lng', value: number) {
-  console.log(`Updating on LocationMap ${coord} to`, value);
-  if (coord === 'lat') lat.value = value;
-  else lng.value = value;
+  console.log(`Updating ${coord} to ${value}`);
+  if (coord === 'lat') lat.value = clampLat(value);
+  else lng.value = clampLng(value);
 }
 
 onMounted(async () => {
@@ -29,18 +30,23 @@ onMounted(async () => {
   });
 
   const isDefault = lat.value === 0 && lng.value === 0;
-  map = L.map(mapEl.value!, { zoomControl: true }).setView(
-    [lat.value, lng.value],
-    isDefault ? 2 : 13,
-  );
+  const initialLat = clampLat(lat.value);
+  const initialLng = clampLng(lng.value);
+  map = L.map(mapEl.value!, {
+    zoomControl: true,
+    maxBounds: L.latLngBounds([-90, -180], [90, 180]),
+    maxBoundsViscosity: 1.0,
+    minZoom: 2,
+  }).setView([initialLat, initialLng], isDefault ? 2 : 13);
 
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution:
       '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     maxZoom: 19,
+    noWrap: true,
   }).addTo(map);
 
-  marker = L.marker([lat.value, lng.value], { draggable: true }).addTo(map);
+  marker = L.marker([initialLat, initialLng], { draggable: true }).addTo(map);
 
   marker.on('dragend', () => {
     const pos = marker!.getLatLng();
@@ -49,21 +55,34 @@ onMounted(async () => {
   });
 
   map.on('click', async e => {
-    marker!.setLatLng(e.latlng);
-    updateCoordinate('lat', e.latlng.lat);
-    updateCoordinate('lng', e.latlng.lng);
+    const clampedLatLng = L.latLng(
+      clampLat(e.latlng.lat),
+      clampLng(e.latlng.lng),
+    );
+    marker!.setLatLng(clampedLatLng);
+    updateCoordinate('lat', clampedLatLng.lat);
+    updateCoordinate('lng', clampedLatLng.lng);
   });
+
+  resizeObserver = new ResizeObserver(() => {
+    map?.invalidateSize();
+  });
+  resizeObserver.observe(mapEl.value!);
 });
 
 onUnmounted(() => {
+  resizeObserver?.disconnect();
+  resizeObserver = null;
   map?.remove();
   map = null;
   marker = null;
 });
 
 watch([lat, lng], ([newLat, newLng]) => {
-  marker?.setLatLng([newLat, newLng]);
-  map?.setView([newLat, newLng], map.getZoom());
+  const clampedLat = clampLat(newLat);
+  const clampedLng = clampLng(newLng);
+  marker?.setLatLng([clampedLat, clampedLng]);
+  map?.setView([clampedLat, clampedLng], map.getZoom());
 });
 </script>
 

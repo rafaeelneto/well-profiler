@@ -39,20 +39,18 @@ watch(
 function commitLat() {
   const parsed = parseToDd(rawLat.value);
   if (!isNaN(parsed)) {
-    lat.value = parsed;
-    rawLat.value = formatCoord(parsed, uiStore.coordinateFormat, true);
+    lat.value = clampLat(parsed);
+    rawLat.value = formatCoord(lat.value, uiStore.coordinateFormat, true);
   } else {
     rawLat.value = formatCoord(lat.value, uiStore.coordinateFormat, true);
   }
 }
 
 function commitLng() {
-  console.log('Committing lng:', rawLng.value);
   const parsed = parseToDd(rawLng.value);
-  console.log(parsed);
   if (!isNaN(parsed)) {
-    lng.value = parsed;
-    rawLng.value = formatCoord(parsed, uiStore.coordinateFormat, false);
+    lng.value = clampLng(parsed);
+    rawLng.value = formatCoord(lng.value, uiStore.coordinateFormat, false);
   } else {
     rawLng.value = formatCoord(lng.value, uiStore.coordinateFormat, false);
   }

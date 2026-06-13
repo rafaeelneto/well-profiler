@@ -345,9 +345,8 @@ export const useProfileStore = defineStore(
   {
     persist: {
       key: 'welldot_profile',
-      // Only persist the well data — errors, isDirty, and history are
-      // transient session state and must not survive page reload.
       pick: ['_well'],
+      storage: piniaPluginPersistedstate.localStorage(),
     },
   },
 );

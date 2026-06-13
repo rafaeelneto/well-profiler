@@ -38,6 +38,14 @@ export function parseToDd(input: string): number {
   return result;
 }
 
+export function clampLat(lat: number): number {
+  return Math.min(90, Math.max(-90, lat));
+}
+
+export function clampLng(lng: number): number {
+  return Math.min(180, Math.max(-180, lng));
+}
+
 export function formatCoord(
   dd: number,
   format: CoordFormat,
