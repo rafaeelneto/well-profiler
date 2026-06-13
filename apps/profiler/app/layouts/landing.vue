@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { useDark } from '@vueuse/core';
 
-const { t, locale, locales } = useI18n();
+const { t, locale, locales, setLocale } = useI18n();
 
-function setLocale(code: string) {
-  locale.value = code as 'pt' | 'en';
+function changeLocale(code: string) {
+  setLocale(code as 'en' | 'pt');
 }
 
 const drawerOpen = ref(false);
@@ -224,7 +224,7 @@ const togglePt = {
             :class="
               locale === loc.code ? 'text-content-0' : 'hover:text-content-300'
             "
-            @click="setLocale(loc.code)"
+            @click="changeLocale(loc.code)"
           >
             {{ loc.code }}
           </button>
