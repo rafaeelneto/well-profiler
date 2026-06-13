@@ -46,7 +46,7 @@ const togglePt = {
         <!-- Desktop text links -->
         <div class="hidden lg:flex items-center gap-6">
           <NuxtLink
-            to="/"
+            to="/editor"
             class="text-content-400 hover:text-content-0 font-medium transition-colors no-underline"
           >
             {{ t('nav.editor') }}
@@ -91,8 +91,8 @@ const togglePt = {
         <Button
           :label="t('nav.openEditor')"
           size="small"
-          as="a"
-          href="#"
+          as="NuxtLink"
+          to="/editor"
           class="hidden lg:inline-flex"
         />
 
@@ -100,8 +100,8 @@ const togglePt = {
         <Button
           :label="t('nav.openEditorMobile')"
           size="small"
-          as="a"
-          href="#"
+          as="NuxtLink"
+          to="/editor"
           class="lg:hidden"
         />
 
@@ -140,7 +140,7 @@ const togglePt = {
 
       <nav class="flex flex-col gap-1 mt-2">
         <NuxtLink
-          to="/"
+          to="/editor"
           class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-content-200 hover:text-content-0 hover:bg-surface-100 transition-colors no-underline"
           @click="drawerOpen = false"
         >
@@ -196,8 +196,8 @@ const togglePt = {
         <Button
           :label="t('nav.openEditor')"
           class="w-full"
-          as="a"
-          href="#"
+          as="NuxtLink"
+          to="/editor"
           @click="drawerOpen = false"
         />
       </template>

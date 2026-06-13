@@ -131,11 +131,12 @@ const horizonProps = computed(() =>
             {{ t('hero.body') }}
           </p>
           <div class="flex flex-col sm:flex-row gap-2.5 mb-5 lg:mb-7">
-            <Button :label="t('hero.ctaPrimary')" as="a" href="#" />
+            <Button :label="t('hero.ctaPrimary')" as="NuxtLink" to="/editor" />
             <Button
               :label="t('hero.ctaSecondary')"
               as="a"
-              href="#"
+              href="https://github.com/rafaeelneto/welldot/tree/main/packages/core"
+              target="_blank"
               variant="outlined"
               severity="secondary"
             />
@@ -409,7 +410,7 @@ const horizonProps = computed(() =>
       <div
         class="flex flex-col sm:flex-row gap-2.5 justify-center items-center"
       >
-        <Button :label="t('cta.primary')" as="a" href="#" />
+        <Button :label="t('cta.primary')" as="NuxtLink" to="/editor" />
         <Button
           :label="t('cta.secondary')"
           as="a"
