@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useDark } from '@vueuse/core';
+import { NuxtLink } from '#components';
 
 const { t, locale, locales, setLocale } = useI18n();
 
@@ -91,7 +92,7 @@ const togglePt = {
         <Button
           :label="t('nav.openEditor')"
           size="small"
-          as="NuxtLink"
+          :as="NuxtLink"
           to="/editor"
           class="hidden lg:inline-flex"
         />
@@ -100,7 +101,7 @@ const togglePt = {
         <Button
           :label="t('nav.openEditorMobile')"
           size="small"
-          as="NuxtLink"
+          :as="NuxtLink"
           to="/editor"
           class="lg:hidden"
         />
@@ -196,7 +197,7 @@ const togglePt = {
         <Button
           :label="t('nav.openEditor')"
           class="w-full"
-          as="NuxtLink"
+          :as="NuxtLink"
           to="/editor"
           @click="drawerOpen = false"
         />
