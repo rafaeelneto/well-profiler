@@ -22,6 +22,7 @@ import type {
   BeforeSaveDataDetails,
   ColumnProp,
   ColumnRegular,
+  Editors,
   FocusAfterRenderEvent,
 } from '@revolist/revogrid';
 
@@ -97,7 +98,7 @@ function selectEditorFactory(options: Array<{ label: string; value: string }>) {
 }
 
 const gridEditors = computed(() => {
-  const editors: Record<string, unknown> = {
+  const editors: Editors = {
     text: VGridVueEditor(GridTextEditor),
     number: VGridVueEditor(GridNumberEditor),
     color: VGridVueEditor(GridColorPickerEditor),
