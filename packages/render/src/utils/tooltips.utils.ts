@@ -1,5 +1,4 @@
 // TODO remove this dependency on d3-tip by implementing our own tooltip logic using plain divs and mouse events, which will also allow us to support touch devices
-import * as d3module from 'd3';
 // eslint-disable-next-line import-x/default
 import d3tip from 'd3-tip';
 import sanitizeHtml from 'sanitize-html';
@@ -23,8 +22,6 @@ import type {
 } from '~/types/render.types';
 import { formatDiameter, formatLength } from '~/utils/format.utils';
 
-const d3 = Object.assign(d3module, { tip: d3tip });
-
 interface D3Tip {
   attr(name: string, value: string): D3Tip;
   direction(dir: string): D3Tip;
@@ -37,7 +34,12 @@ interface D3Tip {
 const esc = (v: unknown): string =>
   sanitizeHtml(String(v ?? ''), { allowedTags: [], allowedAttributes: {} });
 
-/** Initialises d3-tip tooltip instances for each well component, respecting the `tooltipConfig` allow-list. Skips re-initialisation if the SVG was already set up. */
+const _tooltipCache = new WeakMap<
+  Element,
+  Record<string, D3Tip | { show: () => void; hide: () => void }>
+>();
+
+/** Initialises d3-tip tooltip instances for each well component, respecting the `tooltipConfig` allow-list. Caches instances per SVG element to prevent duplicate DOM nodes on re-render. */
 export const populateTooltips = (
   svg: SvgSelection,
   customClasses: ComponentsClassNames,
@@ -49,11 +51,8 @@ export const populateTooltips = (
     typeof (svg as WithNode).node === 'function'
       ? (svg as { node: () => Element | null }).node()
       : null;
-  if (svgEl?.getAttribute('data-tooltips-init') === 'true') {
-    return {} as Record<
-      string,
-      { show: (...a: unknown[]) => void; hide: (...a: unknown[]) => void }
-    >;
+  if (svgEl && _tooltipCache.has(svgEl)) {
+    return _tooltipCache.get(svgEl)!;
   }
 
   const tipsText = {
@@ -97,7 +96,7 @@ export const populateTooltips = (
                 <strong>Diâmetro:</strong> ${esc(formatDiameter(d.diameter, units.diameter))} ${esc(units.diameter)}</span>
               <span class="${customClasses.tooltip.secondaryInfo}"><strong>Tipo:</strong> ${esc(d.type)}</span>
               <span class="${customClasses.tooltip.secondaryInfo}">
-                <strong>Ranhura:</strong> ${esc(d.screen_slot_mm)} mm
+                <strong>Ranhura:</strong> ${esc(d.screen_slot)} mm
               </span>
           `,
     conflict: (_: unknown, d: { from: number; to: number }) => `
@@ -150,8 +149,7 @@ export const populateTooltips = (
       return;
     }
 
-    tooltips[tipTextKey] = (d3 as unknown as { tip: () => D3Tip })
-      .tip()
+    tooltips[tipTextKey] = (d3tip as unknown as () => D3Tip)()
       .attr('class', customClasses.tooltip.root)
       .direction('e')
       .html(tipsText[tipTextKey]);
@@ -162,6 +160,7 @@ export const populateTooltips = (
   });
 
   svgEl?.setAttribute('data-tooltips-init', 'true');
+  if (svgEl) _tooltipCache.set(svgEl, tooltips);
 
   return tooltips;
 };

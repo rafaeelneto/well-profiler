@@ -1,9 +1,16 @@
 import type {
+  BoreHole,
   Cave,
   Constructive,
   Fracture,
+  HoleFill,
   Lithology,
+  Reduction,
+  SurfaceCase,
   Units,
+  Well,
+  WellCase,
+  WellScreen,
 } from '@welldot/core';
 import {
   type BaseType,
@@ -481,4 +488,48 @@ export type DrawContext = {
   /** Full (unfiltered) construction profile — for x-scale domain. */
   constructionData: Constructive;
   groups: DrawGroups;
+};
+
+/**
+ * Attaches an optional stable render identity to any feature type.
+ *
+ * **`key` is runtime-only.** It exists solely in memory while the renderer is
+ * running and must never be written to a `.well` file. It is not part of the
+ * `.well` v2 spec — persisting it would produce a non-conformant file.
+ */
+export type WithKey<T> = T & { key?: string | number };
+
+/**
+ * A `Well` profile where every feature array element may carry an optional `key`.
+ *
+ * When `key` is present the renderer uses it as the D3 data-join key,
+ * giving fully stable DOM identity regardless of depth edits or array reordering.
+ * When absent the renderer falls back to coordinate-based keys (`from:to` or
+ * `depth:index`).
+ *
+ * **`key` is runtime-only** — generate it once per feature (e.g.
+ * `crypto.randomUUID()`) and keep it in memory across edits, but always strip
+ * it before serializing to a `.well` file.
+ */
+export type RenderableWell = Omit<
+  Well,
+  | 'lithology'
+  | 'fractures'
+  | 'caves'
+  | 'bore_hole'
+  | 'well_case'
+  | 'well_screen'
+  | 'hole_fill'
+  | 'surface_case'
+  | 'reduction'
+> & {
+  lithology: WithKey<Lithology>[];
+  fractures: WithKey<Fracture>[];
+  caves: WithKey<Cave>[];
+  bore_hole: WithKey<BoreHole>[];
+  well_case: WithKey<WellCase>[];
+  well_screen: WithKey<WellScreen>[];
+  hole_fill: WithKey<HoleFill>[];
+  surface_case: WithKey<SurfaceCase>[];
+  reduction: WithKey<Reduction>[];
 };

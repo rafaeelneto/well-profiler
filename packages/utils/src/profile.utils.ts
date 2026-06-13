@@ -1,4 +1,10 @@
-import { Constructive, HoleFill, Reduction, Well } from '@welldot/core';
+import {
+  AquiferAnalysis,
+  Constructive,
+  HoleFill,
+  Reduction,
+  Well,
+} from '@welldot/core';
 
 type DepthPoint = { depth: number };
 type DepthInterval = { to: number };
@@ -111,7 +117,7 @@ export function getConstructivePropertySummary<T>(
  * @param height - Height (or depth span) in meters.
  * @returns Volume in cubic meters (m³).
  */
-export function calculateCilindricVolume(
+export function calculateCylindricVolume(
   diameter: number,
   height: number,
 ): number {
@@ -119,16 +125,66 @@ export function calculateCilindricVolume(
 }
 
 /**
+ * Calculates the net annular volume of a single hole-fill segment, accounting
+ * for the space taken by casings and screens that overlap it.
+ *
+ * The gross cylindrical volume of the fill annulus is computed first. Any
+ * well-case or well-screen section that overlaps the fill interval is then
+ * subtracted (clipped to the overlapping length) to yield the true net volume.
+ *
+ * The result is in **cubic meters (m³)** — diameters are converted from mm
+ * internally via {@link calculateCylindricVolume}.
+ *
+ * @param fill - The hole-fill segment to compute the volume of.
+ * @param profile - The well providing the well_case/well_screen sections to
+ *   subtract.
+ * @returns Net volume (m³) of `fill`, possibly negative if its diameter is
+ *   smaller than an overlapping casing/screen.
+ */
+export function calculateHoleFillSegmentVolume(
+  fill: HoleFill,
+  profile: Well,
+): number {
+  const { well_case: wellCase, well_screen: wellScreen } = profile;
+
+  let outerVolume = calculateCylindricVolume(
+    fill.diameter,
+    fill.to - fill.from,
+  );
+
+  for (let i = 0; i < wellCase.length; i++) {
+    const wC = wellCase[i] as DepthRange;
+
+    if (!(wC.from > fill.to || wC.to < fill.from)) {
+      let { from, to } = fill;
+      if (wC.from > fill.from) from = wC.from;
+      if (wC.to < fill.to) to = wC.to;
+
+      outerVolume -= calculateCylindricVolume(wC.diameter, to - from);
+    }
+  }
+
+  for (let i = 0; i < wellScreen.length; i++) {
+    const wS = wellScreen[i] as DepthRange;
+
+    if (!(wS.from > fill.to || wS.to < fill.from)) {
+      let { from, to } = fill;
+      if (wS.from > fill.from) from = wS.from;
+      if (wS.to < fill.to) to = wS.to;
+
+      outerVolume -= calculateCylindricVolume(wS.diameter, to - from);
+    }
+  }
+
+  return outerVolume;
+}
+
+/**
  * Calculates the net annular volume occupied by a specific hole-fill type,
  * accounting for the space taken by casings and screens inside the fill zone.
  *
- * For each hole-fill segment of the requested type, the gross cylindrical
- * volume of the fill annulus is computed first. Any well-case or well-screen
- * section that overlaps the fill interval is then subtracted to yield the true
- * net fill volume.
- *
- * The result is in **cubic meters (m³)** — diameters are converted from mm
- * internally via {@link calculateCilindricVolume}.
+ * Sums {@link calculateHoleFillSegmentVolume} over every hole-fill segment of
+ * the requested type.
  *
  * @param type - Fill category to sum: `'gravel_pack'` or `'seal'`.
  * @param profile - The well whose fill volumes are being calculated.
@@ -138,41 +194,102 @@ export function calculateHoleFillVolume(
   type: HoleFill['type'],
   profile: Well,
 ): number {
-  let volume = 0;
+  return profile.hole_fill
+    .filter(el => el.type === type)
+    .reduce(
+      (volume, el) => volume + calculateHoleFillSegmentVolume(el, profile),
+      0,
+    );
+}
 
-  const { well_case: wellCase, well_screen: wellScreen } = profile;
+// ─── Derived hydrodynamic parameter computations ──────────────────────────────
 
-  const holeFillType = profile.hole_fill.filter(el => el.type === type);
+/** Drawdown s at a level reading: readingDepth − staticLevel (m). */
+export function calculateDrawdown(
+  readingDepth: number,
+  staticLevel: number,
+): number {
+  return readingDepth - staticLevel;
+}
 
-  holeFillType.forEach(el => {
-    let outerVolume = calculateCilindricVolume(el.diameter, el.to - el.from);
+/** Specific capacity Q/s (m²/h). Throws RangeError when drawdown is zero. */
+export function calculateSpecificCapacity(
+  flowRate: number,
+  drawdown: number,
+): number {
+  if (drawdown === 0) throw new RangeError('drawdown must not be zero');
+  return flowRate / drawdown;
+}
 
-    for (let i = 0; i < wellCase.length; i++) {
-      const wC = wellCase[i] as DepthRange;
+/** Unit drawdown s/Q (h/m²). Throws RangeError when flowRate is zero. */
+export function calculateUnitDrawdown(
+  drawdown: number,
+  flowRate: number,
+): number {
+  if (flowRate === 0) throw new RangeError('flowRate must not be zero');
+  return drawdown / flowRate;
+}
 
-      if (!(wC.from > el.to || wC.to < el.from)) {
-        let { from, to } = el;
-        if (wC.from > el.from) from = wC.from;
-        if (wC.to < el.to) to = wC.to;
+/** Formation head loss via Jacob B coefficient: jacobB × flowRate (m). */
+export function calculateFormationLoss(
+  jacobB: number,
+  flowRate: number,
+): number {
+  return jacobB * flowRate;
+}
 
-        outerVolume -= calculateCilindricVolume(wC.diameter, to - from);
-      }
-    }
+/** Well head loss via Jacob C coefficient: jacobC × flowRate² (m). */
+export function calculateWellLoss(jacobC: number, flowRate: number): number {
+  return jacobC * flowRate ** 2;
+}
 
-    for (let i = 0; i < wellScreen.length; i++) {
-      const wS = wellScreen[i] as DepthRange;
+/** Hydraulic conductivity K = transmissivity / aquiferThickness (m/h). Throws RangeError when aquiferThickness is zero. */
+export function calculateHydraulicConductivity(
+  transmissivity: number,
+  aquiferThickness: number,
+): number {
+  if (aquiferThickness === 0)
+    throw new RangeError('aquiferThickness must not be zero');
+  return transmissivity / aquiferThickness;
+}
 
-      if (!(wS.from > el.to || wS.to < el.from)) {
-        let { from, to } = el;
-        if (wS.from > el.from) from = wS.from;
-        if (wS.to < el.to) to = wS.to;
+// ─── Hydrodynamic event query utilities ──────────────────────────────────────
 
-        outerVolume -= calculateCilindricVolume(wS.diameter, to - from);
-      }
-    }
+/**
+ * Returns the static water level (m) from the most recent hydrodynamic event
+ * that carries a `static_level` field. Events are compared by UTC datetime.
+ * Returns `undefined` if no such event exists.
+ */
+export function getLatestStaticLevel(well: Well): number | undefined {
+  const events = well.hydrodynamic_events;
+  if (!events || events.length === 0) return undefined;
+  const withLevel = events.filter(
+    (e): e is typeof e & { static_level: number } =>
+      'static_level' in e &&
+      (e as { static_level?: number }).static_level !== undefined,
+  );
+  if (withLevel.length === 0) return undefined;
+  withLevel.sort(
+    (a, b) => new Date(b.datetime).getTime() - new Date(a.datetime).getTime(),
+  );
+  return (withLevel[0] as { static_level: number }).static_level;
+}
 
-    volume += outerVolume;
-  });
-
-  return volume;
+/**
+ * Returns the value of `field` from the most recent `aquifer_analysis` entry
+ * where that field is present. Entries are compared by UTC datetime.
+ * Returns `undefined` if no matching entry exists.
+ */
+export function getLatestAquiferAnalysisField<K extends keyof AquiferAnalysis>(
+  well: Well,
+  field: K,
+): AquiferAnalysis[K] | undefined {
+  const entries = well.aquifer_analysis;
+  if (!entries || entries.length === 0) return undefined;
+  const withField = entries.filter(e => e[field] !== undefined);
+  if (withField.length === 0) return undefined;
+  withField.sort(
+    (a, b) => new Date(b.datetime).getTime() - new Date(a.datetime).getTime(),
+  );
+  return withField[0][field];
 }

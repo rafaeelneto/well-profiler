@@ -9,7 +9,7 @@ import {
   type WellTextures,
 } from './configs/render.textures';
 
-const d3 = Object.assign(d3module, { tip: d3tip });
+const d3 = { ...d3module, tip: d3tip };
 
 import {
   isWellEmpty,
@@ -26,6 +26,7 @@ import {
   DrawGroups,
   Highlights,
   InstanceState,
+  RenderableWell,
   RenderConfig,
   SvgInstance,
   SvgSelection,
@@ -238,10 +239,18 @@ export class WellRenderer {
    * @param options.highlights - Highlight overlays to display on top of the profile.
    */
   draw(
-    profile: Well,
+    profile: RenderableWell,
     options: { units?: Units; highlights?: Highlights } = {},
   ) {
     if (isWellEmpty(profile)) return;
+
+    if (profile.version !== 2) {
+      console.warn(
+        `[WellRenderer] Received a .well file with version ${profile.version ?? 'unknown'}. ` +
+          `Only v2 is supported. Normalize with deserializeWell() from @welldot/core before rendering.`,
+      );
+    }
+
     this.units = { ...this.units, ...options.units };
     const highlights = options.highlights ?? {};
 
@@ -284,7 +293,7 @@ export class WellRenderer {
 
   private drawLogToInstance(
     state: InstanceState,
-    profile: Well,
+    profile: RenderableWell,
     depthFrom: number,
     depthTo: number,
     highlights: Highlights = {},

@@ -945,13 +945,12 @@ export const innerRenderPdf = async (
     metadataPosition,
     renderConfig,
   );
-  // @ts-ignore
+
   try {
     const pdfDocGenerator = pdfMake.createPdf(docDefinition);
-    console.log('Generating PDF...', pdfDocGenerator);
-    const pdfDataUrl = await pdfDocGenerator.getDataUrl();
+    const pdfDataUrl = await pdfMake.createPdf(docDefinition).getDataUrl();
+
     const blobUrl = base64ToBlob(pdfDataUrl, 'application/pdf');
-    console.log('PDF generated, setting iframe src...', blobUrl);
     if (iframeId) {
       const iframe = document.getElementById(iframeId);
       // @ts-ignore
