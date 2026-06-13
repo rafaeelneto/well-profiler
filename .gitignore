@@ -29,3 +29,5 @@ debug.log
 
 # TypeScript
 *.tsbuildinfo
+
+*.wrangler
