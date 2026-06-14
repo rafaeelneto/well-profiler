@@ -413,7 +413,11 @@ function handleGridClick(event: MouseEvent) {
 <style scoped>
 .well-data-grid-wrapper {
   --accent-soft: color-mix(in srgb, var(--color-primary-500) 12%, transparent);
-  --color-primary-soft: color-mix(in srgb, var(--color-primary-500) 25%, transparent);
+  --color-primary-soft: color-mix(
+    in srgb,
+    var(--color-primary-500) 25%,
+    transparent
+  );
 }
 
 .well-data-grid :deep(.header-rgRow) {
@@ -523,7 +527,7 @@ revo-grid .well-cell-input {
   border: none !important;
   border-radius: 0 !important;
   background: var(--color-surface-0) !important;
-  box-shadow: inset 0 0 0 1.5px var(--color-primary-500) !important;
+  box-shadow: inset 0 0 0 1.5px var(--color-focus-ring) !important;
   font-family: var(--font-mono) !important;
   font-size: 11px !important;
   color: var(--color-content-0) !important;
@@ -631,7 +635,7 @@ revogr-edit .well-cell-select.p-select {
   border: none;
   border-radius: 0;
   background: var(--color-surface-0);
-  box-shadow: inset 0 0 0 1.5px var(--color-primary-500);
+  box-shadow: inset 0 0 0 1.5px var(--color-focus-ring);
   font-family: var(--font-mono);
   font-size: 11px;
 }
@@ -657,7 +661,7 @@ revogr-edit .well-cell-color-trigger {
   width: 100%;
   height: 100%;
   padding: 0 8px;
-  box-shadow: inset 0 0 0 1.5px var(--color-primary-500);
+  box-shadow: inset 0 0 0 1.5px var(--color-focus-ring);
   background: var(--color-surface-0);
 }
 

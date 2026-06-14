@@ -45,13 +45,21 @@ const customPt = {
       'font-display transition-all duration-200 hover:scale-[1.02] active:scale-95',
   },
   inputtext: {
-    root: 'font-mono text-sm rounded-[var(--radius-sm)] focus:shadow-[inset_0_0_0_1.5px_var(--w-primary-500)]',
+    root: 'font-mono border-content-600 border-[1px] text-sm rounded-[var(--radius-sm)] focus:shadow-[inset_0_0_0_1.5px_var(--color-focus-ring)] [&.p-invalid]:shadow-[inset_0_0_0_1.5px_var(--color-error-ring)]',
+  },
+  inputnumber: {
+    pcInput: {
+      root: 'font-mono border-content-600 border-[1px] text-sm rounded-[var(--radius-sm)] focus:shadow-[inset_0_0_0_1.5px_var(--color-focus-ring)] [&.p-invalid]:shadow-[inset_0_0_0_1.5px_var(--color-error-ring)]',
+    },
   },
   select: {
-    root: 'font-display',
+    root: 'font-display border-content-600 border-[1px] rounded-[var(--radius-sm)] [&.p-focus]:shadow-[inset_0_0_0_1.5px_var(--color-focus-ring)] [&.p-invalid]:shadow-[inset_0_0_0_1.5px_var(--color-error-ring)]',
     label: 'font-display',
     overlay: 'font-display',
     option: 'font-display',
+  },
+  textarea: {
+    root: 'font-mono border-content-600 border-[1px] text-sm rounded-[var(--radius-sm)] focus:shadow-[inset_0_0_0_1.5px_var(--color-focus-ring)] [&.p-invalid]:shadow-[inset_0_0_0_1.5px_var(--color-error-ring)]',
   },
   datepicker: {
     panel: 'font-display',
@@ -60,6 +68,9 @@ const customPt = {
     selectYear: 'font-display',
     weekDay: 'font-display text-xs uppercase tracking-wide',
     day: 'font-mono text-sm',
+    pcInput: {
+      root: 'font-mono border-content-600 border-[1px] text-sm rounded-[var(--radius-sm)] focus:shadow-[inset_0_0_0_1.5px_var(--color-focus-ring)] [&.p-invalid]:shadow-[inset_0_0_0_1.5px_var(--color-error-ring)]',
+    },
   },
   dialog: {
     root: 'font-display backdrop-blur-2xl backdrop-saturate-150',
