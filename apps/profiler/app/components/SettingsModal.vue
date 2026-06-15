@@ -8,6 +8,9 @@ const visible = defineModel<boolean>({ default: false });
 const { t, locale, locales, setLocale } = useI18n();
 const uiStore = useUiStore();
 
+const viewport = useViewport();
+const isMobile = computed(() => viewport.isLessThan('lg'));
+
 const isDark = useDark({
   selector: 'html',
   attribute: 'class',
@@ -37,11 +40,11 @@ const togglePt = {
 </script>
 
 <template>
-  <Dialog
+  <Drawer
     v-model:visible="visible"
-    modal
+    :position="isMobile ? 'bottom' : 'right'"
     :header="t('editor.settings.title')"
-    :style="{ width: '26rem' }"
+    :class="isMobile ? 'h-auto max-h-[85vh] rounded-t-2xl' : 'w-104!'"
   >
     <div class="flex flex-col gap-5 pt-1">
       <!-- Units -->
@@ -158,5 +161,5 @@ const togglePt = {
         </div>
       </div>
     </div>
-  </Dialog>
+  </Drawer>
 </template>

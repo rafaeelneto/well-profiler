@@ -152,7 +152,7 @@ const viewOptions = computed(() => [
         </template>
       </Button>
       <Button
-        :label="t('editor.settings.title')"
+        :aria-label="t('editor.settings.title')"
         unstyled
         :pt="actionBtnPt"
         @click="settingsVisible = true"
