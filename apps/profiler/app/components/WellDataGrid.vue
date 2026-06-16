@@ -14,6 +14,8 @@ import GridColorPickerEditor from './GridColorPickerEditor.vue';
 import GridUnitCell from './GridUnitCell.vue';
 import GridColorCell from './GridColorCell.vue';
 import GridSelectCell from './GridSelectCell.vue';
+import GridTextureSelectEditor from './GridTextureSelectEditor.vue';
+import GridTextureSelectCell from './GridTextureSelectCell.vue';
 import GridFormattedCell from './GridFormattedCell.vue';
 import { columnStretchPlugin } from './columnStretchPlugin';
 import GridDeleteCell from './GridDeleteCell.vue';
@@ -57,7 +59,8 @@ export type WellGridColumn =
   | (WellGridColumnBase & {
       type: 'select';
       options: Array<{ label: string; value: string }>;
-    });
+    })
+  | (WellGridColumnBase & { type: 'texture' });
 
 // ─── Props / Emits ────────────────────────────────────────────────────────────
 
@@ -98,6 +101,13 @@ function selectEditorFactory(options: Array<{ label: string; value: string }>) {
   });
 }
 
+function textureEditorFactory() {
+  return defineComponent({
+    props: ['val', 'save', 'close'],
+    setup: (p: any) => () => h(GridTextureSelectEditor, p),
+  });
+}
+
 const gridEditors = computed(() => {
   const editors: Editors = {
     text: VGridVueEditor(GridTextEditor),
@@ -105,6 +115,7 @@ const gridEditors = computed(() => {
     color: VGridVueEditor(GridColorPickerEditor),
     length: VGridVueEditor(unitEditorFactory('length')),
     diameter: VGridVueEditor(unitEditorFactory('diameter')),
+    texture: VGridVueEditor(textureEditorFactory()),
   };
   for (const col of props.columns) {
     if (col.type === 'select') {
@@ -154,7 +165,8 @@ type ColumnKind =
   | 'color'
   | 'select'
   | 'formatted'
-  | 'checkbox';
+  | 'checkbox'
+  | 'texture';
 
 interface ColumnKindDef {
   editor?: (col: WellGridColumn) => string;
@@ -203,9 +215,14 @@ const columnKinds: Record<ColumnKind, ColumnKindDef> = {
           emit('change', rowIndex, prop, value),
       }),
   },
+  texture: {
+    editor: () => 'texture',
+    cellTemplate: () => VGridVueTemplate(GridTextureSelectCell),
+  },
 };
 
 function resolveColumnKind(col: WellGridColumn): ColumnKind {
+  if (col.type === 'texture') return 'texture';
   if (col.type === 'select') return 'select';
   if (col.type === 'color') return 'color';
   if (col.type === 'checkbox') return 'checkbox';
@@ -650,6 +667,10 @@ revogr-edit .well-cell-select .p-select-label {
 revogr-edit .well-cell-select .p-select-dropdown {
   width: 24px;
   color: var(--color-content-500);
+}
+
+revogr-edit .well-cell-texture-select .p-select-label {
+  padding: 0 4px;
 }
 
 /* ── Color editor trigger ─────────────────────────────────────────────────── */

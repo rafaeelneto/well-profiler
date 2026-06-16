@@ -1,18 +1,11 @@
 <script setup lang="ts">
 import type { Well } from '@welldot/core';
-import { FGDC_TEXTURES_OPTIONS, metersToFeet } from '@welldot/core';
+import { metersToFeet } from '@welldot/core';
 import type { WellGridColumn } from '~/components/WellDataGrid.vue';
 
 const { t } = useI18n();
 const profileStore = useProfileStore();
 const uiStore = useUiStore();
-
-const textureOptions = computed(() =>
-  FGDC_TEXTURES_OPTIONS.map(texture => ({
-    label: `${texture.code} — ${texture.label}`,
-    value: texture.code,
-  })),
-);
 
 const lithologyColumns = computed<WellGridColumn[]>(() => [
   {
@@ -36,9 +29,8 @@ const lithologyColumns = computed<WellGridColumn[]>(() => [
   {
     prop: 'texture',
     label: t('editor.geological.lithology.texture'),
-    type: 'select',
+    type: 'texture',
     size: 160,
-    options: textureOptions.value,
   },
   {
     prop: 'geologic_unit',
