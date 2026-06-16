@@ -22,9 +22,12 @@ const lengthUnitOptions: LengthUnits[] = ['m', 'ft'];
 const diameterUnitOptions: DiameterUnits[] = ['mm', 'inches'];
 const coordinateFormatOptions: CoordinateFormat[] = ['DD', 'DMS'];
 
-function changeLocale(code: string) {
-  setLocale(code as 'en' | 'pt');
-}
+const currentLocale = computed({
+  get: () => locale.value,
+  set: (val: string) => setLocale(val as 'en' | 'pt'),
+});
+
+const localeOptions = locales.value.map((l) => l.code);
 
 const togglePt = {
   root: {
@@ -141,23 +144,11 @@ const togglePt = {
           <span class="text-sm text-content-0">
             {{ t('editor.settings.appearance.language') }}
           </span>
-          <div
-            class="flex items-center gap-1 rounded-lg border border-surface-200 p-0.5"
-          >
-            <button
-              v-for="loc in locales"
-              :key="loc.code"
-              class="px-2.5 py-1 rounded-md text-xs font-semibold uppercase transition-colors cursor-pointer"
-              :class="
-                locale === loc.code
-                  ? 'bg-primary-500 text-white'
-                  : 'text-content-400 hover:text-content-0'
-              "
-              @click="changeLocale(loc.code)"
-            >
-              {{ loc.code }}
-            </button>
-          </div>
+          <SelectButton
+            v-model="currentLocale"
+            :options="localeOptions"
+            :allow-empty="false"
+          />
         </div>
       </div>
     </div>
