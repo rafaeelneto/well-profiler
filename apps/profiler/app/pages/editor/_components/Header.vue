@@ -92,6 +92,7 @@ const toolItems = computed<ToolItem[]>(() => [
     label: t('editor.saveAs'),
     icon: 'ph:floppy-disk-back-duotone',
     disabled: !hasWell.value,
+    alwaysInMenu: true,
     onClick: saveFileAs,
   },
   {
@@ -126,7 +127,7 @@ const toolItems = computed<ToolItem[]>(() => [
 // Extra tools shown in the desktop menu, on top of the dedicated buttons
 // already present in the nav.
 const extraToolItems = computed<ToolItem[]>(() =>
-  toolItems.value.filter(item => item.comingSoon),
+  toolItems.value.filter(item => item.comingSoon || item.alwaysInMenu),
 );
 
 // ── Pass-through ────────────────────────────────────────────────────
@@ -220,17 +221,6 @@ const viewOptions = computed(() => [
       >
         <template #icon>
           <Icon name="ph:floppy-disk-duotone" class="size-4 shrink-0" />
-        </template>
-      </Button>
-      <Button
-        :label="t('editor.saveAs')"
-        :disabled="!hasWell"
-        unstyled
-        :pt="actionBtnPt"
-        @click="saveFileAs"
-      >
-        <template #icon>
-          <Icon name="ph:floppy-disk-back-duotone" class="size-4 shrink-0" />
         </template>
       </Button>
       <Button

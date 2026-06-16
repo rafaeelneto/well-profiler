@@ -5,6 +5,7 @@ export interface ToolItem {
   description?: string;
   disabled?: boolean;
   comingSoon?: boolean;
+  alwaysInMenu?: boolean;
   onClick?: () => void;
 }
 
