@@ -10,7 +10,8 @@ const emit = defineEmits<{
 
 const { t } = useI18n();
 const store = useProfileStore();
-const { download } = useProfileExport();
+const { save, saveAs } = useProfileExport();
+const persistence = useFilePersistence();
 
 const viewport = useViewport();
 const isMobile = computed(() => viewport.isLessThan('lg'));
@@ -28,22 +29,48 @@ const totalLayers = computed(
 // ── Open ────────────────────────────────────────────────────────────
 const fileInputRef = ref<HTMLInputElement | null>(null);
 
-function openFile() {
-  fileInputRef.value?.click();
+async function openFile() {
+  if (persistence.hasFileSystemAccess) {
+    const text = await persistence.open();
+    if (text !== null) store.loadWell(text);
+  } else {
+    fileInputRef.value?.click();
+  }
 }
 
 async function onFileSelected(event: Event) {
   const input = event.target as HTMLInputElement;
   const file = input.files?.[0];
   if (!file) return;
+  persistence.clearHandle();
   store.loadWell(await file.text());
   input.value = '';
 }
 
-// ── Save ────────────────────────────────────────────────────────────
-function saveFile() {
-  download();
+// ── Save / Save As ───────────────────────────────────────────────────
+async function saveFile() {
+  await save();
 }
+
+async function saveFileAs() {
+  await saveAs();
+}
+
+// ── Keyboard shortcuts ───────────────────────────────────────────────
+function _onKeyDown(e: KeyboardEvent) {
+  const mod = e.metaKey || e.ctrlKey;
+  if (!mod || !hasWell.value) return;
+  if (e.key === 's' && e.shiftKey) {
+    e.preventDefault();
+    saveFileAs();
+  } else if (e.key === 's') {
+    e.preventDefault();
+    saveFile();
+  }
+}
+
+onMounted(() => document.addEventListener('keydown', _onKeyDown));
+onBeforeUnmount(() => document.removeEventListener('keydown', _onKeyDown));
 
 // ── Share dialog ────────────────────────────────────────────────────
 const shareVisible = ref(false);
@@ -60,6 +87,12 @@ const toolItems = computed<ToolItem[]>(() => [
     icon: 'ph:floppy-disk-duotone',
     disabled: !hasWell.value,
     onClick: saveFile,
+  },
+  {
+    label: t('editor.saveAs'),
+    icon: 'ph:floppy-disk-back-duotone',
+    disabled: !hasWell.value,
+    onClick: saveFileAs,
   },
   {
     label: t('editor.open'),
@@ -187,6 +220,17 @@ const viewOptions = computed(() => [
       >
         <template #icon>
           <Icon name="ph:floppy-disk-duotone" class="size-4 shrink-0" />
+        </template>
+      </Button>
+      <Button
+        :label="t('editor.saveAs')"
+        :disabled="!hasWell"
+        unstyled
+        :pt="actionBtnPt"
+        @click="saveFileAs"
+      >
+        <template #icon>
+          <Icon name="ph:floppy-disk-back-duotone" class="size-4 shrink-0" />
         </template>
       </Button>
       <Button

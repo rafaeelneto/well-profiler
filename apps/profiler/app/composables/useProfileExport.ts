@@ -9,12 +9,42 @@ import { serializeWell } from '@welldot/core';
  */
 export function useProfileExport() {
   const store = useProfileStore();
+  const persistence = useFilePersistence();
 
   /** Serialise the current well to a JSON string, or null if no well is loaded. */
   function getRawJson(): string | null {
     const well = store.getExportableWell();
     if (!well) return null;
     return serializeWell(well);
+  }
+
+  function _defaultName(): string {
+    const well = store.getExportableWell();
+    return `${well?.name ?? 'well'}.well`;
+  }
+
+  /**
+   * Save to the currently open file handle, or prompt with Save As if no
+   * handle exists. Falls back to a blob download on unsupported browsers.
+   */
+  async function save(): Promise<void> {
+    if (import.meta.server) return;
+    const json = getRawJson();
+    if (!json) return;
+    const ok = await persistence.save(json, _defaultName());
+    if (ok) store.markClean();
+  }
+
+  /**
+   * Always prompt the user to choose a save location, then store the new
+   * handle for future saves. Falls back to download on unsupported browsers.
+   */
+  async function saveAs(): Promise<void> {
+    if (import.meta.server) return;
+    const json = getRawJson();
+    if (!json) return;
+    const ok = await persistence.saveAs(json, _defaultName());
+    if (ok) store.markClean();
   }
 
   /**
@@ -29,8 +59,7 @@ export function useProfileExport() {
     const json = getRawJson();
     if (!json) return;
 
-    const well = store.getExportableWell()!;
-    const name = filename ?? `${well.name ?? 'well'}.well`;
+    const name = filename ?? _defaultName();
 
     const blob = new Blob([json], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
@@ -41,5 +70,5 @@ export function useProfileExport() {
     URL.revokeObjectURL(url);
   }
 
-  return { getRawJson, download };
+  return { getRawJson, save, saveAs, download };
 }

@@ -178,6 +178,7 @@
   "editor": {
     "well": "Well",
     "save": "Save",
+    "saveAs": "Save As",
     "open": "Open",
     "share": "Share",
     "exportPdf": "Export PDF",

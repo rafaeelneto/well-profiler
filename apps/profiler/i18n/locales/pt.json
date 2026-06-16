@@ -178,6 +178,7 @@
   "editor": {
     "well": "Poço",
     "save": "Salvar",
+    "saveAs": "Salvar Como",
     "open": "Abrir",
     "share": "Compartilhar",
     "exportPdf": "Exportar PDF",
