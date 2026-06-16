@@ -183,6 +183,10 @@
     "exportPdf": "Export PDF",
     "back": "Back",
     "menu": "Menu",
+    "importSiagas": "Import from SIAGAS",
+    "toolsMenu": {
+      "title": "Tools"
+    },
     "settings": {
       "title": "Settings",
       "units": {

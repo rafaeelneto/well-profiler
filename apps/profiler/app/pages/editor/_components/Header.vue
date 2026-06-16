@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import ShareProfile from '~/components/ShareProfile.vue';
 import SettingsModal from '~/components/SettingsModal.vue';
+import ToolsMenu, { type ToolItem } from './ToolsMenu.vue';
 
 const props = defineProps<{ mobileView: 'perfil' | 'dados' }>();
 const emit = defineEmits<{
@@ -10,6 +11,9 @@ const emit = defineEmits<{
 const { t } = useI18n();
 const store = useProfileStore();
 const { download } = useProfileExport();
+
+const viewport = useViewport();
+const isMobile = computed(() => viewport.isLessThan('lg'));
 
 // ── Store-derived computeds ─────────────────────────────────────────
 const hasWell = computed(() => !!store.well);
@@ -47,6 +51,51 @@ const shareVisible = ref(false);
 // ── Settings dialog ─────────────────────────────────────────────────
 const settingsVisible = ref(false);
 
+// ── Tools menu ──────────────────────────────────────────────────────
+const toolsMenuVisible = ref(false);
+
+const toolItems = computed<ToolItem[]>(() => [
+  {
+    label: t('editor.save'),
+    icon: 'ph:floppy-disk-duotone',
+    disabled: !hasWell.value,
+    onClick: saveFile,
+  },
+  {
+    label: t('editor.open'),
+    icon: 'ph:folder-open-duotone',
+    onClick: openFile,
+  },
+  {
+    label: t('editor.share'),
+    icon: 'ph:share-network-duotone',
+    disabled: !hasWell.value,
+    onClick: () => (shareVisible.value = true),
+  },
+  {
+    label: t('editor.settings.title'),
+    icon: 'ph:gear-six-duotone',
+    onClick: () => (settingsVisible.value = true),
+  },
+  {
+    label: t('editor.exportPdf'),
+    icon: 'ph:file-pdf-duotone',
+    disabled: !hasWell.value,
+  },
+  {
+    label: t('editor.importSiagas'),
+    icon: 'ph:download-simple-duotone',
+    comingSoon: true,
+    disabled: true,
+  },
+]);
+
+// Extra tools shown in the desktop menu, on top of the dedicated buttons
+// already present in the nav.
+const extraToolItems = computed<ToolItem[]>(() =>
+  toolItems.value.filter(item => item.comingSoon),
+);
+
 // ── Pass-through ────────────────────────────────────────────────────
 const actionBtnPt = {
   root: {
@@ -55,6 +104,16 @@ const actionBtnPt = {
       'text-content-400 hover:text-content-0 hover:bg-surface-100',
       'transition-colors duration-150 cursor-pointer border-none bg-transparent',
       'disabled:opacity-40 disabled:cursor-not-allowed disabled:pointer-events-none',
+    ],
+  },
+};
+
+const iconBtnPt = {
+  root: {
+    class: [
+      'size-8 rounded-full border border-surface-200 flex items-center justify-center shrink-0',
+      'text-content-400 hover:text-content-0 hover:border-surface-300',
+      'transition-colors duration-150 cursor-pointer bg-transparent',
     ],
   },
 };
@@ -161,6 +220,16 @@ const viewOptions = computed(() => [
           <Icon name="ph:gear-six-duotone" class="size-4 shrink-0" />
         </template>
       </Button>
+      <Button
+        :aria-label="t('editor.toolsMenu.title')"
+        unstyled
+        :pt="actionBtnPt"
+        @click="toolsMenuVisible = true"
+      >
+        <template #icon>
+          <Icon name="ph:dots-three-outline-light" class="size-4 shrink-0" />
+        </template>
+      </Button>
     </div>
 
     <!-- Divider -->
@@ -197,13 +266,16 @@ const viewOptions = computed(() => [
         </span>
       </div>
 
-      <button
-        class="size-8 rounded-full border border-surface-200 flex items-center justify-center text-content-400 hover:text-content-0 hover:border-surface-300 transition-colors shrink-0"
-        :aria-label="t('editor.settings.title')"
-        @click="settingsVisible = true"
+      <Button
+        :aria-label="t('editor.toolsMenu.title')"
+        unstyled
+        :pt="iconBtnPt"
+        @click="toolsMenuVisible = true"
       >
-        <Icon name="ph:gear-six-duotone" class="size-4" />
-      </button>
+        <template #icon>
+          <Icon name="ph:dots-three-outline-light" class="size-4" />
+        </template>
+      </Button>
     </div>
 
     <!-- Row 2: status bar -->
@@ -249,6 +321,12 @@ const viewOptions = computed(() => [
 
   <!-- ─── Settings dialog ───────────────────────────────────────────── -->
   <SettingsModal v-model="settingsVisible" />
+
+  <!-- ─── Tools menu ────────────────────────────────────────────────── -->
+  <ToolsMenu
+    v-model="toolsMenuVisible"
+    :items="isMobile ? toolItems : extraToolItems"
+  />
 
   <!-- ─── Hidden file input ─────────────────────────────────────────── -->
   <ClientOnly>
