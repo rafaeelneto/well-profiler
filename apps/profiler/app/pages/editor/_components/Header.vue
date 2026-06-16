@@ -28,13 +28,31 @@ const totalLayers = computed(
 
 // ── Open ────────────────────────────────────────────────────────────
 const fileInputRef = ref<HTMLInputElement | null>(null);
+const confirm = useConfirm();
 
-async function openFile() {
+async function _doOpenFile() {
   if (persistence.hasFileSystemAccess) {
     const text = await persistence.open();
     if (text !== null) store.loadWell(text);
   } else {
     fileInputRef.value?.click();
+  }
+}
+
+async function openFile() {
+  if (store.isDirty && hasWell.value) {
+    confirm.require({
+      icon: 'ph:warning-duotone',
+      header: t('editor.confirmOpen.header'),
+      message: t('editor.confirmOpen.message'),
+      acceptLabel: t('editor.confirmOpen.accept'),
+      rejectLabel: t('editor.confirmOpen.reject'),
+      defaultFocus: 'reject',
+      rejectProps: { text: true, severity: 'secondary' },
+      accept: () => _doOpenFile(),
+    });
+  } else {
+    await _doOpenFile();
   }
 }
 

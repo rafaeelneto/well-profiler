@@ -352,6 +352,12 @@ export const useProfileStore = defineStore(
       key: 'welldot_profile',
       pick: ['_well'],
       storage: piniaPluginPersistedstate.localStorage(),
+      afterHydrate(ctx) {
+        const w = ctx.store._well as Well | null;
+        if (w && !isWellEmpty(w)) {
+          ctx.store.isDirty = true;
+        }
+      },
     },
   },
 );

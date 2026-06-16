@@ -219,6 +219,12 @@
       "unsaved": "Unsaved",
       "layers": "Layers"
     },
+    "confirmOpen": {
+      "header": "Open file",
+      "message": "You have unsaved changes. Opening a new file will discard them.",
+      "accept": "Open anyway",
+      "reject": "Cancel"
+    },
     "shareDialog": {
       "title": "Share well",
       "copyJson": "Copy JSON",

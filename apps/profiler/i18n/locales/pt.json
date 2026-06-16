@@ -219,6 +219,12 @@
       "unsaved": "Não salvo",
       "layers": "Camadas"
     },
+    "confirmOpen": {
+      "header": "Abrir arquivo",
+      "message": "Há alterações não salvas. Abrir um novo arquivo irá descartá-las.",
+      "accept": "Abrir mesmo assim",
+      "reject": "Cancelar"
+    },
     "shareDialog": {
       "title": "Compartilhar poço",
       "copyJson": "Copiar JSON",

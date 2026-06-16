@@ -86,6 +86,16 @@ const customPt = {
       class: 'backdrop-blur-[3px] bg-surface-900/10 dark:bg-surface-950/30',
     },
   },
+  confirmdialog: {
+    root: 'font-display backdrop-blur-2xl backdrop-saturate-150',
+    title: 'font-mono tracking-tight',
+    header: 'pb-0',
+    content: 'px-6 py-4',
+    footer: 'flex justify-end gap-2 pt-0',
+    mask: {
+      class: 'backdrop-blur-[3px] bg-surface-900/10 dark:bg-surface-950/30',
+    },
+  },
 };
 
 export default customPt;
