@@ -10,7 +10,8 @@ const lengthLabel = computed(
   () => `${t('editor.construction.wellhead.length')} (${uiStore.lengthUnit})`,
 );
 const thicknessLabel = computed(
-  () => `${t('editor.construction.wellhead.thickness')} (${uiStore.lengthUnit})`,
+  () =>
+    `${t('editor.construction.wellhead.thickness')} (${uiStore.lengthUnit})`,
 );
 
 const hasCementPad = computed(
@@ -93,7 +94,6 @@ const cementPadTypeOptions = computed(() => [
           option-label="label"
           option-value="value"
           class="w-full"
-          :pt="{ label: { class: 'font-mono text-sm' } }"
         />
       </Field>
 

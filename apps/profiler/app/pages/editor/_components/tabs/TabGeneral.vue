@@ -91,7 +91,6 @@ const wellTypeOptions = computed(() => [
             option-value="value"
             :placeholder="t('editor.general.wellType')"
             class="w-full"
-            :pt="{ label: { class: 'font-mono text-sm' } }"
           />
         </Field>
       </div>

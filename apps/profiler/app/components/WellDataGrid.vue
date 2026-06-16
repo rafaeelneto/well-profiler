@@ -20,6 +20,7 @@ import GridFormattedCell from './GridFormattedCell.vue';
 import { columnStretchPlugin } from './columnStretchPlugin';
 import GridDeleteCell from './GridDeleteCell.vue';
 import GridCheckboxCell from './GridCheckboxCell.vue';
+import GridSelectButtonCell from './GridSelectButtonCell.vue';
 import type {
   AfterEditEvent,
   BeforeSaveDataDetails,
@@ -58,6 +59,10 @@ export type WellGridColumn =
   | (WellGridColumnBase & { type?: 'text' | 'number' | 'color' | 'checkbox' })
   | (WellGridColumnBase & {
       type: 'select';
+      options: Array<{ label: string; value: string }>;
+    })
+  | (WellGridColumnBase & {
+      type: 'select-button';
       options: Array<{ label: string; value: string }>;
     })
   | (WellGridColumnBase & { type: 'texture' });
@@ -164,6 +169,7 @@ type ColumnKind =
   | 'diameter'
   | 'color'
   | 'select'
+  | 'select-button'
   | 'formatted'
   | 'checkbox'
   | 'texture';
@@ -215,6 +221,18 @@ const columnKinds: Record<ColumnKind, ColumnKindDef> = {
           emit('change', rowIndex, prop, value),
       }),
   },
+  'select-button': {
+    readonly: true,
+    cellProperties: () => () => ({ class: 'well-grid-checkbox-cell' }),
+    cellTemplate: col =>
+      VGridVueTemplate(GridSelectButtonCell, {
+        prop: col.prop,
+        options: (col as Extract<WellGridColumn, { type: 'select-button' }>)
+          .options,
+        onChange: (rowIndex: number, prop: string, value: unknown) =>
+          emit('change', rowIndex, prop, value),
+      }),
+  },
   texture: {
     editor: () => 'texture',
     cellTemplate: () => VGridVueTemplate(GridTextureSelectCell),
@@ -224,6 +242,7 @@ const columnKinds: Record<ColumnKind, ColumnKindDef> = {
 function resolveColumnKind(col: WellGridColumn): ColumnKind {
   if (col.type === 'texture') return 'texture';
   if (col.type === 'select') return 'select';
+  if (col.type === 'select-button') return 'select-button';
   if (col.type === 'color') return 'color';
   if (col.type === 'checkbox') return 'checkbox';
   if (col.unitType) return col.unitType;
@@ -526,6 +545,10 @@ revo-grid .rgCell.num {
 revo-grid .rgCell.disabled.well-grid-checkbox-cell {
   background-color: transparent;
   --revo-grid-cell-disabled-bg: transparent;
+}
+
+revo-grid .rgRow:hover .rgCell.disabled.well-grid-checkbox-cell {
+  background-color: var(--accent-soft);
 }
 
 /* ── PrimeVue cell editors ────────────────────────────────────────────────── */

@@ -1,6 +1,6 @@
 import { definePreset } from '@primeuix/themes';
 import Aura from '@primeuix/themes/aura';
-import type { ComponentsDesignTokens } from '@primeuix/themes/types';
+import type { ComponentsDesignTokens, Preset } from '@primeuix/themes/types';
 
 // Cool-slate surface scale (blue-tinted neutrals, light → dark)
 const surfaceLight = {
@@ -155,6 +155,7 @@ const MyPreset = definePreset(Aura, {
           hoverMutedColor: '{content.300}',
         },
         formField: {
+          fontSize: '0.9375rem',
           focusBorderColor: 'none',
           color: '{content.0}',
           background: '{surface.0}',
@@ -399,6 +400,13 @@ const MyPreset = definePreset(Aura, {
     checkbox: {
       root: {
         borderColor: '{content.600}',
+        filledBackground: 'transparent',
+        checkedBackground: '{primary.600}',
+      },
+      icon: {
+        checkedColor: '{content.950}',
+        checkedHoverColor: '{content.950}',
+        color: '{content.950}',
       },
     },
     datepicker: {
@@ -547,7 +555,7 @@ const MyPreset = definePreset(Aura, {
       },
     },
   } as ComponentsDesignTokens,
-});
+} as Preset);
 
 export default {
   preset: MyPreset,
