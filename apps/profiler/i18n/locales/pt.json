@@ -219,10 +219,17 @@
       "unsaved": "Não salvo",
       "layers": "Camadas"
     },
+    "clearWell": "Limpar poço",
     "confirmOpen": {
       "header": "Abrir arquivo",
       "message": "Há alterações não salvas. Abrir um novo arquivo irá descartá-las.",
       "accept": "Abrir mesmo assim",
+      "reject": "Cancelar"
+    },
+    "confirmClear": {
+      "header": "Limpar poço",
+      "message": "Isso irá redefinir todos os dados do poço. Esta ação não pode ser desfeita.",
+      "accept": "Limpar",
       "reject": "Cancelar"
     },
     "shareDialog": {

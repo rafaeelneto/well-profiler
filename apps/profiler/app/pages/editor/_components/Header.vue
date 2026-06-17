@@ -74,6 +74,21 @@ async function saveFileAs() {
   await saveAs();
 }
 
+// ── Clear ────────────────────────────────────────────────────────────
+function clearWell() {
+  confirm.require({
+    icon: 'ph:warning-duotone',
+    header: t('editor.confirmClear.header'),
+    message: t('editor.confirmClear.message'),
+    acceptLabel: t('editor.confirmClear.accept'),
+    rejectLabel: t('editor.confirmClear.reject'),
+    acceptProps: { severity: 'danger' },
+    rejectProps: { text: true, severity: 'secondary' },
+    defaultFocus: 'reject',
+    accept: () => store.clear(),
+  });
+}
+
 // ── Keyboard shortcuts ───────────────────────────────────────────────
 function _onKeyDown(e: KeyboardEvent) {
   const mod = e.metaKey || e.ctrlKey;
@@ -139,6 +154,13 @@ const toolItems = computed<ToolItem[]>(() => [
     icon: 'ph:download-simple-duotone',
     comingSoon: true,
     disabled: true,
+  },
+  {
+    label: t('editor.clearWell'),
+    icon: 'welldot:delete-well',
+    disabled: !hasWell.value,
+    alwaysInMenu: true,
+    onClick: clearWell,
   },
 ]);
 

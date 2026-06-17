@@ -219,10 +219,17 @@
       "unsaved": "Unsaved",
       "layers": "Layers"
     },
+    "clearWell": "Clear well",
     "confirmOpen": {
       "header": "Open file",
       "message": "You have unsaved changes. Opening a new file will discard them.",
       "accept": "Open anyway",
+      "reject": "Cancel"
+    },
+    "confirmClear": {
+      "header": "Clear well",
+      "message": "This will reset all well data. This action cannot be undone.",
+      "accept": "Clear",
       "reject": "Cancel"
     },
     "shareDialog": {
