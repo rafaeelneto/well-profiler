@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import ShareProfile from '~/components/ShareProfile.vue';
 import SettingsModal from '~/components/SettingsModal.vue';
+import ToolsMenu, { type ToolItem } from './ToolsMenu.vue';
 
 const props = defineProps<{ mobileView: 'perfil' | 'dados' }>();
 const emit = defineEmits<{
@@ -9,7 +10,11 @@ const emit = defineEmits<{
 
 const { t } = useI18n();
 const store = useProfileStore();
-const { download } = useProfileExport();
+const { save, saveAs } = useProfileExport();
+const persistence = useFilePersistence();
+
+const viewport = useViewport();
+const isMobile = computed(() => viewport.isLessThan('lg'));
 
 // ── Store-derived computeds ─────────────────────────────────────────
 const hasWell = computed(() => !!store.well);
@@ -23,29 +28,147 @@ const totalLayers = computed(
 
 // ── Open ────────────────────────────────────────────────────────────
 const fileInputRef = ref<HTMLInputElement | null>(null);
+const confirm = useConfirm();
 
-function openFile() {
-  fileInputRef.value?.click();
+async function _doOpenFile() {
+  if (persistence.hasFileSystemAccess) {
+    const text = await persistence.open();
+    if (text !== null) store.loadWell(text);
+  } else {
+    fileInputRef.value?.click();
+  }
+}
+
+async function openFile() {
+  if (store.isDirty && hasWell.value) {
+    confirm.require({
+      icon: 'ph:warning-duotone',
+      header: t('editor.confirmOpen.header'),
+      message: t('editor.confirmOpen.message'),
+      acceptLabel: t('editor.confirmOpen.accept'),
+      rejectLabel: t('editor.confirmOpen.reject'),
+      defaultFocus: 'reject',
+      rejectProps: { text: true, severity: 'secondary' },
+      accept: () => _doOpenFile(),
+    });
+  } else {
+    await _doOpenFile();
+  }
 }
 
 async function onFileSelected(event: Event) {
   const input = event.target as HTMLInputElement;
   const file = input.files?.[0];
   if (!file) return;
+  persistence.clearHandle();
   store.loadWell(await file.text());
   input.value = '';
 }
 
-// ── Save ────────────────────────────────────────────────────────────
-function saveFile() {
-  download();
+// ── Save / Save As ───────────────────────────────────────────────────
+async function saveFile() {
+  await save();
 }
+
+async function saveFileAs() {
+  await saveAs();
+}
+
+// ── Clear ────────────────────────────────────────────────────────────
+function clearWell() {
+  confirm.require({
+    icon: 'ph:warning-duotone',
+    header: t('editor.confirmClear.header'),
+    message: t('editor.confirmClear.message'),
+    acceptLabel: t('editor.confirmClear.accept'),
+    rejectLabel: t('editor.confirmClear.reject'),
+    acceptProps: { severity: 'danger' },
+    rejectProps: { text: true, severity: 'secondary' },
+    defaultFocus: 'reject',
+    accept: () => store.clear(),
+  });
+}
+
+// ── Keyboard shortcuts ───────────────────────────────────────────────
+function _onKeyDown(e: KeyboardEvent) {
+  const mod = e.metaKey || e.ctrlKey;
+  if (!mod || !hasWell.value) return;
+  if (e.key === 's' && e.shiftKey) {
+    e.preventDefault();
+    saveFileAs();
+  } else if (e.key === 's') {
+    e.preventDefault();
+    saveFile();
+  }
+}
+
+onMounted(() => document.addEventListener('keydown', _onKeyDown));
+onBeforeUnmount(() => document.removeEventListener('keydown', _onKeyDown));
 
 // ── Share dialog ────────────────────────────────────────────────────
 const shareVisible = ref(false);
 
 // ── Settings dialog ─────────────────────────────────────────────────
 const settingsVisible = ref(false);
+
+// ── Tools menu ──────────────────────────────────────────────────────
+const toolsMenuVisible = ref(false);
+
+const toolItems = computed<ToolItem[]>(() => [
+  {
+    label: t('editor.save'),
+    icon: 'ph:floppy-disk-duotone',
+    disabled: !hasWell.value,
+    onClick: saveFile,
+  },
+  {
+    label: t('editor.saveAs'),
+    icon: 'ph:floppy-disk-back-duotone',
+    disabled: !hasWell.value,
+    alwaysInMenu: true,
+    onClick: saveFileAs,
+  },
+  {
+    label: t('editor.open'),
+    icon: 'ph:folder-open-duotone',
+    onClick: openFile,
+  },
+  {
+    label: t('editor.share'),
+    icon: 'ph:share-network-duotone',
+    disabled: !hasWell.value,
+    onClick: () => (shareVisible.value = true),
+  },
+  {
+    label: t('editor.settings.title'),
+    icon: 'ph:gear-six-duotone',
+    onClick: () => (settingsVisible.value = true),
+  },
+  {
+    label: t('editor.exportPdf'),
+    icon: 'ph:file-pdf-duotone',
+    disabled: !hasWell.value,
+  },
+  {
+    label: t('editor.importSiagas'),
+    icon: 'ph:download-simple-duotone',
+    comingSoon: true,
+    disabled: true,
+  },
+  {
+    label: t('editor.clearWell'),
+    icon: 'welldot:delete-well',
+    disabled: !hasWell.value,
+    alwaysInMenu: true,
+    onClick: clearWell,
+  },
+]);
+
+// Extra tools shown in the desktop menu, on top of the dedicated buttons
+// already present in the nav.
+const extraToolItems = computed<ToolItem[]>(() =>
+  toolItems.value.filter(item => item.comingSoon || item.alwaysInMenu),
+);
 
 // ── Pass-through ────────────────────────────────────────────────────
 const actionBtnPt = {
@@ -55,6 +178,16 @@ const actionBtnPt = {
       'text-content-400 hover:text-content-0 hover:bg-surface-100',
       'transition-colors duration-150 cursor-pointer border-none bg-transparent',
       'disabled:opacity-40 disabled:cursor-not-allowed disabled:pointer-events-none',
+    ],
+  },
+};
+
+const iconBtnPt = {
+  root: {
+    class: [
+      'size-8 rounded-full border border-surface-200 flex items-center justify-center shrink-0',
+      'text-content-400 hover:text-content-0 hover:border-surface-300',
+      'transition-colors duration-150 cursor-pointer bg-transparent',
     ],
   },
 };
@@ -152,13 +285,23 @@ const viewOptions = computed(() => [
         </template>
       </Button>
       <Button
-        :label="t('editor.settings.title')"
+        :aria-label="t('editor.settings.title')"
         unstyled
         :pt="actionBtnPt"
         @click="settingsVisible = true"
       >
         <template #icon>
           <Icon name="ph:gear-six-duotone" class="size-4 shrink-0" />
+        </template>
+      </Button>
+      <Button
+        :aria-label="t('editor.toolsMenu.title')"
+        unstyled
+        :pt="actionBtnPt"
+        @click="toolsMenuVisible = true"
+      >
+        <template #icon>
+          <Icon name="ph:dots-three-outline-light" class="size-4 shrink-0" />
         </template>
       </Button>
     </div>
@@ -197,13 +340,16 @@ const viewOptions = computed(() => [
         </span>
       </div>
 
-      <button
-        class="size-8 rounded-full border border-surface-200 flex items-center justify-center text-content-400 hover:text-content-0 hover:border-surface-300 transition-colors shrink-0"
-        :aria-label="t('editor.settings.title')"
-        @click="settingsVisible = true"
+      <Button
+        :aria-label="t('editor.toolsMenu.title')"
+        unstyled
+        :pt="iconBtnPt"
+        @click="toolsMenuVisible = true"
       >
-        <Icon name="ph:gear-six-duotone" class="size-4" />
-      </button>
+        <template #icon>
+          <Icon name="ph:dots-three-outline-light" class="size-4" />
+        </template>
+      </Button>
     </div>
 
     <!-- Row 2: status bar -->
@@ -249,6 +395,12 @@ const viewOptions = computed(() => [
 
   <!-- ─── Settings dialog ───────────────────────────────────────────── -->
   <SettingsModal v-model="settingsVisible" />
+
+  <!-- ─── Tools menu ────────────────────────────────────────────────── -->
+  <ToolsMenu
+    v-model="toolsMenuVisible"
+    :items="isMobile ? toolItems : extraToolItems"
+  />
 
   <!-- ─── Hidden file input ─────────────────────────────────────────── -->
   <ClientOnly>

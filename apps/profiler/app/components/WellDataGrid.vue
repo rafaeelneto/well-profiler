@@ -14,10 +14,13 @@ import GridColorPickerEditor from './GridColorPickerEditor.vue';
 import GridUnitCell from './GridUnitCell.vue';
 import GridColorCell from './GridColorCell.vue';
 import GridSelectCell from './GridSelectCell.vue';
+import GridTextureSelectEditor from './GridTextureSelectEditor.vue';
+import GridTextureSelectCell from './GridTextureSelectCell.vue';
 import GridFormattedCell from './GridFormattedCell.vue';
 import { columnStretchPlugin } from './columnStretchPlugin';
 import GridDeleteCell from './GridDeleteCell.vue';
 import GridCheckboxCell from './GridCheckboxCell.vue';
+import GridSelectButtonCell from './GridSelectButtonCell.vue';
 import type {
   AfterEditEvent,
   BeforeSaveDataDetails,
@@ -57,7 +60,12 @@ export type WellGridColumn =
   | (WellGridColumnBase & {
       type: 'select';
       options: Array<{ label: string; value: string }>;
-    });
+    })
+  | (WellGridColumnBase & {
+      type: 'select-button';
+      options: Array<{ label: string; value: string }>;
+    })
+  | (WellGridColumnBase & { type: 'texture' });
 
 // ─── Props / Emits ────────────────────────────────────────────────────────────
 
@@ -98,6 +106,13 @@ function selectEditorFactory(options: Array<{ label: string; value: string }>) {
   });
 }
 
+function textureEditorFactory() {
+  return defineComponent({
+    props: ['val', 'save', 'close'],
+    setup: (p: any) => () => h(GridTextureSelectEditor, p),
+  });
+}
+
 const gridEditors = computed(() => {
   const editors: Editors = {
     text: VGridVueEditor(GridTextEditor),
@@ -105,6 +120,7 @@ const gridEditors = computed(() => {
     color: VGridVueEditor(GridColorPickerEditor),
     length: VGridVueEditor(unitEditorFactory('length')),
     diameter: VGridVueEditor(unitEditorFactory('diameter')),
+    texture: VGridVueEditor(textureEditorFactory()),
   };
   for (const col of props.columns) {
     if (col.type === 'select') {
@@ -153,8 +169,10 @@ type ColumnKind =
   | 'diameter'
   | 'color'
   | 'select'
+  | 'select-button'
   | 'formatted'
-  | 'checkbox';
+  | 'checkbox'
+  | 'texture';
 
 interface ColumnKindDef {
   editor?: (col: WellGridColumn) => string;
@@ -203,10 +221,28 @@ const columnKinds: Record<ColumnKind, ColumnKindDef> = {
           emit('change', rowIndex, prop, value),
       }),
   },
+  'select-button': {
+    readonly: true,
+    cellProperties: () => () => ({ class: 'well-grid-checkbox-cell' }),
+    cellTemplate: col =>
+      VGridVueTemplate(GridSelectButtonCell, {
+        prop: col.prop,
+        options: (col as Extract<WellGridColumn, { type: 'select-button' }>)
+          .options,
+        onChange: (rowIndex: number, prop: string, value: unknown) =>
+          emit('change', rowIndex, prop, value),
+      }),
+  },
+  texture: {
+    editor: () => 'texture',
+    cellTemplate: () => VGridVueTemplate(GridTextureSelectCell),
+  },
 };
 
 function resolveColumnKind(col: WellGridColumn): ColumnKind {
+  if (col.type === 'texture') return 'texture';
   if (col.type === 'select') return 'select';
+  if (col.type === 'select-button') return 'select-button';
   if (col.type === 'color') return 'color';
   if (col.type === 'checkbox') return 'checkbox';
   if (col.unitType) return col.unitType;
@@ -411,6 +447,15 @@ function handleGridClick(event: MouseEvent) {
 </template>
 
 <style scoped>
+.well-data-grid-wrapper {
+  --accent-soft: color-mix(in srgb, var(--color-primary-500) 12%, transparent);
+  --color-primary-soft: color-mix(
+    in srgb,
+    var(--color-primary-500) 25%,
+    transparent
+  );
+}
+
 .well-data-grid :deep(.header-rgRow) {
   height: v-bind('`${HEADER_H}px`');
 }
@@ -427,7 +472,22 @@ revogr-attribution {
 
 revo-grid {
   --revo-grid-font: var(--font-mono);
-  --revo-border-color: var(--color-surface-200);
+  --revo-grid-background: var(--color-surface-0);
+  --revo-grid-foreground: var(--color-content-0);
+  --revo-grid-text: var(--color-content-0);
+  --revo-grid-divider: var(--color-surface-200);
+  --revo-grid-border: var(--color-surface-200);
+  --revo-grid-header-bg: var(--color-surface-50);
+  --revo-grid-header-color: var(--color-content-500);
+  --revo-grid-header-border: var(--color-surface-200);
+  --revo-grid-cell-border: var(--color-surface-200);
+  --revo-grid-focused-bg: var(--accent-soft);
+  --revo-grid-row-hover: var(--accent-soft);
+  --revo-grid-row-headers-bg: var(--color-surface-50);
+  --revo-grid-row-headers-color: var(--color-content-500);
+  --revo-grid-cell-disabled-bg: var(--color-surface-100);
+  --revo-grid-primary: var(--color-primary-500);
+  --revo-grid-primary-transparent: var(--color-primary-soft);
   font-family: var(--font-mono) !important;
   font-size: 11px !important;
   color: var(--color-content-0);
@@ -487,6 +547,10 @@ revo-grid .rgCell.disabled.well-grid-checkbox-cell {
   --revo-grid-cell-disabled-bg: transparent;
 }
 
+revo-grid .rgRow:hover .rgCell.disabled.well-grid-checkbox-cell {
+  background-color: var(--accent-soft);
+}
+
 /* ── PrimeVue cell editors ────────────────────────────────────────────────── */
 
 /* Editor renders in revogr-edit which is a portal outside revo-grid */
@@ -503,7 +567,7 @@ revo-grid .well-cell-input {
   border: none !important;
   border-radius: 0 !important;
   background: var(--color-surface-0) !important;
-  box-shadow: inset 0 0 0 1.5px var(--color-primary-500) !important;
+  box-shadow: inset 0 0 0 1.5px var(--color-focus-ring) !important;
   font-family: var(--font-mono) !important;
   font-size: 11px !important;
   color: var(--color-content-0) !important;
@@ -611,7 +675,7 @@ revogr-edit .well-cell-select.p-select {
   border: none;
   border-radius: 0;
   background: var(--color-surface-0);
-  box-shadow: inset 0 0 0 1.5px var(--color-primary-500);
+  box-shadow: inset 0 0 0 1.5px var(--color-focus-ring);
   font-family: var(--font-mono);
   font-size: 11px;
 }
@@ -628,6 +692,10 @@ revogr-edit .well-cell-select .p-select-dropdown {
   color: var(--color-content-500);
 }
 
+revogr-edit .well-cell-texture-select .p-select-label {
+  padding: 0 4px;
+}
+
 /* ── Color editor trigger ─────────────────────────────────────────────────── */
 
 revogr-edit .well-cell-color-trigger {
@@ -637,7 +705,7 @@ revogr-edit .well-cell-color-trigger {
   width: 100%;
   height: 100%;
   padding: 0 8px;
-  box-shadow: inset 0 0 0 1.5px var(--color-primary-500);
+  box-shadow: inset 0 0 0 1.5px var(--color-focus-ring);
   background: var(--color-surface-0);
 }
 

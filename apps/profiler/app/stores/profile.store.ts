@@ -284,6 +284,10 @@ export const useProfileStore = defineStore(
       isDirty.value = false;
     }
 
+    function markClean(): void {
+      isDirty.value = false;
+    }
+
     return {
       // ── State (raw ref — persistence only, prefer `well` in components)
       _well,
@@ -340,6 +344,7 @@ export const useProfileStore = defineStore(
       validate,
       getExportableWell,
       clear,
+      markClean,
     };
   },
   {
@@ -347,6 +352,12 @@ export const useProfileStore = defineStore(
       key: 'welldot_profile',
       pick: ['_well'],
       storage: piniaPluginPersistedstate.localStorage(),
+      afterHydrate(ctx) {
+        const w = ctx.store._well as Well | null;
+        if (w && !isWellEmpty(w)) {
+          ctx.store.isDirty = true;
+        }
+      },
     },
   },
 );

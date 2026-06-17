@@ -178,11 +178,16 @@
   "editor": {
     "well": "Well",
     "save": "Save",
+    "saveAs": "Save As",
     "open": "Open",
     "share": "Share",
     "exportPdf": "Export PDF",
     "back": "Back",
     "menu": "Menu",
+    "importSiagas": "Import from SIAGAS",
+    "toolsMenu": {
+      "title": "Tools"
+    },
     "settings": {
       "title": "Settings",
       "units": {
@@ -207,12 +212,29 @@
       "construction": "Construction",
       "constructionShort": "Constr.",
       "geological": "Geological",
-      "summary": "Summary"
+      "summary": "Summary",
+      "historico": "History",
+      "hidrodinamica": "Hydrodynamic",
+      "hidro": "Hydro",
+      "inDevelopment": "In dev"
     },
     "status": {
       "saved": "Saved",
       "unsaved": "Unsaved",
       "layers": "Layers"
+    },
+    "clearWell": "Clear well",
+    "confirmOpen": {
+      "header": "Open file",
+      "message": "You have unsaved changes. Opening a new file will discard them.",
+      "accept": "Open anyway",
+      "reject": "Cancel"
+    },
+    "confirmClear": {
+      "header": "Clear well",
+      "message": "This will reset all well data. This action cannot be undone.",
+      "accept": "Clear",
+      "reject": "Cancel"
     },
     "shareDialog": {
       "title": "Share well",
@@ -370,6 +392,18 @@
         "shallowTubular": "Shallow tubular",
         "artesian": "Artesian",
         "handDug": "Hand dug"
+      },
+      "wellIds": {
+        "title": "Well Identifiers",
+        "tag": "IDENTIFIERS",
+        "authority": "Authority",
+        "authorityPlaceholder": "SIAGAS, ANA…",
+        "id": "ID",
+        "idPlaceholder": "e.g. SP-0042819",
+        "primary": "Primary",
+        "addRow": "Add identifier",
+        "delete": "Delete identifier",
+        "empty": "No identifiers yet"
       }
     },
     "summary": {

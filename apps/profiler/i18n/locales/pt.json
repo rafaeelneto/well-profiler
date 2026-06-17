@@ -178,11 +178,16 @@
   "editor": {
     "well": "Poço",
     "save": "Salvar",
+    "saveAs": "Salvar Como",
     "open": "Abrir",
     "share": "Compartilhar",
     "exportPdf": "Exportar PDF",
     "back": "Voltar",
     "menu": "Menu",
+    "importSiagas": "Importar do SIAGAS",
+    "toolsMenu": {
+      "title": "Ferramentas"
+    },
     "settings": {
       "title": "Configurações",
       "units": {
@@ -207,12 +212,29 @@
       "construction": "Construtivo",
       "constructionShort": "Constr.",
       "geological": "Geológico",
-      "summary": "Sumário"
+      "summary": "Sumário",
+      "historico": "Histórico",
+      "hidrodinamica": "Hidrodinâmica",
+      "hidro": "Hidro",
+      "inDevelopment": "Em dev"
     },
     "status": {
       "saved": "Salvo",
       "unsaved": "Não salvo",
       "layers": "Camadas"
+    },
+    "clearWell": "Limpar poço",
+    "confirmOpen": {
+      "header": "Abrir arquivo",
+      "message": "Há alterações não salvas. Abrir um novo arquivo irá descartá-las.",
+      "accept": "Abrir mesmo assim",
+      "reject": "Cancelar"
+    },
+    "confirmClear": {
+      "header": "Limpar poço",
+      "message": "Isso irá redefinir todos os dados do poço. Esta ação não pode ser desfeita.",
+      "accept": "Limpar",
+      "reject": "Cancelar"
     },
     "shareDialog": {
       "title": "Compartilhar poço",
@@ -370,6 +392,18 @@
         "shallowTubular": "Tubular raso",
         "artesian": "Artesiano",
         "handDug": "Escavado"
+      },
+      "wellIds": {
+        "title": "Identificadores do Poço",
+        "tag": "IDENTIFICADORES",
+        "authority": "Autoridade",
+        "authorityPlaceholder": "SIAGAS, ANA…",
+        "id": "ID",
+        "idPlaceholder": "ex. SP-0042819",
+        "primary": "Principal",
+        "addRow": "Adicionar identificador",
+        "delete": "Remover identificador",
+        "empty": "Nenhum identificador cadastrado"
       }
     },
     "summary": {

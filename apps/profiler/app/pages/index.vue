@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useElementBounding } from '@vueuse/core';
+import { NuxtLink } from '#components';
 
 definePageMeta({ layout: 'landing' });
 
@@ -131,7 +132,7 @@ const horizonProps = computed(() =>
             {{ t('hero.body') }}
           </p>
           <div class="flex flex-col sm:flex-row gap-2.5 mb-5 lg:mb-7">
-            <Button :label="t('hero.ctaPrimary')" as="NuxtLink" to="/editor" />
+            <Button :label="t('hero.ctaPrimary')" :as="NuxtLink" to="/editor" />
             <Button
               :label="t('hero.ctaSecondary')"
               as="a"
@@ -408,7 +409,7 @@ const horizonProps = computed(() =>
       <div
         class="flex flex-col sm:flex-row gap-2.5 justify-center items-center"
       >
-        <Button :label="t('cta.primary')" as="NuxtLink" to="/editor" />
+        <Button :label="t('cta.primary')" :as="NuxtLink" to="/editor" />
         <Button
           :label="t('cta.secondary')"
           as="a"

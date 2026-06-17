@@ -45,13 +45,21 @@ const customPt = {
       'font-display transition-all duration-200 hover:scale-[1.02] active:scale-95',
   },
   inputtext: {
-    root: 'font-mono text-sm rounded-[var(--radius-sm)] focus:shadow-[inset_0_0_0_1.5px_var(--w-primary-500)]',
+    root: 'font-mono border-content-600 py-[5px] border-[1px] text-[12px] rounded-[var(--radius-sm)] focus:shadow-[inset_0_0_0_1.5px_var(--color-focus-ring)] [&.p-invalid]:shadow-[inset_0_0_0_1.5px_var(--color-error-ring)]',
+  },
+  inputnumber: {
+    pcInput: {
+      root: 'font-mono border-content-600 border-[1px] py-[5px] text-[12px] rounded-[var(--radius-sm)] focus:shadow-[inset_0_0_0_1.5px_var(--color-focus-ring)] [&.p-invalid]:shadow-[inset_0_0_0_1.5px_var(--color-error-ring)]',
+    },
   },
   select: {
-    root: 'font-display',
-    label: 'font-display',
-    overlay: 'font-display',
-    option: 'font-display',
+    root: 'font-mono border-content-600 border-[1px] py-[5px] rounded-[var(--radius-sm)] [&.p-focus]:shadow-[inset_0_0_0_1.5px_var(--color-focus-ring)] [&.p-invalid]:shadow-[inset_0_0_0_1.5px_var(--color-error-ring)]',
+    label: 'font-mono py-0 px-2 text-[12px]',
+    overlay: 'font-mono',
+    option: 'font-mono',
+  },
+  textarea: {
+    root: 'font-mono border-content-600 border-[1px] py-[5px] text-[12px] rounded-[var(--radius-sm)] focus:shadow-[inset_0_0_0_1.5px_var(--color-focus-ring)] [&.p-invalid]:shadow-[inset_0_0_0_1.5px_var(--color-error-ring)]',
   },
   datepicker: {
     panel: 'font-display',
@@ -59,7 +67,10 @@ const customPt = {
     selectMonth: 'font-display',
     selectYear: 'font-display',
     weekDay: 'font-display text-xs uppercase tracking-wide',
-    day: 'font-mono text-sm',
+    day: 'font-mono text-[12px]',
+    pcInput: {
+      root: 'font-mono border-content-600 border-[1px] py-[5px] text-[12px] rounded-[var(--radius-sm)] focus:shadow-[inset_0_0_0_1.5px_var(--color-focus-ring)] [&.p-invalid]:shadow-[inset_0_0_0_1.5px_var(--color-error-ring)]',
+    },
   },
   dialog: {
     root: 'font-display backdrop-blur-2xl backdrop-saturate-150',
@@ -71,6 +82,16 @@ const customPt = {
         class: hasHeader ? 'justify-between' : 'justify-end',
       };
     },
+    mask: {
+      class: 'backdrop-blur-[3px] bg-surface-900/10 dark:bg-surface-950/30',
+    },
+  },
+  confirmdialog: {
+    root: 'font-display backdrop-blur-2xl backdrop-saturate-150',
+    title: 'font-mono tracking-tight',
+    header: 'pb-0',
+    content: 'px-6 py-4',
+    footer: 'flex justify-end gap-2 pt-0',
     mask: {
       class: 'backdrop-blur-[3px] bg-surface-900/10 dark:bg-surface-950/30',
     },

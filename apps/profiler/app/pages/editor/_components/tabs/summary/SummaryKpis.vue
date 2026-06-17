@@ -34,7 +34,7 @@ const kpis = computed(() => [
     <div
       v-for="kpi in kpis"
       :key="kpi.key"
-      class="rounded-[10px] border border-surface-200 bg-gradient-to-b from-white/85 to-surface-50/55 p-3 shadow-[0_1px_0_rgba(255,255,255,0.7)_inset]"
+      class="rounded-[10px] border border-surface-200 bg-gradient-to-b from-surface-0/85 to-surface-50/55 p-3 shadow-[0_1px_0_rgba(255,255,255,0.7)_inset] dark:shadow-[0_1px_0_rgba(255,255,255,0.04)_inset]"
     >
       <div class="mb-1 font-mono text-[9.5px] tracking-[0.08em] uppercase text-content-400">
         {{ kpi.label }}
