@@ -212,7 +212,11 @@
       "construction": "Construtivo",
       "constructionShort": "Constr.",
       "geological": "Geológico",
-      "summary": "Sumário"
+      "summary": "Sumário",
+      "historico": "Histórico",
+      "hidrodinamica": "Hidrodinâmica",
+      "hidro": "Hidro",
+      "inDevelopment": "Em dev"
     },
     "status": {
       "saved": "Salvo",

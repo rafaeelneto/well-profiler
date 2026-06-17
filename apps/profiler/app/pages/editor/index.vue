@@ -35,6 +35,20 @@ const tabs = computed(() => [
     label: t('editor.tabs.summary'),
     shortLabel: t('editor.tabs.summary'),
   },
+  {
+    value: '4',
+    label: t('editor.tabs.historico'),
+    shortLabel: t('editor.tabs.historico'),
+    disabled: true,
+    comingSoon: true,
+  },
+  {
+    value: '5',
+    label: t('editor.tabs.hidrodinamica'),
+    shortLabel: t('editor.tabs.hidro'),
+    disabled: true,
+    comingSoon: true,
+  },
 ]);
 </script>
 
@@ -119,8 +133,21 @@ const tabs = computed(() => [
     >
       <Tabs v-model:value="activeTabKey">
         <TabList>
-          <Tab v-for="tab in tabs" :key="tab.value" :value="tab.value">
-            {{ isMobile ? tab.shortLabel : tab.label }}
+          <Tab
+            v-for="tab in tabs"
+            :key="tab.value"
+            :value="tab.value"
+            :disabled="tab.disabled ?? false"
+          >
+            <span class="flex items-center gap-1.5">
+              {{ isMobile ? tab.shortLabel : tab.label }}
+              <span
+                v-if="tab.comingSoon"
+                class="text-[9px] font-semibold tracking-wider uppercase px-1.5 py-0.5 rounded-full bg-surface-200 dark:bg-surface-700 text-content-400"
+              >
+                {{ t('editor.tabs.inDevelopment') }}
+              </span>
+            </span>
           </Tab>
         </TabList>
         <TabPanels>
@@ -128,6 +155,8 @@ const tabs = computed(() => [
           <TabPanel value="1"><TabConstruction /></TabPanel>
           <TabPanel value="2"><TabGeological /></TabPanel>
           <TabPanel value="3"><TabSummary /></TabPanel>
+          <TabPanel value="4" />
+          <TabPanel value="5" />
         </TabPanels>
       </Tabs>
     </div>
