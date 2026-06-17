@@ -388,6 +388,18 @@
         "shallowTubular": "Tubular raso",
         "artesian": "Artesiano",
         "handDug": "Escavado"
+      },
+      "wellIds": {
+        "title": "Identificadores do Poço",
+        "tag": "IDENTIFICADORES",
+        "authority": "Autoridade",
+        "authorityPlaceholder": "SIAGAS, ANA…",
+        "id": "ID",
+        "idPlaceholder": "ex. SP-0042819",
+        "primary": "Principal",
+        "addRow": "Adicionar identificador",
+        "delete": "Remover identificador",
+        "empty": "Nenhum identificador cadastrado"
       }
     },
     "summary": {

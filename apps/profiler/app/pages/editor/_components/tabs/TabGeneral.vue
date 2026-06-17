@@ -30,6 +30,40 @@ async function updateLocationField<K extends 'lat' | 'lng' | 'elevation'>(
   profileStore.well.location[key] = newValue;
 }
 
+// ─── Well IDs ─────────────────────────────────────────────────────────────────
+
+const AUTHORITY_SUGGESTIONS = [
+  'SIAGAS',
+  'ANA',
+  'SEMAS/PA',
+  'CPRM',
+  'IBGE',
+  'FUNASA',
+  'INEMA',
+  'NGWD',
+];
+
+const primaryIndex = computed(
+  () => profileStore.well.well_id?.findIndex(e => e.primary) ?? -1,
+);
+
+function addWellId() {
+  if (!profileStore.well.well_id) profileStore.well.well_id = [];
+  profileStore.well.well_id.push({ authority: '', id: '' });
+}
+
+function deleteWellId(index: number) {
+  profileStore.well.well_id?.splice(index, 1);
+}
+
+function setPrimary(index: number) {
+  if (!profileStore.well.well_id) return;
+  const isAlreadyPrimary = primaryIndex.value === index;
+  profileStore.well.well_id.forEach((entry, i) => {
+    entry.primary = !isAlreadyPrimary && i === index ? true : undefined;
+  });
+}
+
 // ─── Well type Select ─────────────────────────────────────────────────────────
 
 const wellTypeOptions = computed(() => [
@@ -96,6 +130,77 @@ const wellTypeOptions = computed(() => [
       </div>
     </section>
 
+    <!-- ── Section: Well Identifiers ────────────────────────────────────── -->
+    <section class="flex flex-col gap-5">
+      <div
+        class="flex items-baseline justify-between border-b border-surface-200/70 dark:border-surface-700/60 pb-3"
+      >
+        <h2 class="text-2xl font-semibold tracking-tight">
+          {{ t('editor.general.wellIds.title') }}
+        </h2>
+        <span
+          class="text-[10px] font-semibold tracking-widest uppercase text-content-400"
+        >
+          {{ t('editor.general.wellIds.tag') }} · {{ t('editor.well') }}
+        </span>
+      </div>
+
+      <div
+        v-if="profileStore.well.well_id?.length"
+        class="flex flex-col gap-2"
+      >
+        <div
+          v-for="(entry, index) in profileStore.well.well_id"
+          :key="index"
+          class="flex items-center gap-2"
+        >
+          <RadioButton
+            :model-value="primaryIndex"
+            :value="index"
+            :pt="{ root: 'cursor-pointer' }"
+            @click="setPrimary(index)"
+          />
+          <div class="flex flex-1 flex-col gap-2 sm:flex-row">
+            <Select
+              v-model="entry.authority"
+              :options="AUTHORITY_SUGGESTIONS"
+              editable
+              :placeholder="t('editor.general.wellIds.authorityPlaceholder')"
+              class="w-full sm:w-40 sm:shrink-0"
+            />
+            <InputText
+              v-model="entry.id"
+              :placeholder="t('editor.general.wellIds.idPlaceholder')"
+              class="w-full font-mono"
+            />
+          </div>
+          <Button
+            icon="ph:trash"
+            severity="secondary"
+            text
+            :aria-label="t('editor.general.wellIds.delete')"
+            @click="deleteWellId(index)"
+          />
+        </div>
+      </div>
+
+      <p v-else class="text-sm text-content-400 italic">
+        {{ t('editor.general.wellIds.empty') }}
+      </p>
+
+      <Button
+        unstyled
+        class="well-ids-add-btn"
+        type="button"
+        @click="addWellId"
+      >
+        <template #icon>
+          <Icon name="ph:plus" />
+        </template>
+        {{ t('editor.general.wellIds.addRow') }}
+      </Button>
+    </section>
+
     <!-- ── Section: Location ──────────────────────────────────────────────── -->
     <section class="flex flex-col gap-5">
       <div
@@ -146,3 +251,44 @@ const wellTypeOptions = computed(() => [
     </section>
   </div>
 </template>
+
+<style scoped>
+.well-ids-add-btn {
+  align-self: flex-start;
+  margin-top: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 14px;
+  min-height: 32px;
+  border-radius: 999px;
+  border: 1px dashed var(--color-surface-300);
+  background: var(--color-surface-50);
+  color: var(--color-content-300);
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition:
+    background 120ms ease,
+    color 120ms ease,
+    border-color 120ms ease;
+}
+
+.well-ids-add-btn:hover {
+  background: var(--color-surface-100);
+  color: var(--color-content-0);
+  border-color: var(--color-content-0);
+}
+
+.well-ids-add-btn:active {
+  transform: translateY(0.5px);
+}
+
+.well-ids-add-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary-500) 25%, transparent);
+  border-color: var(--color-primary-500);
+}
+</style>

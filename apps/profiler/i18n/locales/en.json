@@ -388,6 +388,18 @@
         "shallowTubular": "Shallow tubular",
         "artesian": "Artesian",
         "handDug": "Hand dug"
+      },
+      "wellIds": {
+        "title": "Well Identifiers",
+        "tag": "IDENTIFIERS",
+        "authority": "Authority",
+        "authorityPlaceholder": "SIAGAS, ANA…",
+        "id": "ID",
+        "idPlaceholder": "e.g. SP-0042819",
+        "primary": "Primary",
+        "addRow": "Add identifier",
+        "delete": "Delete identifier",
+        "empty": "No identifiers yet"
       }
     },
     "summary": {
