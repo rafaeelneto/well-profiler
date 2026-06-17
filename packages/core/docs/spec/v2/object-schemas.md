@@ -31,7 +31,7 @@ Steel or plastic casing installed inside the borehole.
 | ---------- | ------ | -------- | ------------------------------------------------------------------- |
 | `from`     | number | yes      | Start depth in meters.                                              |
 | `to`       | number | yes      | End depth in meters.                                                |
-| `type`     | string | yes      | Casing material. Recommended: `steel`, `pvc`, `hdpe`, `fiberglass`. |
+| `type`     | string | yes      | Casing material. Free Text |
 | `diameter` | number | yes      | Casing outer diameter in millimeters.                               |
 
 ---
@@ -46,7 +46,7 @@ A transition piece connecting two casing or screen sections of different diamete
 | `to`        | number | yes      | End depth in meters.                                       |
 | `diam_from` | number | yes      | Diameter at top in millimeters.                            |
 | `diam_to`   | number | yes      | Diameter at bottom in millimeters.                         |
-| `type`      | string | yes      | Reducer type. Recommended: `conical`, `stepped`, `swaged`. |
+| `type`      | string | yes      | Reducer type. Free Text |
 
 ---
 
@@ -58,7 +58,7 @@ Slotted or wire-wound screen section.
 | ------------- | ------ | -------- | ---------------------------------------------------------------------------------------------------- |
 | `from`        | number | yes      | Start depth in meters.                                                                               |
 | `to`          | number | yes      | End depth in meters.                                                                                 |
-| `type`        | string | yes      | Screen type. Recommended: `wire_wound`, `bridge_slot`, `louvered`, `pvc_slotted`, `continuous_slot`. |
+| `type`        | string | yes      | Screen type. Free text |
 | `diameter`    | number | yes      | Screen outer diameter in millimeters.                                                                |
 | `screen_slot` | number | yes      | Slot opening size in millimeters.                                                                    |
 
@@ -119,7 +119,7 @@ Geological description of a depth interval.
 | `color`         | string    | yes      | Representative color as a CSS hex value.                            |
 | `texture`       | `Texture` | yes      | Lithology pattern reference. See below.                             |
 | `geologic_unit` | string    | yes      | Stratigraphic or geologic unit name.                                |
-| `aquifer_unit`  | string    | yes      | Aquifer classification (e.g. `freático`, `confinado`, `fraturado`). |
+| `aquifer_unit`  | string    | yes      | Aquifer unit name like "Aquifero Pirabas" or "Massachusetts Aquifer"|
 
 ### `Texture`
 
@@ -179,7 +179,7 @@ A discrete fracture or fracture zone.
 | `swarm`           | boolean | yes      | Whether this fracture belongs to a swarm.         |
 | `azimuth`         | number  | yes      | Azimuth in degrees from geographic north (0–360). |
 | `dip`             | number  | yes      | Dip angle in degrees from horizontal (0–90).      |
-| `depth_precision` | number  | no       | One-sigma precision of `depth` in meters.         |
+| `depth_precision` | number  | no       | One-sigma precision of `depth` in meters. Default handled by editors       |
 
 ---
 
