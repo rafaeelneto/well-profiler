@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type { Well } from '@welldot/core';
 import type { WellGridColumn } from '~/components/WellDataGrid.vue';
 
 const { t } = useI18n();
@@ -27,7 +26,7 @@ const surfaceCaseColumns = computed<WellGridColumn[]>(() => [
 ]);
 
 function addSurfaceCase() {
-  profileStore.well.surface_case.push({ from: 0, to: 0, diameter: 0 });
+  profileStore.addWellFeature('surface_case', { from: 0, to: 10, diameter: 0 });
 }
 
 function deleteSurfaceCase(index: number) {
@@ -35,18 +34,11 @@ function deleteSurfaceCase(index: number) {
 }
 
 function updateSurfaceCase(index: number, prop: string, value: unknown) {
-  (profileStore.well.surface_case[index] as Record<string, unknown>)[prop] =
-    value;
+  profileStore.updateWellFeature('surface_case', index, prop, value);
 }
 
 function reorderSurfaceCase(from: number, to: number) {
-  const items = [...profileStore.well.surface_case];
-  const [moved] = items.splice(from, 1);
-  if (!moved) return;
-  items.splice(to, 0, moved);
-  profileStore.updateWell((draft: Well) => {
-    draft.surface_case.splice(0, draft.surface_case.length, ...items);
-  });
+  profileStore.reorderWellFeature('surface_case', from, to);
 }
 </script>
 

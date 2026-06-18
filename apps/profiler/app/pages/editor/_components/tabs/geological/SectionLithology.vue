@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type { Well } from '@welldot/core';
 import { metersToFeet } from '@welldot/core';
 import type { WellGridColumn } from '~/components/WellDataGrid.vue';
 
@@ -61,9 +60,9 @@ const lithologyRows = computed(() =>
 );
 
 function addLithology() {
-  profileStore.well.lithology.push({
+  profileStore.addWellFeature('lithology', {
     from: 0,
-    to: 0,
+    to: 10,
     description: '',
     color: '#cccccc',
     texture: { code: 612, vocabulary: 'fgdc' },
@@ -77,24 +76,15 @@ function deleteLithology(index: number) {
 }
 
 function updateLithology(index: number, prop: string, value: unknown) {
-  if (prop === 'texture') {
-    profileStore.well.lithology[index]!.texture = {
-      code: value as string | number,
-      vocabulary: 'fgdc',
-    };
-    return;
-  }
-  (profileStore.well.lithology[index] as Record<string, unknown>)[prop] = value;
+  const v =
+    prop === 'texture'
+      ? { code: value as string | number, vocabulary: 'fgdc' }
+      : value;
+  profileStore.updateWellFeature('lithology', index, prop, v);
 }
 
 function reorderLithology(from: number, to: number) {
-  const items = [...profileStore.well.lithology];
-  const [moved] = items.splice(from, 1);
-  if (!moved) return;
-  items.splice(to, 0, moved);
-  profileStore.updateWell((draft: Well) => {
-    draft.lithology.splice(0, draft.lithology.length, ...items);
-  });
+  profileStore.reorderWellFeature('lithology', from, to);
 }
 
 const geologicUnitSummary = computed(() => {

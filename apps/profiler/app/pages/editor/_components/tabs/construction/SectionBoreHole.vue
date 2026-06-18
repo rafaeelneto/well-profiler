@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type { Well } from '@welldot/core';
 import type { WellGridColumn } from '~/components/WellDataGrid.vue';
 
 const { t } = useI18n();
@@ -34,7 +33,7 @@ const boreHoleColumns = computed<WellGridColumn[]>(() => [
 ]);
 
 function addBoreHole() {
-  profileStore.well.bore_hole.push({ from: 0, to: 0, diameter: 0 });
+  profileStore.addWellFeature('bore_hole', { from: 0, to: 10, diameter: 0 });
 }
 
 function deleteBoreHole(index: number) {
@@ -42,17 +41,11 @@ function deleteBoreHole(index: number) {
 }
 
 function updateBoreHole(index: number, prop: string, value: unknown) {
-  (profileStore.well.bore_hole[index] as Record<string, unknown>)[prop] = value;
+  profileStore.updateWellFeature('bore_hole', index, prop, value);
 }
 
 function reorderBoreHole(from: number, to: number) {
-  const items = [...profileStore.well.bore_hole];
-  const [moved] = items.splice(from, 1);
-  if (!moved) return;
-  items.splice(to, 0, moved);
-  profileStore.updateWell((draft: Well) => {
-    draft.bore_hole.splice(0, draft.bore_hole.length, ...items);
-  });
+  profileStore.reorderWellFeature('bore_hole', from, to);
 }
 </script>
 
