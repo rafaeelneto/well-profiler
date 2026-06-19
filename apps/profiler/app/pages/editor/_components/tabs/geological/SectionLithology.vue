@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import { metersToFeet } from '@welldot/core';
 import type { WellGridColumn } from '~/components/WellDataGrid.vue';
 
 const { t } = useI18n();
 const profileStore = useProfileStore();
-const uiStore = useUiStore();
+const { formatLength } = useUnitFormat();
 
 const lithologyColumns = computed<WellGridColumn[]>(() => [
   {
@@ -101,10 +100,7 @@ const geologicUnitSummary = computed(() => {
   }
   return groups.map(group => ({
     ...group,
-    display:
-      uiStore.lengthUnit === 'ft'
-        ? metersToFeet(group.thickness)
-        : group.thickness,
+    displayLabel: formatLength(group.thickness, 1),
   }));
 });
 </script>
@@ -135,9 +131,7 @@ const geologicUnitSummary = computed(() => {
           :style="{ backgroundColor: group.color }"
         />
         {{ group.name }}
-        <span class="text-content-500"
-          >{{ Number(group.display.toFixed(1)) }} {{ uiStore.lengthUnit }}</span
-        >
+        <span class="text-content-500">{{ group.displayLabel }}</span>
       </span>
     </div>
 

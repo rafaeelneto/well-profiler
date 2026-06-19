@@ -40,7 +40,7 @@ function update(value: number) {
 </script>
 
 <template>
-  <InputNumber
+  <WellInputNumber
     ref="numRef"
     :model-value="localValue"
     @update:model-value="update"

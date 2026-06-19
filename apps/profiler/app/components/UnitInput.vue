@@ -18,10 +18,6 @@ const emit = defineEmits<{
 const attrs = useAttrs()
 const uiStore = useUiStore()
 
-const displayUnit = computed(() =>
-  props.unitType === 'length' ? uiStore.lengthUnit : uiStore.diameterUnit,
-)
-
 function toDisplay(v: number): number {
   if (props.unitType === 'length') return uiStore.lengthUnit === 'ft' ? metersToFeet(v) : v
   return uiStore.diameterUnit === 'inches' ? mmToInches(v) : v
@@ -39,10 +35,9 @@ const displayStep = computed(() => (props.step != null ? toDisplay(props.step) :
 </script>
 
 <template>
-  <InputNumber
+  <WellInputNumber
     v-bind="attrs"
     :model-value="displayValue"
-    :suffix="` ${displayUnit}`"
     :min="displayMin"
     :max="displayMax"
     :step="displayStep"

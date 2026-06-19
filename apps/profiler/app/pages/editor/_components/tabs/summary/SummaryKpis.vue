@@ -2,6 +2,7 @@
 const { t } = useI18n();
 const profileStore = useProfileStore();
 const { unit: lengthUnit, toDisplay } = useUnitDisplay('length');
+const { formatNumber } = useNumberFormat();
 
 const screenLength = computed(() =>
   profileStore.well.well_screen.reduce((sum, s) => sum + (s.to - s.from), 0),
@@ -11,7 +12,7 @@ const kpis = computed(() => [
   {
     key: 'depth',
     label: t('editor.summary.kpis.depth'),
-    value: toDisplay(profileStore.maxDepth).toFixed(2),
+    value: formatNumber(toDisplay(profileStore.maxDepth), { fractionDigits: 2 }),
     unit: lengthUnit.value,
   },
   {
@@ -23,7 +24,7 @@ const kpis = computed(() => [
   {
     key: 'screen',
     label: t('editor.summary.kpis.screen'),
-    value: toDisplay(screenLength.value).toFixed(2),
+    value: formatNumber(toDisplay(screenLength.value), { fractionDigits: 2 }),
     unit: lengthUnit.value,
   },
 ]);

@@ -5,19 +5,17 @@ const props = defineProps<{
 }>();
 
 const { unit, toDisplay } = useUnitDisplay(props.unitType);
+const { formatNumber } = useNumberFormat();
 
-const display = computed(() => {
+const display = computed((): string => {
   const raw = props.value;
-  if (raw === null || raw === undefined || raw === '') return null;
+  if (raw === null || raw === undefined || raw === '') return '—';
   const canonical = Number(raw);
-  if (isNaN(canonical)) return null;
-  return Number(toDisplay(canonical).toFixed(4));
+  if (isNaN(canonical)) return '—';
+  return formatNumber(toDisplay(canonical), { maximumFractionDigits: 4, suffix: unit.value });
 });
 </script>
 
 <template>
-  <span class="flex h-full w-full items-center justify-end">
-    <template v-if="display !== null">{{ display }} {{ unit }}</template>
-    <template v-else>—</template>
-  </span>
+  <span class="flex h-full w-full items-center justify-end">{{ display }}</span>
 </template>

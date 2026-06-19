@@ -6,9 +6,7 @@ const props = defineProps<{
   unitType: 'length' | 'diameter'
 }>()
 
-const { unit: displayUnit, toDisplay, toCanonical } = useUnitDisplay(props.unitType)
-
-const suffix = computed(() => ` ${displayUnit.value}`)
+const { toDisplay, toCanonical } = useUnitDisplay(props.unitType)
 
 const numRef = ref<{ $el: HTMLElement } | null>(null)
 
@@ -48,12 +46,11 @@ function update(value: number) {
 </script>
 
 <template>
-  <InputNumber
+  <WellInputNumber
     ref="numRef"
     :model-value="localValue"
     @update:model-value="update"
     :max-fraction-digits="4"
-    :suffix="suffix"
     :pt="{
       root: 'well-cell-input-number',
       pcInput: { root: 'well-cell-input well-cell-input-number text-right' },

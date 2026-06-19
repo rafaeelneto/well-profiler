@@ -6,20 +6,7 @@ import SummaryKpis from './summary/SummaryKpis.vue';
 
 const { t } = useI18n();
 const profileStore = useProfileStore();
-const { unit: lengthUnit, toDisplay: toLength } = useUnitDisplay('length');
-const { unit: diameterUnit, toDisplay: toDiameter } = useUnitDisplay('diameter');
-
-function fmtLen(value: number): string {
-  return `${toLength(value).toFixed(2)} ${lengthUnit.value}`;
-}
-
-function fmtDiam(value: number): string {
-  return `${toDiameter(value).toFixed(1)} ${diameterUnit.value}`;
-}
-
-function fmtVol(value: number): string {
-  return `${value.toFixed(2)} m³`;
-}
+const { formatLength, formatDiameter, formatVolume } = useUnitFormat();
 
 // ─── Furo (bore_hole) ──────────────────────────────────────────────────────
 
@@ -34,10 +21,10 @@ const boreHoleGroups = computed<SummaryGroup[]>(() => {
   const items = profileStore.well.bore_hole;
   const rows = items.map(b => ({
     cells: {
-      diameter: fmtDiam(b.diameter),
-      from: fmtLen(b.from),
-      to: fmtLen(b.to),
-      length: fmtLen(b.to - b.from),
+      diameter: formatDiameter(b.diameter),
+      from: formatLength(b.from),
+      to: formatLength(b.to),
+      length: formatLength(b.to - b.from),
     },
   }));
   const totalLength = items.reduce((sum, b) => sum + (b.to - b.from), 0);
@@ -46,7 +33,7 @@ const boreHoleGroups = computed<SummaryGroup[]>(() => {
       rows,
       total: {
         label: t('editor.summary.boreHole.total'),
-        value: fmtLen(totalLength),
+        value: formatLength(totalLength),
         colspan: 3,
       },
     },
@@ -66,10 +53,10 @@ const surfaceCaseGroups = computed<SummaryGroup[]>(() => {
   const items = profileStore.well.surface_case;
   const rows = items.map(s => ({
     cells: {
-      diameter: fmtDiam(s.diameter),
-      from: fmtLen(s.from),
-      to: fmtLen(s.to),
-      length: fmtLen(s.to - s.from),
+      diameter: formatDiameter(s.diameter),
+      from: formatLength(s.from),
+      to: formatLength(s.to),
+      length: formatLength(s.to - s.from),
     },
   }));
   const totalLength = items.reduce((sum, s) => sum + (s.to - s.from), 0);
@@ -78,7 +65,7 @@ const surfaceCaseGroups = computed<SummaryGroup[]>(() => {
       rows,
       total: {
         label: t('editor.summary.surfaceCase.total'),
-        value: fmtLen(totalLength),
+        value: formatLength(totalLength),
         colspan: 3,
       },
     },
@@ -113,10 +100,10 @@ const casingGroups = computed<SummaryGroup[]>(() => {
   const rows = items.map(item => ({
     cells: {
       type: item.type,
-      diameter: fmtDiam(item.diameter),
-      from: fmtLen(item.from),
-      to: fmtLen(item.to),
-      length: fmtLen(item.to - item.from),
+      diameter: formatDiameter(item.diameter),
+      from: formatLength(item.from),
+      to: formatLength(item.to),
+      length: formatLength(item.to - item.from),
     },
   }));
   const totalLength = items.reduce((sum, item) => sum + (item.to - item.from), 0);
@@ -125,7 +112,7 @@ const casingGroups = computed<SummaryGroup[]>(() => {
       rows,
       total: {
         label: t('editor.summary.casing.total'),
-        value: fmtLen(totalLength),
+        value: formatLength(totalLength),
         colspan: 4,
       },
     },
@@ -156,10 +143,10 @@ const holeFillGroups = computed<SummaryGroup[]>(() => {
     const rows = items.map((f, i) => ({
       cells: {
         description: f.description || label,
-        diameter: fmtDiam(f.diameter),
-        from: fmtLen(f.from),
-        to: fmtLen(f.to),
-        volume: fmtVol(volumes[i] ?? 0),
+        diameter: formatDiameter(f.diameter),
+        from: formatLength(f.from),
+        to: formatLength(f.to),
+        volume: formatVolume(volumes[i] ?? 0),
       },
     }));
     const totalVolume = volumes.reduce((sum, v) => sum + v, 0);
@@ -167,7 +154,7 @@ const holeFillGroups = computed<SummaryGroup[]>(() => {
       rows,
       total: {
         label: t('editor.summary.holeFill.groupTotal', { group: label }),
-        value: fmtVol(totalVolume),
+        value: formatVolume(totalVolume),
         colspan: 4,
       },
     };
@@ -211,9 +198,9 @@ const lithologyGroups = computed<SummaryGroup[]>(() => {
       cells: {
         unit,
         layers: String(group.count),
-        from: fmtLen(group.from),
-        to: fmtLen(group.to),
-        thickness: fmtLen(group.to - group.from),
+        from: formatLength(group.from),
+        to: formatLength(group.to),
+        thickness: formatLength(group.to - group.from),
       },
       color: group.color,
     };
