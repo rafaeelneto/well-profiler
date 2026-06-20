@@ -222,13 +222,17 @@ export type SpotMeasurementEvent = HydrodynamicEventBase & {
   static_level: number;
   static_level_precision?: number;
   measurement_method?: string;
+  /** At most one step — an informal brief pump observation, not a controlled test. */
+  steps?: PumpingStep[];
+  recovery?: RecoveryPhase;
 };
 
 export type ConstantRateEvent = HydrodynamicEventBase & {
   type: 'constant_rate';
   static_level?: number;
   static_level_precision?: number;
-  steps?: PumpingStep[];
+  /** Exactly one entry if present. A second step would make this a step_drawdown. */
+  steps?: [PumpingStep];
   recovery?: RecoveryPhase;
 };
 
@@ -243,6 +247,7 @@ export type StepDrawdownEvent = HydrodynamicEventBase & {
 export type AirliftEvent = HydrodynamicEventBase & {
   type: 'airlift';
   steps: PumpingStep[];
+  recovery?: RecoveryPhase;
 };
 
 export type RecoveryOnlyEvent = HydrodynamicEventBase & {
@@ -275,6 +280,9 @@ export type AquiferAnalysis = {
   dynamic_level_precision?: number;
   flow_rate?: number;
   flow_rate_precision?: number;
+  max_flow_rate?: number;
+  max_flow_rate_precision?: number;
+  max_flow_rate_basis?: string;
   specific_capacity?: number;
   transmissivity?: number;
   storativity?: number | null;

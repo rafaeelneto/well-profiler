@@ -200,15 +200,17 @@ A cavity or void zone.
 
 A chronological, append-only ledger of all hydrodynamic observations. Events are ordered by `datetime` ascending (UTC-normalized instants); parsers MUST NOT assume order and SHOULD sort by `datetime` when querying. When two events share the same instant, an optional `sequence` integer breaks the tie.
 
+> **Note — interpretive contracts, not pumping methods.** Each `type` value identifies a *category of field record* with a distinct semantic contract, not a pumping technique or equipment class. Equipment belongs in the `equipment` field; test-analysis method belongs in `method` on `aquifer_analysis`. The contract for each type specifies what data it reliably supplies, how many steps it may carry, whether recovery is permitted, and whether its event ID is valid input to `source_event_ids` on an `aquifer_analysis` entry.
+
 ### Event types
 
-| `type`             | Portuguese (BR)           | Description                                                                  |
-| ------------------ | ------------------------- | ---------------------------------------------------------------------------- |
-| `spot_measurement` | Medição pontual           | A single water level reading with no pumping.                                |
-| `constant_rate`    | Teste de vazão constante  | A pumping test at a single fixed flow rate.                                  |
-| `step_drawdown`    | Teste de vazão escalonada | A pumping test with two or more successive flow rate steps.                  |
-| `airlift`          | Air-lift                  | Flow rate and approximate dynamic level during air-lift development.         |
-| `recovery_only`    | Apenas recuperação        | Recovery measurements after a pumping event whose drawdown was not recorded. |
+| `type` | Português (BR) | What it records | `steps` constraint | `recovery` | Valid in `source_event_ids` |
+| ------------------ | ------------------------- | --------------------------------------------------------------------------------------------------------------------------------- | ------------------- | ---------- | ----------------------------------------- |
+| `spot_measurement` | Medição pontual           | Static water level during a routine visit; optionally an informal brief pump observation. Not a controlled test. | 0 or 1 | Optional | As `static_level_source_id` only |
+| `constant_rate`    | Teste de vazão constante  | Controlled pump test at exactly one fixed rate. | Exactly 1 | Optional | Yes |
+| `step_drawdown`    | Teste de vazão escalonada | Controlled pump test at two or more successive rates in ascending order. | ≥ 2, ascending | Optional | Yes |
+| `airlift`          | Air-lift                  | Historical fact that air-lift development was performed and produced an estimated yield. | ≥ 1 | Optional | No — see § airlift |
+| `recovery_only`    | Apenas recuperação        | Recovery after a pumping event whose drawdown data was not recorded. | None | Required | Yes |
 
 The `type` field accepts any string. Non-canonical values SHOULD use the `x-` prefix.
 
@@ -230,11 +232,13 @@ Only `id`, `type`, and `datetime` are required. All others are optional for all 
 
 ### `spot_measurement`
 
-| Field                    | Type   | Required | Description                                                               |
-| ------------------------ | ------ | -------- | ------------------------------------------------------------------------- |
-| `static_level`           | number | yes      | Depth to water surface from ground level, in meters.                      |
-| `static_level_precision` | number | no       | One-sigma precision of `static_level`.                                    |
-| `measurement_method`     | string | no       | Recommended: `electric_probe`, `pressure_transducer`, `air_line`, `tape`. |
+| Field                    | Type            | Required | Description                                                                                                                              |
+| ------------------------ | --------------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| `static_level`           | number          | yes      | Depth to water surface from ground level, in meters.                                                                                     |
+| `static_level_precision` | number          | no       | One-sigma precision of `static_level`.                                                                                                   |
+| `measurement_method`     | string          | no       | Recommended: `electric_probe`, `pressure_transducer`, `air_line`, `tape`.                                                                |
+| `steps`                  | `PumpingStep[]` | no       | At most one step. For an informal brief pump observation during the visit — not a controlled test. Use `constant_rate` for a formal test. |
+| `recovery`               | `RecoveryPhase` | no       | Recovery after the optional pumping step.                                                                                                |
 
 ---
 
@@ -244,7 +248,7 @@ Only `id`, `type`, and `datetime` are required. All others are optional for all 
 | ------------------------ | --------------- | -------- | ------------------------------------------------------------------------- |
 | `static_level`           | number          | no       | Pre-test static level in meters. Omit if not measured.                    |
 | `static_level_precision` | number          | no       | One-sigma precision of `static_level`.                                    |
-| `steps`                  | `PumpingStep[]` | no       | One entry for the pumping phase. Omit if only recovery data is available. |
+| `steps`                  | `PumpingStep[]` | no       | Exactly one entry. A second step would make this a `step_drawdown`. Omit if only recovery data is available. |
 | `recovery`               | `RecoveryPhase` | no       | Recovery measurements after pump shutdown.                                |
 
 ---
@@ -264,11 +268,14 @@ Jacob's `B` and `C` are derived — store them in `aquifer_analysis`, never here
 
 ### `airlift`
 
+This type exists to record the historical fact that air-lift development was performed and produced an estimated yield. It is **not** suitable input for `aquifer_analysis`: tools producing `aquifer_analysis` entries MUST refuse to accept `airlift` event IDs in `source_event_ids` and MUST emit a warning if one is supplied.
+
 Static level is not reliably measurable during air-lift and SHOULD be omitted.
 
-| Field   | Type            | Required | Description        |
-| ------- | --------------- | -------- | ------------------ |
-| `steps` | `PumpingStep[]` | yes      | One or more steps. |
+| Field      | Type            | Required | Description                                                    |
+| ---------- | --------------- | -------- | -------------------------------------------------------------- |
+| `steps`    | `PumpingStep[]` | yes      | One or more steps. Each step may carry time-series `readings`. |
+| `recovery` | `RecoveryPhase` | no       | Recovery measurements after air-lift shutdown, if recorded.    |
 
 ---
 
@@ -328,6 +335,9 @@ An array of interpreted aquifer parameter sets. Multiple entries may coexist, re
 | `dynamic_level_precision` | number   | no       | One-sigma precision of `dynamic_level`.                                                              |
 | `flow_rate`               | number   | no       | Flow rate associated with `dynamic_level`, in m³/h.                                                  |
 | `flow_rate_precision`     | number   | no       | One-sigma precision of `flow_rate`.                                                                  |
+| `max_flow_rate`           | number   | no       | Maximum recommended sustained extraction rate in m³/h, as judged by the analyst from the source events. This is an interpretive recommendation, not the test rate. Distinct from `flow_rate`, which is the rate actually applied during the test that produced `dynamic_level`. |
+| `max_flow_rate_precision` | number   | no       | One-sigma precision of `max_flow_rate` in m³/h.                                                      |
+| `max_flow_rate_basis`     | string   | no       | Free-text justification: safety factor applied, regulatory framework referenced (e.g. `"80% of test rate per ANA practice"`, `"limited by available drawdown to top of screen"`), or assumptions about long-term recharge. |
 | `specific_capacity`       | number   | no       | `Q/s` in m³/h per m (i.e. m²/h).                                                                     |
 | `transmissivity`          | number   | no       | Aquifer transmissivity `T` in m²/s.                                                                  |
 | `storativity`             | number   | no       | Dimensionless storativity `S`.                                                                       |
