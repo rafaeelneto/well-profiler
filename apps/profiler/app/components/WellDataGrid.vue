@@ -644,10 +644,12 @@ revo-grid .revo-drag-icon::before {
   display: block;
   width: 12px;
   height: 12px;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpath fill='%23aaaaaa' d='M102 60a10 10 0 1 1-10-10a10 10 0 0 1 10 10m62 10a10 10 0 1 0-10-10a10 10 0 0 0 10 10m-72 48a10 10 0 1 0 10 10a10 10 0 0 0-10-10m72 0a10 10 0 1 0 10 10a10 10 0 0 0-10-10m-72 68a10 10 0 1 0 10 10a10 10 0 0 0-10-10m72 0a10 10 0 1 0 10 10a10 10 0 0 0-10-10'/%3E%3C/svg%3E");
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
+  color: var(--color-content-0);
+  background-color: currentColor;
+  mask-image: url('/drag-handle.svg');
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  mask-position: center;
   opacity: 0.7;
   transition: opacity 200ms ease;
 }
