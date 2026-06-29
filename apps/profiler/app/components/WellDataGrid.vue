@@ -115,6 +115,15 @@ function textureEditorFactory() {
 
 const gridEditors = computed(() => {
   const editors: Editors = {
+    noop: VGridVueEditor(
+      defineComponent({
+        props: ['val', 'save', 'close'],
+        setup: (p: any) => {
+          p.close();
+          return () => null;
+        },
+      }),
+    ),
     text: VGridVueEditor(GridTextEditor),
     number: VGridVueEditor(GridNumberEditor),
     color: VGridVueEditor(GridColorPickerEditor),
@@ -212,7 +221,7 @@ const columnKinds: Record<ColumnKind, ColumnKindDef> = {
       VGridVueTemplate(GridFormattedCell, { formatter: col.formatter }),
   },
   checkbox: {
-    readonly: true,
+    editor: () => 'noop',
     cellProperties: () => () => ({ class: 'well-grid-checkbox-cell' }),
     cellTemplate: col =>
       VGridVueTemplate(GridCheckboxCell, {
@@ -222,7 +231,7 @@ const columnKinds: Record<ColumnKind, ColumnKindDef> = {
       }),
   },
   'select-button': {
-    readonly: true,
+    editor: () => 'noop',
     cellProperties: () => () => ({ class: 'well-grid-checkbox-cell' }),
     cellTemplate: col =>
       VGridVueTemplate(GridSelectButtonCell, {
@@ -328,14 +337,36 @@ const gridHeight = computed(() => {
 
 // ─── Event handlers ───────────────────────────────────────────────────────────
 
-function handleAfterEdit(event: CustomEvent<AfterEditEvent>) {
-  const detail = event.detail;
+function coerceCellValue(prop: string, val: unknown): unknown {
+  const col = props.columns.find(c => c.prop === prop);
+  if (col?.type === 'checkbox' && typeof val === 'string') {
+    return val === 'true' || val === '1' || val.toLowerCase() === 'yes';
+  }
+  return val;
+}
 
-  console.log(event.detail);
-  // Narrow to single-cell edit (BeforeSaveDataDetails has rowIndex + prop)
-  if (!('rowIndex' in detail)) return;
-  const { rowIndex, prop, val } = detail as BeforeSaveDataDetails;
-  emit('change', rowIndex, String(prop), val);
+function handleAfterEdit(event: CustomEvent<AfterEditEvent>) {
+  const detail = event.detail as Record<string, unknown>;
+
+  // Single-cell edit: detail has rowIndex + prop + val
+  if ('rowIndex' in detail) {
+    const { rowIndex, prop, val } = detail as unknown as BeforeSaveDataDetails;
+    emit('change', rowIndex, String(prop), coerceCellValue(String(prop), val));
+    return;
+  }
+
+  // Block edit (paste, range clear, etc.): detail has data keyed by row index
+  const blockData = detail.data as
+    | Record<string, Record<string, unknown>>
+    | undefined;
+  if (!blockData) return;
+
+  for (const [rowKey, rowData] of Object.entries(blockData)) {
+    const rowIndex = Number(rowKey);
+    for (const [prop, val] of Object.entries(rowData)) {
+      emit('change', rowIndex, prop, coerceCellValue(prop, val));
+    }
+  }
 }
 
 function handleRowOrderChanged(
