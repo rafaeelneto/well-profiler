@@ -115,4 +115,4 @@ Use `severity` props (`"primary"`, `"success"`, `"warn"`, `"danger"`, `"info"`) 
 - SSR is enabled; avoid `window`/`document` access outside of client lifecycle hooks or `process.client` guards.
 - Deployed to Cloudflare Pages — no Node.js server runtime. All server routes must be Cloudflare-compatible.
 - **Icons:** Use Phosphor (`ph:`) for all new UI. Prefer the **duotone** variant (`ph:icon-name-duotone`) as the default — it matches the editorial aesthetic. Fall back to `ph:icon-name` (regular) only when duotone is unavailable. Browse at https://icones.js.org/collection/ph. Do not use Heroicons in new components; the landing page (`layouts/landing.vue`) may keep its existing `heroicons:` usage.
-- Use Tailwind canonical utilities instead of arbitrary measurements.
+- **Tailwind canonical classes only** — no arbitrary values (`w-[37px]`, `bg-[#eef0f3]`, `text-[14px]`). Use the design-token utilities (`bg-surface-*`, `text-content-*`, spacing scale, etc.) or standard Tailwind scale values. Arbitrary values bypass the token system, don't respond to mode changes, and make refactoring the theme harder.
