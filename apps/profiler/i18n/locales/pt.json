@@ -178,6 +178,7 @@
   "editor": {
     "well": "Poço",
     "save": "Salvar",
+    "edit": "Editar",
     "saveAs": "Salvar Como",
     "open": "Abrir",
     "share": "Compartilhar",
@@ -463,6 +464,56 @@
         "from": "De",
         "to": "Até",
         "thickness": "Espessura"
+      }
+    },
+    "historico": {
+      "tag": "Histórico · Poço",
+      "logs": {
+        "title": "History Logs",
+        "tag": "REGISTRO",
+        "empty": "Nenhum evento registrado",
+        "noResults": "Nenhum registro corresponde à pesquisa",
+        "search": "Buscar registros…",
+        "registries": "registros",
+        "addEvent": "Adicionar evento",
+        "editEvent": "Editar evento",
+        "deleteConfirm": "Excluir este registro?",
+        "editedAt": "Editado em {date}",
+        "attachments": "{n} anexo | {n} anexos",
+        "addAttachment": "Adicionar arquivo",
+        "showMore": "Ver mais",
+        "showLess": "Ver menos",
+        "by": "por",
+        "deleteAttachment": "Remover anexo?",
+        "editAttachment": "Editar anexo",
+        "categories": {
+          "maintenance": "Manutenção",
+          "inspection": "Inspeção",
+          "incident": "Incidente",
+          "event": "Evento"
+        },
+        "severity": {
+          "low": "Baixa",
+          "medium": "Média",
+          "high": "Alta",
+          "critical": "Crítica"
+        },
+        "fields": {
+          "category": "Categoria",
+          "datetime": "Data / Hora",
+          "description": "Descrição",
+          "author": "Autor",
+          "severity": "Severidade",
+          "attachmentUrl": "URL do arquivo",
+          "attachmentFilename": "Nome exibido",
+          "attachmentMediaType": "Tipo de arquivo"
+        }
+      },
+      "events": {
+        "title": "Eventos Hidrodinâmicos",
+        "tag": "TESTES · MEDIÇÕES",
+        "empty": "Nenhum evento hidrodinâmico",
+        "comingSoon": "Edição disponível na aba Hidrodinâmica"
       }
     }
   }

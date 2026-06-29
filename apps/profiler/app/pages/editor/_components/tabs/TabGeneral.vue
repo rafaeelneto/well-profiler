@@ -81,14 +81,14 @@ const wellTypeOptions = computed(() => [
   <div class="flex flex-col gap-8 p-6 lg:p-8">
     <!-- ── Section: General Information ──────────────────────────────────── -->
     <section class="flex flex-col gap-5">
-      <div
-        class="flex items-baseline justify-between border-b border-surface-200/70 dark:border-surface-700/60 pb-3"
-      >
-        <h2 class="text-2xl font-semibold tracking-tight">
+      <div class="flex items-baseline justify-between">
+        <h3
+          class="font-serif text-[22px] font-medium tracking-[-0.015em] text-content-0 m-0"
+        >
           {{ t('editor.general.generalInfo') }}
-        </h2>
+        </h3>
         <span
-          class="text-[10px] font-semibold tracking-widest uppercase text-content-400"
+          class="font-mono text-[10px] tracking-[0.08em] uppercase text-content-500"
         >
           {{ t('editor.general.metadata') }} · {{ t('editor.well') }}
         </span>
@@ -132,14 +132,14 @@ const wellTypeOptions = computed(() => [
 
     <!-- ── Section: Well Identifiers ────────────────────────────────────── -->
     <section class="flex flex-col gap-5">
-      <div
-        class="flex items-baseline justify-between border-b border-surface-200/70 dark:border-surface-700/60 pb-3"
-      >
-        <h2 class="text-2xl font-semibold tracking-tight">
+      <div class="flex items-baseline justify-between">
+        <h3
+          class="font-serif text-[22px] font-medium tracking-[-0.015em] text-content-0 m-0"
+        >
           {{ t('editor.general.wellIds.title') }}
-        </h2>
+        </h3>
         <span
-          class="text-[10px] font-semibold tracking-widest uppercase text-content-400"
+          class="font-mono text-[10px] tracking-[0.08em] uppercase text-content-500"
         >
           {{ t('editor.general.wellIds.tag') }} · {{ t('editor.well') }}
         </span>
@@ -203,14 +203,14 @@ const wellTypeOptions = computed(() => [
 
     <!-- ── Section: Location ──────────────────────────────────────────────── -->
     <section class="flex flex-col gap-5">
-      <div
-        class="flex items-baseline justify-between border-b border-surface-200/70 dark:border-surface-700/60 pb-3"
-      >
-        <h2 class="text-2xl font-semibold tracking-tight">
+      <div class="flex items-baseline justify-between">
+        <h3
+          class="font-serif text-[22px] font-medium tracking-[-0.015em] text-content-0 m-0"
+        >
           {{ t('editor.general.location') }}
-        </h2>
+        </h3>
         <span
-          class="text-[10px] font-semibold tracking-widest uppercase text-content-400"
+          class="font-mono text-[10px] tracking-[0.08em] uppercase text-content-500"
         >
           {{ t('editor.general.coordinates') }}
         </span>
@@ -228,14 +228,14 @@ const wellTypeOptions = computed(() => [
 
     <!-- ── Section: Observations ──────────────────────────────────────────── -->
     <section class="flex flex-col gap-5">
-      <div
-        class="flex items-baseline justify-between border-b border-surface-200/70 dark:border-surface-700/60 pb-3"
-      >
-        <h2 class="text-2xl font-semibold tracking-tight">
+      <div class="flex items-baseline justify-between">
+        <h3
+          class="font-serif text-[22px] font-medium tracking-[-0.015em] text-content-0 m-0"
+        >
           {{ t('editor.general.observations') }}
-        </h2>
+        </h3>
         <span
-          class="text-[10px] font-semibold tracking-widest uppercase text-content-400"
+          class="font-mono text-[10px] tracking-[0.08em] uppercase text-content-500"
         >
           {{ t('editor.general.freeNotes') }}
         </span>

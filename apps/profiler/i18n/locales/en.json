@@ -178,6 +178,7 @@
   "editor": {
     "well": "Well",
     "save": "Save",
+    "edit": "Edit",
     "saveAs": "Save As",
     "open": "Open",
     "share": "Share",
@@ -463,6 +464,56 @@
         "from": "From",
         "to": "To",
         "thickness": "Thickness"
+      }
+    },
+    "historico": {
+      "tag": "History · Well",
+      "logs": {
+        "title": "History Logs",
+        "tag": "HISTORY LOG",
+        "empty": "No events recorded",
+        "noResults": "No entries match your search",
+        "search": "Search entries…",
+        "registries": "entries",
+        "addEvent": "Add event",
+        "editEvent": "Edit event",
+        "deleteConfirm": "Delete this log entry?",
+        "editedAt": "Edited {date}",
+        "attachments": "{n} attachment | {n} attachments",
+        "addAttachment": "Add file",
+        "showMore": "Show more",
+        "showLess": "Show less",
+        "by": "by",
+        "deleteAttachment": "Remove attachment?",
+        "editAttachment": "Edit attachment",
+        "categories": {
+          "maintenance": "Maintenance",
+          "inspection": "Inspection",
+          "incident": "Incident",
+          "event": "Event"
+        },
+        "severity": {
+          "low": "Low",
+          "medium": "Medium",
+          "high": "High",
+          "critical": "Critical"
+        },
+        "fields": {
+          "category": "Category",
+          "datetime": "Date / Time",
+          "description": "Description",
+          "author": "Author",
+          "severity": "Severity",
+          "attachmentUrl": "File URL",
+          "attachmentFilename": "Display name",
+          "attachmentMediaType": "File type"
+        }
+      },
+      "events": {
+        "title": "Hydrodynamic Events",
+        "tag": "PUMP TESTS · MEASUREMENTS",
+        "empty": "No hydrodynamic events",
+        "comingSoon": "Full editing available in the Hydrodynamic tab"
       }
     }
   }

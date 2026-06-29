@@ -4,6 +4,7 @@ import TabGeneral from './_components/tabs/TabGeneral.vue';
 import TabConstruction from './_components/tabs/TabConstruction.vue';
 import TabGeological from './_components/tabs/TabGeological.vue';
 import TabSummary from './_components/tabs/TabSummary.vue';
+import TabHistorico from './_components/tabs/TabHistorico.vue';
 
 definePageMeta({ layout: 'editor' });
 
@@ -39,8 +40,6 @@ const tabs = computed(() => [
     value: '4',
     label: t('editor.tabs.historico'),
     shortLabel: t('editor.tabs.historico'),
-    disabled: true,
-    comingSoon: true,
   },
   {
     value: '5',
@@ -155,7 +154,7 @@ const tabs = computed(() => [
           <TabPanel value="1"><TabConstruction /></TabPanel>
           <TabPanel value="2"><TabGeological /></TabPanel>
           <TabPanel value="3"><TabSummary /></TabPanel>
-          <TabPanel value="4" />
+          <TabPanel value="4"><TabHistorico /></TabPanel>
           <TabPanel value="5" />
         </TabPanels>
       </Tabs>
