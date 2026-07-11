@@ -1,12 +1,13 @@
 <script setup lang="ts">
 const props = defineProps<{
   rowIndex: number;
-  requestDelete: (rowIndex: number) => void;
+  model: Record<string, unknown>;
+  requestDelete: (rowIndex: number, model: Record<string, unknown>) => void;
 }>();
 
 function handleClick(e: MouseEvent) {
   e.stopPropagation();
-  props.requestDelete(props.rowIndex);
+  props.requestDelete(props.rowIndex, props.model);
 }
 </script>
 
