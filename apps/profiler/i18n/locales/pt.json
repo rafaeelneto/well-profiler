@@ -515,6 +515,86 @@
         "empty": "Nenhum evento hidrodinâmico",
         "comingSoon": "Edição disponível na aba Hidrodinâmica"
       }
+    },
+    "hidrodinamica": {
+      "title": "Eventos Hidrodinâmicos",
+      "addEvent": "Adicionar evento",
+      "ledgerNote": "Ledger cronológico — novos registros são adicionados, não sobrescritos.",
+      "empty": "Nenhum evento hidrodinâmico registrado",
+      "noResults": "Nenhum resultado",
+      "deleteConfirm": "Remover este evento?",
+      "editEvent": "Editar evento",
+      "tabs": {
+        "measurements": "Medições",
+        "analyses": "Análises"
+      },
+      "analyses": {
+        "inDevBody": "A aba Análises permitirá inserir resultados de ensaios de aquífero (transmissividade, capacidade específica, coeficiente de armazenamento)."
+      },
+      "estadoAtual": {
+        "title": "Estado Atual",
+        "ne": "NE ATUAL",
+        "specificCapacity": "CAP. ESPECÍFICA",
+        "transmissivity": "TRANSMISSIVIDADE",
+        "dynamicLevel": "ND",
+        "flowRate": "VAZÃO Q",
+        "noData": "—"
+      },
+      "eventTypes": {
+        "spot_measurement": "Medição Pontual",
+        "constant_rate": "Vazão Constante",
+        "step_drawdown": "Escalonada",
+        "airlift": "Air-lift",
+        "recovery_only": "Recuperação"
+      },
+      "fields": {
+        "type": "Tipo de Evento",
+        "datetime": "Data / Hora",
+        "operator": "Operador",
+        "equipment": "Equipamento",
+        "notes": "Notas",
+        "staticLevel": "NE (m)",
+        "staticLevelPrecision": "±Prec. NE",
+        "measurementMethod": "Método de medição",
+        "pumpingRate": "Vazão estimada (m³/h)",
+        "pumpingDuration": "Duração estimada (min)",
+        "steps": "Degraus de Bombeamento",
+        "recovery": "Recuperação",
+        "includeRecovery": "Incluir fase de recuperação",
+        "rate": "Vazão (m³/h)",
+        "ratePrecision": "±Prec.",
+        "duration": "Duração (min)",
+        "durationDerivedHint": "Calculado a partir das leituras (tempo decorrido máximo)",
+        "elapsed": "Tempo (min)",
+        "depth": "Prof. (m)",
+        "depthPrecision": "±Prec.",
+        "stepsDepthPrecision": "±Prec.",
+        "readings": "Leituras"
+      },
+      "stats": {
+        "ne": "NE",
+        "nd": "ND",
+        "drawdown": "REBAIX. S",
+        "flowRate": "VAZÃO Q",
+        "specificCapacity": "Q/S",
+        "method": "MÉTODO",
+        "recovery": "Recuperação",
+        "steps": "degraus",
+        "readings": "leituras"
+      },
+      "measurementMethods": {
+        "electric_probe": "Sonda elétrica",
+        "pressure_transducer": "Transdutor de pressão",
+        "air_line": "Linha de ar",
+        "tape": "Trena"
+      },
+      "addStep": "Adicionar degrau",
+      "addReading": "Adicionar leitura",
+      "manageReadings": "Gerenciar",
+      "readingsDialog": {
+        "stepTitle": "Leituras — Degrau {n} ({rate} m³/h)",
+        "recoveryTitle": "Leituras — Recuperação"
+      }
     }
   }
 }

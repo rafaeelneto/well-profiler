@@ -5,6 +5,7 @@ import TabConstruction from './_components/tabs/TabConstruction.vue';
 import TabGeological from './_components/tabs/TabGeological.vue';
 import TabSummary from './_components/tabs/TabSummary.vue';
 import TabHistorico from './_components/tabs/TabHistorico.vue';
+import TabHidrodynamica from './_components/tabs/TabHidrodynamica.vue';
 
 definePageMeta({ layout: 'editor' });
 
@@ -13,9 +14,17 @@ const viewport = useViewport();
 
 const isMobile = computed(() => viewport.isLessThan('lg'));
 const mobileView = ref<'perfil' | 'dados'>('dados');
-const activeTabKey = ref<string>('0');
+const activeTabKey = ref<string>('5');
 
-const tabs = computed(() => [
+const tabs = computed<
+  {
+    value: string;
+    label: string;
+    shortLabel: string;
+    disabled?: boolean;
+    comingSoon?: boolean;
+  }[]
+>(() => [
   {
     value: '0',
     label: t('editor.tabs.general'),
@@ -45,8 +54,6 @@ const tabs = computed(() => [
     value: '5',
     label: t('editor.tabs.hidrodinamica'),
     shortLabel: t('editor.tabs.hidro'),
-    disabled: true,
-    comingSoon: true,
   },
 ]);
 </script>
@@ -155,7 +162,7 @@ const tabs = computed(() => [
           <TabPanel value="2"><TabGeological /></TabPanel>
           <TabPanel value="3"><TabSummary /></TabPanel>
           <TabPanel value="4"><TabHistorico /></TabPanel>
-          <TabPanel value="5" />
+          <TabPanel value="5"><TabHidrodynamica /></TabPanel>
         </TabPanels>
       </Tabs>
     </div>

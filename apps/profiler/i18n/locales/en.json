@@ -515,6 +515,86 @@
         "empty": "No hydrodynamic events",
         "comingSoon": "Full editing available in the Hydrodynamic tab"
       }
+    },
+    "hidrodinamica": {
+      "title": "Hydrodynamic Events",
+      "addEvent": "Add event",
+      "ledgerNote": "Chronological ledger — new records are appended, not overwritten.",
+      "empty": "No hydrodynamic events recorded",
+      "noResults": "No results",
+      "deleteConfirm": "Remove this event?",
+      "editEvent": "Edit event",
+      "tabs": {
+        "measurements": "Measurements",
+        "analyses": "Analyses"
+      },
+      "analyses": {
+        "inDevBody": "The Analyses tab will allow entering aquifer test results (transmissivity, specific capacity, storage coefficient)."
+      },
+      "estadoAtual": {
+        "title": "Current State",
+        "ne": "CURRENT SWL",
+        "specificCapacity": "SPEC. CAPACITY",
+        "transmissivity": "TRANSMISSIVITY",
+        "dynamicLevel": "DWL",
+        "flowRate": "FLOW RATE Q",
+        "noData": "—"
+      },
+      "eventTypes": {
+        "spot_measurement": "Spot Measurement",
+        "constant_rate": "Constant Rate",
+        "step_drawdown": "Step Drawdown",
+        "airlift": "Air-lift",
+        "recovery_only": "Recovery Only"
+      },
+      "fields": {
+        "type": "Event Type",
+        "datetime": "Date / Time",
+        "operator": "Operator",
+        "equipment": "Equipment",
+        "notes": "Notes",
+        "staticLevel": "SWL (m)",
+        "staticLevelPrecision": "±Prec. SWL",
+        "measurementMethod": "Measurement method",
+        "pumpingRate": "Estimated rate (m³/h)",
+        "pumpingDuration": "Estimated duration (min)",
+        "steps": "Pumping Steps",
+        "recovery": "Recovery",
+        "includeRecovery": "Include recovery phase",
+        "rate": "Rate (m³/h)",
+        "ratePrecision": "±Prec.",
+        "duration": "Duration (min)",
+        "durationDerivedHint": "Calculated from readings (max elapsed time)",
+        "elapsed": "Time (min)",
+        "depth": "Depth (m)",
+        "depthPrecision": "±Prec.",
+        "stepsDepthPrecision": "±Prec.",
+        "readings": "Readings"
+      },
+      "stats": {
+        "ne": "SWL",
+        "nd": "DWL",
+        "drawdown": "DRAWDOWN S",
+        "flowRate": "FLOW RATE Q",
+        "specificCapacity": "Q/S",
+        "method": "METHOD",
+        "recovery": "Recovery",
+        "steps": "steps",
+        "readings": "readings"
+      },
+      "measurementMethods": {
+        "electric_probe": "Electric probe",
+        "pressure_transducer": "Pressure transducer",
+        "air_line": "Air line",
+        "tape": "Tape"
+      },
+      "addStep": "Add step",
+      "addReading": "Add reading",
+      "manageReadings": "Manage",
+      "readingsDialog": {
+        "stepTitle": "Readings — Step {n} ({rate} m³/h)",
+        "recoveryTitle": "Readings — Recovery"
+      }
     }
   }
 }
