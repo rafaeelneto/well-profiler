@@ -19,8 +19,14 @@ onMounted(() =>
   }),
 );
 
+let lastKeyWasEnter = false;
+
+function onKeydownCapture(e: KeyboardEvent) {
+  lastKeyWasEnter = e.key === 'Enter';
+}
+
 function commit() {
-  props.save(localValue.value);
+  props.save(localValue.value, !lastKeyWasEnter);
 }
 
 function onKeydown(e: KeyboardEvent) {
@@ -40,15 +46,17 @@ function update(value: number) {
 </script>
 
 <template>
-  <WellInputNumber
-    ref="numRef"
-    :model-value="localValue"
-    @update:model-value="update"
-    :max-fraction-digits="4"
-    :pt="{
-      root: 'well-cell-input-number',
-      pcInput: { root: 'well-cell-input well-cell-input-number text-right' },
-    }"
-    @keydown="onKeydown"
-  />
+  <div class="contents" @keydown.capture="onKeydownCapture">
+    <WellInputNumber
+      ref="numRef"
+      :model-value="localValue"
+      @update:model-value="update"
+      :max-fraction-digits="4"
+      :pt="{
+        root: 'well-cell-input-number',
+        pcInput: { root: 'well-cell-input well-cell-input-number text-right' },
+      }"
+      @keydown="onKeydown"
+    />
+  </div>
 </template>
