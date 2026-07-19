@@ -594,6 +594,9 @@
       "readingsDialog": {
         "stepTitle": "Readings — Step {n} ({rate} m³/h)",
         "recoveryTitle": "Readings — Recovery"
+      },
+      "validation": {
+        "missing": "Add {fields} to save this event"
       }
     }
   }

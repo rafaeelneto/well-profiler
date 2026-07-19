@@ -594,6 +594,9 @@
       "readingsDialog": {
         "stepTitle": "Leituras — Degrau {n} ({rate} m³/h)",
         "recoveryTitle": "Leituras — Recuperação"
+      },
+      "validation": {
+        "missing": "Adicione {fields} para salvar este evento"
       }
     }
   }

@@ -1,5 +1,12 @@
 <script setup lang="ts">
-import type { HydrodynamicEvent } from '@welldot/core';
+import {
+  AirliftEventSchema,
+  ConstantRateEventSchema,
+  RecoveryOnlyEventSchema,
+  SpotMeasurementEventSchema,
+  StepDrawdownEventSchema,
+  type HydrodynamicEvent,
+} from '@welldot/core';
 import type { WellGridColumn } from '~/components/WellDataGrid.vue';
 
 const { t } = useI18n();
@@ -86,16 +93,36 @@ const showRecoveryOnly = computed(() => form.type === 'recovery_only');
 const showSteps = computed(() => form.type !== 'recovery_only');
 const showRecoveryToggle = computed(() => form.type !== 'recovery_only');
 
-const isFormValid = computed(() => {
-  if (!form.datetime) return false;
-  if (form.type === 'spot_measurement' && form.staticLevel == null)
-    return false;
-  if (form.type === 'recovery_only') {
-    return form.recoveryReadings.some(
-      r => r.elapsed != null && r.depth != null,
-    );
-  }
-  return true;
+// ─── Validation (Zod, per event type) ──────────────────────────────────────────
+
+const eventSchemas = {
+  spot_measurement: SpotMeasurementEventSchema,
+  constant_rate: ConstantRateEventSchema,
+  step_drawdown: StepDrawdownEventSchema,
+  airlift: AirliftEventSchema,
+  recovery_only: RecoveryOnlyEventSchema,
+} as const;
+
+const missingFieldLabelKeys: Record<string, string> = {
+  datetime: 'editor.hidrodinamica.fields.datetime',
+  static_level: 'editor.hidrodinamica.fields.staticLevel',
+  steps: 'editor.hidrodinamica.fields.steps',
+  recovery: 'editor.hidrodinamica.fields.recovery',
+};
+
+const validation = computed(() => {
+  const schema = eventSchemas[form.type as keyof typeof eventSchemas];
+  return schema ? schema.safeParse(buildEventPayload()) : null;
+});
+
+const isFormValid = computed(() => validation.value?.success !== false);
+
+const missingFieldLabels = computed(() => {
+  if (!validation.value || validation.value.success) return [];
+  const paths = new Set(
+    validation.value.error.issues.map(issue => String(issue.path[0])),
+  );
+  return [...paths].map(p => t(missingFieldLabelKeys[p] ?? p));
 });
 
 function resetForm() {
@@ -221,10 +248,8 @@ function buildRecovery() {
   return readings.length > 0 ? { readings } : undefined;
 }
 
-function saveEvent() {
-  if (!form.datetime || !isFormValid.value) return;
-
-  const datetimeStr = form.datetime.toISOString();
+function buildEventPayload(): Record<string, unknown> {
+  const datetimeStr = form.datetime ? form.datetime.toISOString() : '';
   const common: Record<string, unknown> = {
     id: editingId.value ?? crypto.randomUUID(),
     type: form.type,
@@ -294,6 +319,14 @@ function saveEvent() {
       ...(recovery && { recovery }),
     };
   }
+
+  return event;
+}
+
+function saveEvent() {
+  if (!isFormValid.value) return;
+
+  const event = buildEventPayload();
 
   profileStore.updateWell(draft => {
     if (!draft.hydrodynamic_events) draft.hydrodynamic_events = [];
@@ -719,19 +752,34 @@ function reorderRecoveryReading(from: number, to: number) {
     </div>
 
     <template #footer>
-      <Button
-        :label="t('editor.confirmClear.reject')"
-        severity="secondary"
-        text
-        @click="visible = false"
-      />
-      <Button
-        :label="
-          editingId ? t('editor.save') : t('editor.hidrodinamica.addEvent')
-        "
-        :disabled="!isFormValid"
-        @click="saveEvent"
-      />
+      <div class="flex flex-col gap-2 w-full pt-2">
+        <div class="flex justify-end gap-2">
+          <Button
+            :label="t('editor.confirmClear.reject')"
+            severity="secondary"
+            text
+            @click="visible = false"
+          />
+          <Button
+            :label="
+              editingId ? t('editor.save') : t('editor.hidrodinamica.addEvent')
+            "
+            :disabled="!isFormValid"
+            @click="saveEvent"
+          />
+        </div>
+        <p
+          v-if="missingFieldLabels.length"
+          class="flex items-center gap-1.5 text-xs text-error-400"
+        >
+          <Icon name="ph:info" class="size-3.5 shrink-0" />
+          {{
+            t('editor.hidrodinamica.validation.missing', {
+              fields: missingFieldLabels.join(', '),
+            })
+          }}
+        </p>
+      </div>
     </template>
   </Dialog>
 </template>
