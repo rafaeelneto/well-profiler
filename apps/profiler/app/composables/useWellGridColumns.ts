@@ -12,58 +12,22 @@ import {
   type PluginProviders,
 } from '@revolist/vue3-datagrid';
 import { computed, defineComponent, h, type ComputedRef } from 'vue';
-import GridCheckboxCell from '~/components/GridCheckboxCell.vue';
-import GridColorCell from '~/components/GridColorCell.vue';
-import GridColorPickerEditor from '~/components/GridColorPickerEditor.vue';
-import GridDeleteCell from '~/components/GridDeleteCell.vue';
-import GridFormattedCell from '~/components/GridFormattedCell.vue';
-import GridNumberEditor from '~/components/GridNumberEditor.vue';
-import GridSelectButtonCell from '~/components/GridSelectButtonCell.vue';
-import GridSelectCell from '~/components/GridSelectCell.vue';
-import GridSelectEditor from '~/components/GridSelectEditor.vue';
-import GridTextEditor from '~/components/GridTextEditor.vue';
-import GridTextureSelectCell from '~/components/GridTextureSelectCell.vue';
-import GridTextureSelectEditor from '~/components/GridTextureSelectEditor.vue';
-import GridUnitCell from '~/components/GridUnitCell.vue';
-import GridUnitEditor from '~/components/GridUnitEditor.vue';
-import { columnStretchPlugin } from '~/components/columnStretchPlugin';
-
-// ─── Public column-definition interface ──────────────────────────────────────
-// Consumers import this type to declare columns for any well feature array.
-
-export type WellGridColumnBase = {
-  /** Object key on the row model */
-  prop: string;
-  /** Pre-translated header label */
-  label: string;
-  /** Column width in px (default 150) */
-  size?: number;
-  /** Prevent editing */
-  readonly?: boolean;
-  /** Override the RevoGrid editor key */
-  editor?: string;
-  /** Unit-aware column — auto-converts to/from canonical units (m ↔ ft, mm ↔ inches) */
-  unitType?: 'length' | 'diameter';
-  /** Display-only formatter — bypasses the editor */
-  formatter?: (value: unknown, row: Record<string, unknown>) => string;
-  pin?: 'colPinStart' | 'colPinEnd';
-  /** Stretch this column to absorb all remaining grid width */
-  stretch?: boolean;
-  /** Minimum width (px) for a stretch column (default 50) */
-  minSize?: number;
-};
-
-export type WellGridColumn =
-  | (WellGridColumnBase & { type?: 'text' | 'number' | 'color' | 'checkbox' })
-  | (WellGridColumnBase & {
-      type: 'select';
-      options: Array<{ label: string; value: string }>;
-    })
-  | (WellGridColumnBase & {
-      type: 'select-button';
-      options: Array<{ label: string; value: string }>;
-    })
-  | (WellGridColumnBase & { type: 'texture' });
+import GridCheckboxCell from '~/components/DataGrid/cells/GridCheckboxCell.vue';
+import GridColorCell from '~/components/DataGrid/cells/GridColorCell.vue';
+import GridColorPickerEditor from '~/components/DataGrid/cells/GridColorPickerEditor.vue';
+import GridDeleteCell from '~/components/DataGrid/cells/GridDeleteCell.vue';
+import GridFormattedCell from '~/components/DataGrid/cells/GridFormattedCell.vue';
+import GridNumberEditor from '~/components/DataGrid/cells/GridNumberEditor.vue';
+import GridSelectButtonCell from '~/components/DataGrid/cells/GridSelectButtonCell.vue';
+import GridSelectCell from '~/components/DataGrid/cells/GridSelectCell.vue';
+import GridSelectEditor from '~/components/DataGrid/cells/GridSelectEditor.vue';
+import GridTextEditor from '~/components/DataGrid/cells/GridTextEditor.vue';
+import GridTextureSelectCell from '~/components/DataGrid/cells/GridTextureSelectCell.vue';
+import GridTextureSelectEditor from '~/components/DataGrid/cells/GridTextureSelectEditor.vue';
+import GridUnitCell from '~/components/DataGrid/cells/GridUnitCell.vue';
+import GridUnitEditor from '~/components/DataGrid/cells/GridUnitEditor.vue';
+import type { WellGridColumn } from '~/components/DataGrid/types';
+import { columnStretchPlugin } from '~/utils/columnStretchPlugin';
 
 // ─── Column kinds ──────────────────────────────────────────────────────────
 // Declares how each column "kind" renders and edits.

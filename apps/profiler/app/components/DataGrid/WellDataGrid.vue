@@ -1,11 +1,7 @@
 <script setup lang="ts">
 import VGrid from '@revolist/vue3-datagrid';
-import {
-  useWellGridColumns,
-  type WellGridColumn,
-} from '~/composables/useWellGridColumns';
-
-export type { WellGridColumn } from '~/composables/useWellGridColumns';
+import { useWellGridColumns } from '~/composables/useWellGridColumns';
+import type { WellGridColumn } from '~/components/DataGrid/types';
 
 // ─── Props / Emits ────────────────────────────────────────────────────────────
 

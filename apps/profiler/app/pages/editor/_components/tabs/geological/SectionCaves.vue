@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Well } from '@welldot/core';
-import type { WellGridColumn } from '~/components/WellDataGrid.vue';
+import type { WellGridColumn } from '~/components/DataGrid/types';
 
 const { t } = useI18n();
 const profileStore = useProfileStore();
