@@ -58,6 +58,7 @@ new WellRenderer(svgs: SvgInstance[], options?: {
   units?:        Units;
   classNames?:   DeepPartial<ComponentsClassNames>;
   onError?:      (err: Error) => void;
+  onZoom?:       (scale: number) => void;
 })
 ```
 
@@ -69,6 +70,7 @@ new WellRenderer(svgs: SvgInstance[], options?: {
 | `units`        | `Units`                             | `{ length: 'm' \| 'ft'; diameter: 'mm' \| 'inches' }`                      |
 | `classNames`   | `DeepPartial<ComponentsClassNames>` | Override CSS class names for any SVG element                               |
 | `onError`      | `(err: Error) => void`              | Error callback                                                             |
+| `onZoom`       | `(scale: number) => void`           | Called with the current zoom scale (`1` = initial/fit) on every wheel/drag zoom-pan tick, and on `zoomBy`/`resetZoom` calls |
 
 #### Methods
 
@@ -77,8 +79,26 @@ new WellRenderer(svgs: SvgInstance[], options?: {
 | `prepareSvg(): Promise<void>`                                                     | Initialise SVG DOM structure and preload FGDC textures. Call once before the first `draw`. |
 | `draw(profile: RenderableWell, options?: { units?: Units; highlights?: Highlights }): void` | Render or re-render the full well profile.                                                 |
 | `renderLegend(selector: string, profile: Well): void`                             | Render a standalone legend into a separate SVG.                                            |
+| `zoomBy(factor: number): void`                                                    | Multiply the current zoom scale by `factor` (e.g. `1.25` in, `1 / 1.25` out). No-op if `zoom`/`pan` are both disabled. |
+| `resetZoom(): void`                                                               | Reset zoom/pan back to `renderConfig.zoomLevel` (default `1` — the initial fit-to-container view). |
+| `getZoomScale(): number`                                                          | Current zoom scale of the first panel (`1` = initial/fit).                                 |
 
 `RenderableWell` extends `Well` with an optional `key` field on each feature array element, enabling stable D3 data-join keys across re-renders. A plain `Well` object is directly assignable to `RenderableWell`. **`key` is runtime-only** — keep it in memory across edits for stable animation, but strip it before serializing to a `.well` file.
+
+#### Driving zoom from your own UI (zoom in/out/fit buttons)
+
+`zoom`/`pan` (when enabled in `renderConfig`) already wire up mouse wheel and drag directly on the SVG. `zoomBy`/`resetZoom`/`getZoomScale` operate on that same internal zoom behavior, so wheel/drag and a custom toolbar stay in sync — including through the `onZoom` callback, which fires for both interaction sources. `renderConfig.minZoomScale`/`maxZoomScale` (default `0`–`150`, i.e. 0%–15000%) bound the scale for wheel, drag, and `zoomBy`/`resetZoom` alike, since they're enforced on the shared d3-zoom behavior itself rather than by any one call site.
+
+```ts
+const renderer = new WellRenderer(svgs, {
+  renderConfig: { ...INTERACTIVE_RENDER_CONFIG, zoom: true, pan: true },
+  onZoom: scale => updateScaleLabel(scale),
+});
+
+zoomInButton.onclick = () => renderer.zoomBy(1.25);
+zoomOutButton.onclick = () => renderer.zoomBy(1 / 1.25);
+fitButton.onclick = () => renderer.resetZoom();
+```
 
 ---
 

@@ -252,6 +252,9 @@
       "out": "Reduzir",
       "fit": "Ajustar"
     },
+    "canvas": {
+      "empty": "Nenhum dado de poço ainda"
+    },
     "construction": {
       "tag": "Construtivo · Poço",
       "wellhead": {

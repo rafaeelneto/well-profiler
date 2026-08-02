@@ -391,6 +391,7 @@ export const useProfileStore = defineStore(
 
       // ── Well (renderable read / Immer-recipe write)
       well,
+      renderableWell,
       errors,
       isDirty,
 

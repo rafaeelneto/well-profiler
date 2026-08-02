@@ -77,6 +77,7 @@ export class WellRenderer {
   private instanceStates: InstanceState[] = [];
   private textures: WellTextures = createWellTextures();
   private onError?: (err: Error) => void;
+  private onZoom?: (scale: number) => void;
 
   classes = DEFAULT_COMPONENTS_CLASS_NAMES;
   private renderConfig: RenderConfig = INTERACTIVE_RENDER_CONFIG;
@@ -93,6 +94,7 @@ export class WellRenderer {
    * @param options.renderConfig - Rendering behaviour (zoom, pan, animation, layout). Defaults to `INTERACTIVE_RENDER_CONFIG`.
    * @param options.theme - Visual theme overrides. Merged on top of `DEFAULT_WELL_THEME`.
    * @param options.onError - Called when a draw error occurs (e.g., a renderer throws). Falls back to `console.error` if omitted.
+   * @param options.onZoom - Called with the current zoom scale (`1` = initial/fit) whenever the user zooms or pans, and whenever `zoomBy`/`resetZoom` are called. No-op if `renderConfig.zoom`/`pan` are both disabled.
    */
   constructor(
     svgs: SvgInstance[],
@@ -102,6 +104,7 @@ export class WellRenderer {
       renderConfig?: DeepPartial<RenderConfig>;
       theme?: DeepPartial<WellTheme>;
       onError?: (err: Error) => void;
+      onZoom?: (scale: number) => void;
     } = {},
   ) {
     if (svgs.length === 0) {
@@ -112,6 +115,7 @@ export class WellRenderer {
     }
     this.svgInstances = svgs;
     if (options.onError) this.onError = options.onError;
+    if (options.onZoom) this.onZoom = options.onZoom;
 
     if (options.classNames) {
       this.classes = defu(
@@ -219,6 +223,43 @@ export class WellRenderer {
       classNames: this.classes.legend,
       textures: this.renderConfig.textures,
     });
+  }
+
+  /**
+   * Multiplies the current zoom scale by `factor` (e.g. `1.25` to zoom in,
+   * `1 / 1.25` to zoom out) on every panel. No-op if both `renderConfig.zoom`
+   * and `renderConfig.pan` are disabled (no zoom behavior was attached).
+   */
+  public zoomBy(factor: number): void {
+    for (const state of this.instanceStates) {
+      if (!state.zoomNode) continue;
+      asSvgElement<SVGSVGElement>(state.svg)
+        .transition()
+        .call(state.zoomNode.scaleBy, factor);
+    }
+  }
+
+  /**
+   * Resets zoom/pan on every panel back to `renderConfig.zoomLevel`
+   * (defaults to `1`, i.e. the initial fit-to-container view).
+   */
+  public resetZoom(): void {
+    const target = d3.zoomIdentity.scale(this.renderConfig.zoomLevel ?? 1);
+    for (const state of this.instanceStates) {
+      if (!state.zoomNode) continue;
+      asSvgElement<SVGSVGElement>(state.svg)
+        .transition()
+        .call(state.zoomNode.transform, target);
+    }
+  }
+
+  /**
+   * Current zoom scale factor of the first panel (`1` = initial/fit).
+   * Returns `1` if zoom/pan is disabled or `prepareSvg()` hasn't run yet.
+   */
+  public getZoomScale(): number {
+    const node = this.instanceStates[0]?.svg.node();
+    return node ? d3.zoomTransform(node as Element).k : 1;
   }
 
   /**
@@ -538,6 +579,7 @@ export class WellRenderer {
         well_screen: constructionData.well_screen.filter(inDepth),
       });
       drawHighlights(zoomedCtx, highlights);
+      this.onZoom?.(transform.k);
     };
 
     const drawProfile = () => {
@@ -583,10 +625,18 @@ export class WellRenderer {
     if (zoomEnabled || panEnabled) {
       const zoomNode = d3.zoom<SVGSVGElement, unknown>();
       if (zoomEnabled || panEnabled) zoomNode.on('zoom', zooming);
-      if (!zoomEnabled) zoomNode.scaleExtent([1, 1]);
+      zoomNode.scaleExtent(
+        zoomEnabled
+          ? [
+              this.renderConfig.minZoomScale ?? 0,
+              this.renderConfig.maxZoomScale ?? Infinity,
+            ]
+          : [1, 1],
+      );
       if (!panEnabled)
         zoomNode.filter(e => e.type === 'wheel' || e.type === 'dblclick');
       asSvgElement<SVGSVGElement>(svg).call(zoomNode);
+      state.zoomNode = zoomNode;
 
       const initialZoom = this.renderConfig.zoomLevel ?? 1;
       if (initialZoom !== 1) {

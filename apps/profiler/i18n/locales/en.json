@@ -252,6 +252,9 @@
       "out": "Zoom out",
       "fit": "Fit"
     },
+    "canvas": {
+      "empty": "No well data yet"
+    },
     "construction": {
       "tag": "Construction · Well",
       "wellhead": {

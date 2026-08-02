@@ -17,6 +17,7 @@ import {
   type ScaleLinear,
   type Selection,
   type Transition,
+  type ZoomBehavior,
 } from 'd3';
 import type { TexturesConfig, WellTextures } from '~/configs/render.textures';
 
@@ -58,6 +59,8 @@ export type InstanceState = {
   margins: { left: number; right: number; top: number; bottom: number };
   clipId: string;
   clipRectId: string;
+  /** The d3-zoom behavior bound to this panel's `<svg>`, when zoom or pan is enabled. */
+  zoomNode?: ZoomBehavior<SVGSVGElement, unknown>;
 };
 
 export type LithologyTheme = { stroke: string; strokeWidth: number };
@@ -271,6 +274,10 @@ export type RenderConfig = {
   pan: boolean;
   /** Initial zoom scale applied on first render (1 = fit all, 2 = start 2× zoomed in). */
   zoomLevel?: number;
+  /** Upper bound for zoom scale, enforced for wheel/drag and `zoomBy`/`resetZoom` alike (default 150 = 15000%). */
+  maxZoomScale?: number;
+  /** Lower bound for zoom scale, enforced for wheel/drag and `zoomBy`/`resetZoom` alike (default 0 = 0%). */
+  minZoomScale?: number;
   /** undefined = show all; false or [] = show none; array = show only listed keys */
   tooltips?: TooltipKey[] | false;
   animation: {
