@@ -247,6 +247,59 @@
       "copyLinkDesc": "Compartilhar um link direto para este poço",
       "comingSoon": "Em breve"
     },
+    "exportPdfDialog": {
+      "title": "Exportar PDF",
+      "close": "Fechar",
+      "download": "Baixar PDF",
+      "print": "Imprimir",
+      "header": "Cabeçalho",
+      "labelPlaceholder": "Nome",
+      "valuePlaceholder": "Valor",
+      "syncedTooltip": "Valor sincronizado com o perfil",
+      "deleteItem": "Remover",
+      "pageBreaks": {
+        "title": "Quebra de páginas",
+        "split": "Dividir perfil em páginas de 80 m"
+      },
+      "metadataSection": {
+        "title": "Seção de metadados",
+        "before": "Antes",
+        "after": "Depois",
+        "hide": "Não exibir"
+      },
+      "scale": {
+        "title": "Escala"
+      },
+      "metadataFields": {
+        "name": "Nome",
+        "wellType": "Tipo",
+        "driller": "Perfurador",
+        "constructionDate": "Data de Construção",
+        "latitude": "Latitude",
+        "longitude": "Longitude",
+        "elevation": "Elevação",
+        "observations": "Observações"
+      },
+      "initialInfo": {
+        "title": "Informações iniciais",
+        "sections": "Nenhuma seção | 1 seção | {count} seções",
+        "empty": "Nenhuma seção adicionada",
+        "add": "Adicionar",
+        "metadataButton": "Metadados do poço"
+      },
+      "finalInfo": {
+        "title": "Informações finais",
+        "sections": "Nenhuma seção | 1 seção | {count} seções",
+        "empty": "Nenhuma seção adicionada",
+        "add": "Adicionar",
+        "metadataButton": "Metadados do poço"
+      },
+      "preview": {
+        "label": "Pré-visualização",
+        "pages": "páginas",
+        "fit": "Ajustar"
+      }
+    },
     "zoom": {
       "in": "Ampliar",
       "out": "Reduzir",

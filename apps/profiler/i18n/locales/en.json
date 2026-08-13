@@ -247,6 +247,59 @@
       "copyLinkDesc": "Share a deep link to this well",
       "comingSoon": "Soon"
     },
+    "exportPdfDialog": {
+      "title": "Export PDF",
+      "close": "Close",
+      "download": "Download PDF",
+      "print": "Print",
+      "header": "Header",
+      "labelPlaceholder": "Name",
+      "valuePlaceholder": "Value",
+      "syncedTooltip": "Value synced with the profile",
+      "deleteItem": "Remove",
+      "pageBreaks": {
+        "title": "Page breaks",
+        "split": "Split profile into 80 m pages"
+      },
+      "metadataSection": {
+        "title": "Metadata section",
+        "before": "Before",
+        "after": "After",
+        "hide": "Hide"
+      },
+      "scale": {
+        "title": "Scale"
+      },
+      "metadataFields": {
+        "name": "Name",
+        "wellType": "Type",
+        "driller": "Driller",
+        "constructionDate": "Construction date",
+        "latitude": "Latitude",
+        "longitude": "Longitude",
+        "elevation": "Elevation",
+        "observations": "Observations"
+      },
+      "initialInfo": {
+        "title": "Initial information",
+        "sections": "No sections | 1 section | {count} sections",
+        "empty": "No sections added",
+        "add": "Add",
+        "metadataButton": "Well metadata"
+      },
+      "finalInfo": {
+        "title": "Final information",
+        "sections": "No sections | 1 section | {count} sections",
+        "empty": "No sections added",
+        "add": "Add",
+        "metadataButton": "Well metadata"
+      },
+      "preview": {
+        "label": "Preview",
+        "pages": "pages",
+        "fit": "Fit"
+      }
+    },
     "zoom": {
       "in": "Zoom in",
       "out": "Zoom out",
