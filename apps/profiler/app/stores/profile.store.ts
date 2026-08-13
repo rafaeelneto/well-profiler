@@ -13,6 +13,37 @@ import { defineStore } from 'pinia';
 import { computed, markRaw, ref } from 'vue';
 import { makeDeepProxy } from '~/utils/state';
 
+// ─── Chained-depth types ─────────────────────────────────────────────────────
+
+type WellArrayKey =
+  | 'bore_hole'
+  | 'well_case'
+  | 'reduction'
+  | 'well_screen'
+  | 'surface_case'
+  | 'hole_fill'
+  | 'lithology'
+  | 'fractures'
+  | 'caves';
+
+const CHAINING_KEYS = new Set<WellArrayKey>([
+  'bore_hole',
+  'surface_case',
+  'hole_fill',
+  'lithology',
+]);
+
+/** Recalculate from/to so items are contiguous from 0, preserving each item's thickness. */
+function rechainDepths(items: Array<{ from: number; to: number }>): void {
+  let cursor = 0;
+  for (const item of items) {
+    const thickness = item.to - item.from;
+    item.from = cursor;
+    item.to = cursor + thickness;
+    cursor = item.to;
+  }
+}
+
 // ─── Stable render-key registry ──────────────────────────────────────────────
 // WeakMap maps each feature object instance → a stable UUID.
 // Immer returns new objects for mutated elements and preserves identity for
@@ -288,12 +319,79 @@ export const useProfileStore = defineStore(
       isDirty.value = false;
     }
 
+    /**
+     * Move a feature from `fromIdx` to `toIdx` within its array.
+     * For chaining types (bore_hole, surface_case, hole_fill, lithology),
+     * depths are recalculated to remain contiguous from 0 after the move.
+     */
+    function reorderWellFeature(
+      key: WellArrayKey,
+      fromIdx: number,
+      toIdx: number,
+    ): void {
+      updateWell(draft => {
+        const arr = draft[key] as Array<{ from: number; to: number }>;
+        const [moved] = arr.splice(fromIdx, 1);
+        if (!moved) return;
+        arr.splice(toIdx, 0, moved);
+        if (CHAINING_KEYS.has(key)) rechainDepths(arr);
+      });
+    }
+
+    /**
+     * Append a new item to a feature array.
+     * For chaining types, `from`/`to` are overridden so the item starts exactly
+     * where the last existing item ends, preserving the passed-in thickness.
+     */
+    function addWellFeature<K extends WellArrayKey>(
+      key: K,
+      item: Well[K][number],
+    ): void {
+      updateWell(draft => {
+        const arr = draft[key] as Array<{ from: number; to: number }>;
+        if (CHAINING_KEYS.has(key)) {
+          const raw = item as unknown as { from: number; to: number };
+          const lastTo = arr.length > 0 ? arr[arr.length - 1]!.to : 0;
+          const thickness = raw.to - raw.from > 0 ? raw.to - raw.from : 10;
+          arr.push({ ...(item as object), from: lastTo, to: lastTo + thickness } as {
+            from: number;
+            to: number;
+          });
+        } else {
+          arr.push(item as unknown as { from: number; to: number });
+        }
+      });
+    }
+
+    /**
+     * Update a single field on a feature item.
+     * For chaining types, editing `from` or `to` recalculates all subsequent
+     * items to remain contiguous without changing their thicknesses.
+     */
+    function updateWellFeature(
+      key: WellArrayKey,
+      index: number,
+      prop: string,
+      value: unknown,
+    ): void {
+      updateWell(draft => {
+        const arr = draft[key] as Array<
+          Record<string, unknown> & { from: number; to: number }
+        >;
+        (arr[index] as Record<string, unknown>)[prop] = value;
+        if (CHAINING_KEYS.has(key) && (prop === 'from' || prop === 'to')) {
+          rechainDepths(arr);
+        }
+      });
+    }
+
     return {
       // ── State (raw ref — persistence only, prefer `well` in components)
       _well,
 
       // ── Well (renderable read / Immer-recipe write)
       well,
+      renderableWell,
       errors,
       isDirty,
 
@@ -345,6 +443,9 @@ export const useProfileStore = defineStore(
       getExportableWell,
       clear,
       markClean,
+      reorderWellFeature,
+      addWellFeature,
+      updateWellFeature,
     };
   },
   {

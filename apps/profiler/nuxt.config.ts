@@ -28,6 +28,11 @@ export default defineNuxtConfig({
 
   css: ['@/assets/styles/main.css'],
 
+  components: [
+    { path: '~/components/DataGrid', pathPrefix: false },
+    { path: '~/components', pathPrefix: true, ignore: ['**/DataGrid/**'] },
+  ],
+
   pages: {
     pattern: ['**/*.vue', '!**/_*/**'],
   },

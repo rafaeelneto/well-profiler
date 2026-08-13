@@ -178,6 +178,7 @@
   "editor": {
     "well": "Well",
     "save": "Save",
+    "edit": "Edit",
     "saveAs": "Save As",
     "open": "Open",
     "share": "Share",
@@ -246,10 +247,66 @@
       "copyLinkDesc": "Share a deep link to this well",
       "comingSoon": "Soon"
     },
+    "exportPdfDialog": {
+      "title": "Export PDF",
+      "close": "Close",
+      "download": "Download PDF",
+      "print": "Print",
+      "header": "Header",
+      "labelPlaceholder": "Name",
+      "valuePlaceholder": "Value",
+      "syncedTooltip": "Value synced with the profile",
+      "deleteItem": "Remove",
+      "pageBreaks": {
+        "title": "Page breaks",
+        "split": "Split profile into 80 m pages"
+      },
+      "metadataSection": {
+        "title": "Metadata section",
+        "before": "Before",
+        "after": "After",
+        "hide": "Hide"
+      },
+      "scale": {
+        "title": "Scale"
+      },
+      "metadataFields": {
+        "name": "Name",
+        "wellType": "Type",
+        "driller": "Driller",
+        "constructionDate": "Construction date",
+        "latitude": "Latitude",
+        "longitude": "Longitude",
+        "elevation": "Elevation",
+        "observations": "Observations"
+      },
+      "initialInfo": {
+        "title": "Initial information",
+        "sections": "No sections | 1 section | {count} sections",
+        "empty": "No sections added",
+        "add": "Add",
+        "metadataButton": "Well metadata"
+      },
+      "finalInfo": {
+        "title": "Final information",
+        "sections": "No sections | 1 section | {count} sections",
+        "empty": "No sections added",
+        "add": "Add",
+        "metadataButton": "Well metadata"
+      },
+      "preview": {
+        "label": "Preview",
+        "pages": "pages",
+        "fit": "Fit"
+      }
+    },
     "zoom": {
       "in": "Zoom in",
       "out": "Zoom out",
       "fit": "Fit"
+    },
+    "canvas": {
+      "empty": "No well data yet"
     },
     "construction": {
       "tag": "Construction · Well",
@@ -463,6 +520,139 @@
         "from": "From",
         "to": "To",
         "thickness": "Thickness"
+      }
+    },
+    "historico": {
+      "tag": "History · Well",
+      "logs": {
+        "title": "History Logs",
+        "tag": "HISTORY LOG",
+        "empty": "No events recorded",
+        "noResults": "No entries match your search",
+        "search": "Search entries…",
+        "registries": "entries",
+        "addEvent": "Add event",
+        "editEvent": "Edit event",
+        "deleteConfirm": "Delete this log entry?",
+        "editedAt": "Edited {date}",
+        "attachments": "{n} attachment | {n} attachments",
+        "addAttachment": "Add file",
+        "showMore": "Show more",
+        "showLess": "Show less",
+        "by": "by",
+        "deleteAttachment": "Remove attachment?",
+        "editAttachment": "Edit attachment",
+        "categories": {
+          "maintenance": "Maintenance",
+          "inspection": "Inspection",
+          "incident": "Incident",
+          "event": "Event"
+        },
+        "severity": {
+          "low": "Low",
+          "medium": "Medium",
+          "high": "High",
+          "critical": "Critical"
+        },
+        "fields": {
+          "category": "Category",
+          "datetime": "Date / Time",
+          "description": "Description",
+          "author": "Author",
+          "severity": "Severity",
+          "attachmentUrl": "File URL",
+          "attachmentFilename": "Display name",
+          "attachmentMediaType": "File type"
+        }
+      },
+      "events": {
+        "title": "Hydrodynamic Events",
+        "tag": "PUMP TESTS · MEASUREMENTS",
+        "empty": "No hydrodynamic events",
+        "comingSoon": "Full editing available in the Hydrodynamic tab"
+      }
+    },
+    "hidrodinamica": {
+      "title": "Hydrodynamic Events",
+      "addEvent": "Add event",
+      "ledgerNote": "Chronological ledger — new records are appended, not overwritten.",
+      "empty": "No hydrodynamic events recorded",
+      "noResults": "No results",
+      "deleteConfirm": "Remove this event?",
+      "editEvent": "Edit event",
+      "tabs": {
+        "measurements": "Measurements",
+        "analyses": "Analyses"
+      },
+      "analyses": {
+        "inDevBody": "The Analyses tab will allow entering aquifer test results (transmissivity, specific capacity, storage coefficient)."
+      },
+      "estadoAtual": {
+        "title": "Current State",
+        "ne": "CURRENT SWL",
+        "specificCapacity": "SPEC. CAPACITY",
+        "transmissivity": "TRANSMISSIVITY",
+        "dynamicLevel": "DWL",
+        "flowRate": "FLOW RATE Q",
+        "noData": "—"
+      },
+      "eventTypes": {
+        "spot_measurement": "Spot Measurement",
+        "constant_rate": "Constant Rate",
+        "step_drawdown": "Step Drawdown",
+        "airlift": "Air-lift",
+        "recovery_only": "Recovery Only"
+      },
+      "fields": {
+        "type": "Event Type",
+        "datetime": "Date / Time",
+        "operator": "Operator",
+        "equipment": "Equipment",
+        "notes": "Notes",
+        "staticLevel": "SWL (m)",
+        "staticLevelPrecision": "±Prec. SWL",
+        "measurementMethod": "Measurement method",
+        "pumpingRate": "Estimated rate (m³/h)",
+        "pumpingDuration": "Estimated duration (min)",
+        "steps": "Pumping Steps",
+        "recovery": "Recovery",
+        "includeRecovery": "Include recovery phase",
+        "rate": "Rate (m³/h)",
+        "ratePrecision": "±Prec.",
+        "duration": "Duration (min)",
+        "durationDerivedHint": "Calculated from readings (max elapsed time)",
+        "elapsed": "Time (min)",
+        "depth": "Depth (m)",
+        "depthPrecision": "±Prec.",
+        "stepsDepthPrecision": "±Prec.",
+        "readings": "Readings"
+      },
+      "stats": {
+        "ne": "SWL",
+        "nd": "DWL",
+        "drawdown": "DRAWDOWN S",
+        "flowRate": "FLOW RATE Q",
+        "specificCapacity": "Q/S",
+        "method": "METHOD",
+        "recovery": "Recovery",
+        "steps": "steps",
+        "readings": "readings"
+      },
+      "measurementMethods": {
+        "electric_probe": "Electric probe",
+        "pressure_transducer": "Pressure transducer",
+        "air_line": "Air line",
+        "tape": "Tape"
+      },
+      "addStep": "Add step",
+      "addReading": "Add reading",
+      "manageReadings": "Manage",
+      "readingsDialog": {
+        "stepTitle": "Readings — Step {n} ({rate} m³/h)",
+        "recoveryTitle": "Readings — Recovery"
+      },
+      "validation": {
+        "missing": "Add {fields} to save this event"
       }
     }
   }

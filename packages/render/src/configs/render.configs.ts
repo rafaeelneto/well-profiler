@@ -100,6 +100,8 @@ export const STATIC_RENDER_CONFIG: RenderConfig = {
   zoom: true,
   pan: true,
   zoomLevel: 1,
+  maxZoomScale: 150,
+  minZoomScale: 0,
   animation: { duration: 600, ease: easeCubic },
   geologic: { xLeft: 20, xRightInset: 300 },
   layout: {
@@ -205,6 +207,8 @@ export const INTERACTIVE_RENDER_CONFIG: RenderConfig = {
   zoom: true,
   pan: true,
   zoomLevel: 1,
+  maxZoomScale: 150,
+  minZoomScale: 0,
   animation: { duration: 600, ease: easeCubic },
   geologic: { xLeft: 6, xRightInset: 56 },
   layout: {

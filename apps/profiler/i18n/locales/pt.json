@@ -178,6 +178,7 @@
   "editor": {
     "well": "Poço",
     "save": "Salvar",
+    "edit": "Editar",
     "saveAs": "Salvar Como",
     "open": "Abrir",
     "share": "Compartilhar",
@@ -246,10 +247,66 @@
       "copyLinkDesc": "Compartilhar um link direto para este poço",
       "comingSoon": "Em breve"
     },
+    "exportPdfDialog": {
+      "title": "Exportar PDF",
+      "close": "Fechar",
+      "download": "Baixar PDF",
+      "print": "Imprimir",
+      "header": "Cabeçalho",
+      "labelPlaceholder": "Nome",
+      "valuePlaceholder": "Valor",
+      "syncedTooltip": "Valor sincronizado com o perfil",
+      "deleteItem": "Remover",
+      "pageBreaks": {
+        "title": "Quebra de páginas",
+        "split": "Dividir perfil em páginas de 80 m"
+      },
+      "metadataSection": {
+        "title": "Seção de metadados",
+        "before": "Antes",
+        "after": "Depois",
+        "hide": "Não exibir"
+      },
+      "scale": {
+        "title": "Escala"
+      },
+      "metadataFields": {
+        "name": "Nome",
+        "wellType": "Tipo",
+        "driller": "Perfurador",
+        "constructionDate": "Data de Construção",
+        "latitude": "Latitude",
+        "longitude": "Longitude",
+        "elevation": "Elevação",
+        "observations": "Observações"
+      },
+      "initialInfo": {
+        "title": "Informações iniciais",
+        "sections": "Nenhuma seção | 1 seção | {count} seções",
+        "empty": "Nenhuma seção adicionada",
+        "add": "Adicionar",
+        "metadataButton": "Metadados do poço"
+      },
+      "finalInfo": {
+        "title": "Informações finais",
+        "sections": "Nenhuma seção | 1 seção | {count} seções",
+        "empty": "Nenhuma seção adicionada",
+        "add": "Adicionar",
+        "metadataButton": "Metadados do poço"
+      },
+      "preview": {
+        "label": "Pré-visualização",
+        "pages": "páginas",
+        "fit": "Ajustar"
+      }
+    },
     "zoom": {
       "in": "Ampliar",
       "out": "Reduzir",
       "fit": "Ajustar"
+    },
+    "canvas": {
+      "empty": "Nenhum dado de poço ainda"
     },
     "construction": {
       "tag": "Construtivo · Poço",
@@ -463,6 +520,139 @@
         "from": "De",
         "to": "Até",
         "thickness": "Espessura"
+      }
+    },
+    "historico": {
+      "tag": "Histórico · Poço",
+      "logs": {
+        "title": "History Logs",
+        "tag": "REGISTRO",
+        "empty": "Nenhum evento registrado",
+        "noResults": "Nenhum registro corresponde à pesquisa",
+        "search": "Buscar registros…",
+        "registries": "registros",
+        "addEvent": "Adicionar evento",
+        "editEvent": "Editar evento",
+        "deleteConfirm": "Excluir este registro?",
+        "editedAt": "Editado em {date}",
+        "attachments": "{n} anexo | {n} anexos",
+        "addAttachment": "Adicionar arquivo",
+        "showMore": "Ver mais",
+        "showLess": "Ver menos",
+        "by": "por",
+        "deleteAttachment": "Remover anexo?",
+        "editAttachment": "Editar anexo",
+        "categories": {
+          "maintenance": "Manutenção",
+          "inspection": "Inspeção",
+          "incident": "Incidente",
+          "event": "Evento"
+        },
+        "severity": {
+          "low": "Baixa",
+          "medium": "Média",
+          "high": "Alta",
+          "critical": "Crítica"
+        },
+        "fields": {
+          "category": "Categoria",
+          "datetime": "Data / Hora",
+          "description": "Descrição",
+          "author": "Autor",
+          "severity": "Severidade",
+          "attachmentUrl": "URL do arquivo",
+          "attachmentFilename": "Nome exibido",
+          "attachmentMediaType": "Tipo de arquivo"
+        }
+      },
+      "events": {
+        "title": "Eventos Hidrodinâmicos",
+        "tag": "TESTES · MEDIÇÕES",
+        "empty": "Nenhum evento hidrodinâmico",
+        "comingSoon": "Edição disponível na aba Hidrodinâmica"
+      }
+    },
+    "hidrodinamica": {
+      "title": "Eventos Hidrodinâmicos",
+      "addEvent": "Adicionar evento",
+      "ledgerNote": "Ledger cronológico — novos registros são adicionados, não sobrescritos.",
+      "empty": "Nenhum evento hidrodinâmico registrado",
+      "noResults": "Nenhum resultado",
+      "deleteConfirm": "Remover este evento?",
+      "editEvent": "Editar evento",
+      "tabs": {
+        "measurements": "Medições",
+        "analyses": "Análises"
+      },
+      "analyses": {
+        "inDevBody": "A aba Análises permitirá inserir resultados de ensaios de aquífero (transmissividade, capacidade específica, coeficiente de armazenamento)."
+      },
+      "estadoAtual": {
+        "title": "Estado Atual",
+        "ne": "NE ATUAL",
+        "specificCapacity": "CAP. ESPECÍFICA",
+        "transmissivity": "TRANSMISSIVIDADE",
+        "dynamicLevel": "ND",
+        "flowRate": "VAZÃO Q",
+        "noData": "—"
+      },
+      "eventTypes": {
+        "spot_measurement": "Medição Pontual",
+        "constant_rate": "Vazão Constante",
+        "step_drawdown": "Escalonada",
+        "airlift": "Air-lift",
+        "recovery_only": "Recuperação"
+      },
+      "fields": {
+        "type": "Tipo de Evento",
+        "datetime": "Data / Hora",
+        "operator": "Operador",
+        "equipment": "Equipamento",
+        "notes": "Notas",
+        "staticLevel": "NE (m)",
+        "staticLevelPrecision": "±Prec. NE",
+        "measurementMethod": "Método de medição",
+        "pumpingRate": "Vazão estimada (m³/h)",
+        "pumpingDuration": "Duração estimada (min)",
+        "steps": "Degraus de Bombeamento",
+        "recovery": "Recuperação",
+        "includeRecovery": "Incluir fase de recuperação",
+        "rate": "Vazão (m³/h)",
+        "ratePrecision": "±Prec.",
+        "duration": "Duração (min)",
+        "durationDerivedHint": "Calculado a partir das leituras (tempo decorrido máximo)",
+        "elapsed": "Tempo (min)",
+        "depth": "Prof. (m)",
+        "depthPrecision": "±Prec.",
+        "stepsDepthPrecision": "±Prec.",
+        "readings": "Leituras"
+      },
+      "stats": {
+        "ne": "NE",
+        "nd": "ND",
+        "drawdown": "REBAIX. S",
+        "flowRate": "VAZÃO Q",
+        "specificCapacity": "Q/S",
+        "method": "MÉTODO",
+        "recovery": "Recuperação",
+        "steps": "degraus",
+        "readings": "leituras"
+      },
+      "measurementMethods": {
+        "electric_probe": "Sonda elétrica",
+        "pressure_transducer": "Transdutor de pressão",
+        "air_line": "Linha de ar",
+        "tape": "Trena"
+      },
+      "addStep": "Adicionar degrau",
+      "addReading": "Adicionar leitura",
+      "manageReadings": "Gerenciar",
+      "readingsDialog": {
+        "stepTitle": "Leituras — Degrau {n} ({rate} m³/h)",
+        "recoveryTitle": "Leituras — Recuperação"
+      },
+      "validation": {
+        "missing": "Adicione {fields} para salvar este evento"
       }
     }
   }

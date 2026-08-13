@@ -168,13 +168,15 @@ export const SpotMeasurementEventSchema = HydrodynamicEventBaseSchema.extend({
   static_level: z.number(),
   static_level_precision: z.number().optional(),
   measurement_method: z.string().optional(),
+  steps: z.array(PumpingStepSchema).max(1).optional(),
+  recovery: RecoveryPhaseSchema.optional(),
 });
 
 export const ConstantRateEventSchema = HydrodynamicEventBaseSchema.extend({
   type: z.literal('constant_rate'),
   static_level: z.number().optional(),
   static_level_precision: z.number().optional(),
-  steps: z.array(PumpingStepSchema).optional(),
+  steps: z.tuple([PumpingStepSchema]).optional(),
   recovery: RecoveryPhaseSchema.optional(),
 });
 
@@ -189,6 +191,7 @@ export const StepDrawdownEventSchema = HydrodynamicEventBaseSchema.extend({
 export const AirliftEventSchema = HydrodynamicEventBaseSchema.extend({
   type: z.literal('airlift'),
   steps: z.array(PumpingStepSchema),
+  recovery: RecoveryPhaseSchema.optional(),
 });
 
 export const RecoveryOnlyEventSchema = HydrodynamicEventBaseSchema.extend({
@@ -243,6 +246,9 @@ export const AquiferAnalysisSchema = z.object({
   dynamic_level_precision: z.number().optional(),
   flow_rate: z.number().optional(),
   flow_rate_precision: z.number().optional(),
+  max_flow_rate: z.number().optional(),
+  max_flow_rate_precision: z.number().optional(),
+  max_flow_rate_basis: z.string().optional(),
   specific_capacity: z.number().optional(),
   transmissivity: z.number().optional(),
   storativity: z.number().nullable().optional(),

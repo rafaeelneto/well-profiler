@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import ShareProfile from '~/components/ShareProfile.vue';
 import SettingsModal from '~/components/SettingsModal.vue';
+import ExportPdfDialog from '~/components/ExportPdfDialog.vue';
 import ToolsMenu, { type ToolItem } from './ToolsMenu.vue';
 
 const props = defineProps<{ mobileView: 'perfil' | 'dados' }>();
@@ -111,6 +112,9 @@ const shareVisible = ref(false);
 // ── Settings dialog ─────────────────────────────────────────────────
 const settingsVisible = ref(false);
 
+// ── Export PDF dialog ────────────────────────────────────────────────
+const exportPdfVisible = ref(false);
+
 // ── Tools menu ──────────────────────────────────────────────────────
 const toolsMenuVisible = ref(false);
 
@@ -148,6 +152,7 @@ const toolItems = computed<ToolItem[]>(() => [
     label: t('editor.exportPdf'),
     icon: 'ph:file-pdf-duotone',
     disabled: !hasWell.value,
+    onClick: () => (exportPdfVisible.value = true),
   },
   {
     label: t('editor.importSiagas'),
@@ -310,7 +315,12 @@ const viewOptions = computed(() => [
     <div class="w-px h-5 bg-surface-200/80 shrink-0" />
 
     <!-- Export PDF (primary CTA) -->
-    <Button :label="t('editor.exportPdf')" :disabled="!hasWell" size="small">
+    <Button
+      :label="t('editor.exportPdf')"
+      :disabled="!hasWell"
+      size="small"
+      @click="exportPdfVisible = true"
+    >
       <template #icon>
         <Icon name="ph:file-pdf-duotone" class="size-4 shrink-0" />
       </template>
@@ -395,6 +405,9 @@ const viewOptions = computed(() => [
 
   <!-- ─── Settings dialog ───────────────────────────────────────────── -->
   <SettingsModal v-model="settingsVisible" />
+
+  <!-- ─── Export PDF dialog ─────────────────────────────────────────── -->
+  <ExportPdfDialog v-model="exportPdfVisible" />
 
   <!-- ─── Tools menu ────────────────────────────────────────────────── -->
   <ToolsMenu

@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import type { Well } from '@welldot/core';
-import type { WellGridColumn } from '~/components/WellDataGrid.vue';
+import type { WellGridColumn } from '~/components/DataGrid/types';
 
 const { t } = useI18n();
 const profileStore = useProfileStore();
@@ -49,9 +48,9 @@ const holeFillColumns = computed<WellGridColumn[]>(() => [
 ]);
 
 function addHoleFill() {
-  profileStore.well.hole_fill.push({
+  profileStore.addWellFeature('hole_fill', {
     from: 0,
-    to: 0,
+    to: 10,
     diameter: 0,
     type: 'gravel_pack',
     description: '',
@@ -63,17 +62,11 @@ function deleteHoleFill(index: number) {
 }
 
 function updateHoleFill(index: number, prop: string, value: unknown) {
-  (profileStore.well.hole_fill[index] as Record<string, unknown>)[prop] = value;
+  profileStore.updateWellFeature('hole_fill', index, prop, value);
 }
 
 function reorderHoleFill(from: number, to: number) {
-  const items = [...profileStore.well.hole_fill];
-  const [moved] = items.splice(from, 1);
-  if (!moved) return;
-  items.splice(to, 0, moved);
-  profileStore.updateWell((draft: Well) => {
-    draft.hole_fill.splice(0, draft.hole_fill.length, ...items);
-  });
+  profileStore.reorderWellFeature('hole_fill', from, to);
 }
 </script>
 

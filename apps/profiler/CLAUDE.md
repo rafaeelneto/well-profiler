@@ -69,20 +69,45 @@ pnpm lint       # eslint
 
 ## Documentation requirements
 
-`apps/profiler/README.md` is currently the default Nuxt starter README and carries no project-specific content. Until it is replaced with real documentation, treat this CLAUDE.md as the authoritative reference for contributors.
-
 Update this `CLAUDE.md` when:
-
-- A new Nuxt module is added — add it to the Stack section and note any config file it introduces
-- A new top-level directory appears under `app/` (e.g. `app/middleware/`, `app/server/`) — add it to the Directory layout section
-- A significant pattern changes (state management, i18n strategy, deploy target, theme system)
+- A new Nuxt module is added (Stack section + any config file it introduces)
+- A new top-level directory appears under `app/` (Directory layout section)
+- A significant pattern changes (state management, i18n, deploy target, theme system)
 - A new environment variable is required at build or runtime
 
-When `README.md` is eventually replaced with real content, keep it in sync:
+`README.md` covers setup, the color system, and PrimeVue usage for human contributors. Keep it in sync when those topics change.
 
-- Environment variables → `.env.example` table in the README
-- Deploy steps and Cloudflare Pages config
-- Any prerequisite tools beyond `pnpm` and Node
+## Color system
+
+Two mirrored scales — `surface` (backgrounds) and `content` (text, borders, icons) — cover all neutral colors. The scales flip between modes so no `dark:` variant is ever needed for neutrals. `primary`, `error`, `warning`, `success`, and `info` handle semantic highlights.
+
+**Pairing rule:** `surface-N` and `content-N` at the same index always contrast, because the scales are inverses. Mixing distant indexes breaks contrast in one mode (`surface-100 + text-content-900` = near-black on near-black in dark mode).
+
+| Scale | Role | Normal range |
+|---|---|---|
+| `surface` | Backgrounds only — never text/icons | `0–200`; higher only for intentional inversion |
+| `content` | Text, borders, icon strokes | `0` (body) → `300` (muted) → `600` (subtle border); `800+` almost always wrong |
+| `primary` | CTAs, active states, focus rings, interactive highlights | varies |
+| `error/warning/success/info` | State communication | `500` default; `50–100` for bg, `700–800` for text on light bg |
+
+Key rules:
+- `surface` for backgrounds exclusively; `content` for everything neutral on top of it.
+- Pair at the same index. Slight offset toward higher values for hierarchy is fine; a large gap (>400 steps) is a bug.
+- High `surface` values (`400+`) signal a deliberate inversion (dark hero, inverted sidebar) — rare. High `content` values (`800+`) are nearly always wrong.
+- Tailwind utilities (`bg-surface-*`, `text-content-*`, `bg-primary-*`, etc.) are bridged from PrimeVue CSS vars in `app/assets/styles/main.css`. Never use Tailwind grays, raw `bg-white`, or hardcoded hex — they break dark mode.
+
+## PrimeVue components
+
+Always prefer a PrimeVue component over a hand-rolled one. Customise in this order — stop at the first layer that solves the problem:
+
+1. **API** — props and slots (`primevue.org/<component>`).
+2. **`customTheme.ts`** — global visual change (design token override under `components`). Right for color, radius, spacing that should apply to every instance.
+3. **`customPt.js`** — pass-through for structural/utility tweaks (Tailwind class or HTML attr on an internal element). One-off layout adjustments only; not for color changes.
+4. **Custom component** — last resort, only when the three layers above are genuinely insufficient.
+
+Never target PrimeVue internal class names in scoped CSS — they're unstable across minor versions. Use pass-through instead.
+
+Use `severity` props (`"primary"`, `"success"`, `"warn"`, `"danger"`, `"info"`) on PrimeVue components rather than manually applying color classes. The theme maps severities to the semantic scales automatically.
 
 ## Constraints
 
@@ -90,6 +115,4 @@ When `README.md` is eventually replaced with real content, keep it in sync:
 - SSR is enabled; avoid `window`/`document` access outside of client lifecycle hooks or `process.client` guards.
 - Deployed to Cloudflare Pages — no Node.js server runtime. All server routes must be Cloudflare-compatible.
 - **Icons:** Use Phosphor (`ph:`) for all new UI. Prefer the **duotone** variant (`ph:icon-name-duotone`) as the default — it matches the editorial aesthetic. Fall back to `ph:icon-name` (regular) only when duotone is unavailable. Browse at https://icones.js.org/collection/ph. Do not use Heroicons in new components; the landing page (`layouts/landing.vue`) may keep its existing `heroicons:` usage.
-- try to use tailwind canonical classes instead of custom measurements
-- always use semantic colors definition primary, secondary, surface, content
-- preffer primevue components and check documentation for better usage and customization (some changes should be global level theming on customTheme.ts or customPt.js)
+- **Tailwind canonical classes only** — no arbitrary values (`w-[37px]`, `bg-[#eef0f3]`, `text-[14px]`). Use the design-token utilities (`bg-surface-*`, `text-content-*`, spacing scale, etc.) or standard Tailwind scale values. Arbitrary values bypass the token system, don't respond to mode changes, and make refactoring the theme harder.

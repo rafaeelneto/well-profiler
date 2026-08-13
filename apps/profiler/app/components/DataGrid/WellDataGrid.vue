@@ -1,71 +1,7 @@
 <script setup lang="ts">
-import { h, defineComponent } from 'vue';
-import VGrid, {
-  BasePlugin,
-  VGridVueEditor,
-  VGridVueTemplate,
-  type PluginProviders,
-} from '@revolist/vue3-datagrid';
-import GridTextEditor from './GridTextEditor.vue';
-import GridNumberEditor from './GridNumberEditor.vue';
-import GridUnitEditor from './GridUnitEditor.vue';
-import GridSelectEditor from './GridSelectEditor.vue';
-import GridColorPickerEditor from './GridColorPickerEditor.vue';
-import GridUnitCell from './GridUnitCell.vue';
-import GridColorCell from './GridColorCell.vue';
-import GridSelectCell from './GridSelectCell.vue';
-import GridTextureSelectEditor from './GridTextureSelectEditor.vue';
-import GridTextureSelectCell from './GridTextureSelectCell.vue';
-import GridFormattedCell from './GridFormattedCell.vue';
-import { columnStretchPlugin } from './columnStretchPlugin';
-import GridDeleteCell from './GridDeleteCell.vue';
-import GridCheckboxCell from './GridCheckboxCell.vue';
-import GridSelectButtonCell from './GridSelectButtonCell.vue';
-import type {
-  AfterEditEvent,
-  BeforeSaveDataDetails,
-  ColumnProp,
-  ColumnRegular,
-  Editors,
-  FocusAfterRenderEvent,
-} from '@revolist/revogrid';
-
-// ─── Public column-definition interface ──────────────────────────────────────
-// Consumers import this type to declare columns for any well feature array.
-
-type WellGridColumnBase = {
-  /** Object key on the row model */
-  prop: string;
-  /** Pre-translated header label */
-  label: string;
-  /** Column width in px (default 150) */
-  size?: number;
-  /** Prevent editing */
-  readonly?: boolean;
-  /** Override the RevoGrid editor key */
-  editor?: string;
-  /** Unit-aware column — auto-converts to/from canonical units (m ↔ ft, mm ↔ inches) */
-  unitType?: 'length' | 'diameter';
-  /** Display-only formatter — bypasses the editor */
-  formatter?: (value: unknown, row: Record<string, unknown>) => string;
-  pin?: 'colPinStart' | 'colPinEnd';
-  /** Stretch this column to absorb all remaining grid width */
-  stretch?: boolean;
-  /** Minimum width (px) for a stretch column (default 50) */
-  minSize?: number;
-};
-
-export type WellGridColumn =
-  | (WellGridColumnBase & { type?: 'text' | 'number' | 'color' | 'checkbox' })
-  | (WellGridColumnBase & {
-      type: 'select';
-      options: Array<{ label: string; value: string }>;
-    })
-  | (WellGridColumnBase & {
-      type: 'select-button';
-      options: Array<{ label: string; value: string }>;
-    })
-  | (WellGridColumnBase & { type: 'texture' });
+import VGrid from '@revolist/vue3-datagrid';
+import { useWellGridColumns } from '~/composables/useWellGridColumns';
+import type { WellGridColumn } from '~/components/DataGrid/types';
 
 // ─── Props / Emits ────────────────────────────────────────────────────────────
 
@@ -88,226 +24,20 @@ const emit = defineEmits<{
   reorder: [from: number, to: number];
 }>();
 
-const uiStore = useUiStore();
-
-// ─── Editor registry ──────────────────────────────────────────────────────────
-
-function unitEditorFactory(unitType: 'length' | 'diameter') {
-  return defineComponent({
-    props: ['val', 'save', 'close'],
-    setup: (p: any) => () => h(GridUnitEditor, { ...p, unitType }),
-  });
-}
-
-function selectEditorFactory(options: Array<{ label: string; value: string }>) {
-  return defineComponent({
-    props: ['val', 'save', 'close'],
-    setup: (p: any) => () => h(GridSelectEditor, { ...p, options }),
-  });
-}
-
-function textureEditorFactory() {
-  return defineComponent({
-    props: ['val', 'save', 'close'],
-    setup: (p: any) => () => h(GridTextureSelectEditor, p),
-  });
-}
-
-const gridEditors = computed(() => {
-  const editors: Editors = {
-    text: VGridVueEditor(GridTextEditor),
-    number: VGridVueEditor(GridNumberEditor),
-    color: VGridVueEditor(GridColorPickerEditor),
-    length: VGridVueEditor(unitEditorFactory('length')),
-    diameter: VGridVueEditor(unitEditorFactory('diameter')),
-    texture: VGridVueEditor(textureEditorFactory()),
-  };
-  for (const col of props.columns) {
-    if (col.type === 'select') {
-      editors[`select_${col.prop}`] = VGridVueEditor(
-        selectEditorFactory(col.options),
-      );
-    }
-  }
-  return editors;
-});
-
-const stretchCol = computed(() => props.columns.find(c => c.stretch) ?? null);
-const stretchProp = computed(() => stretchCol.value?.prop ?? null);
-
-const gridStretch = computed(() => stretchProp.value === null);
-
-const plugins = computed(() => {
-  const list = [
-    class HRPlugin extends BasePlugin {
-      constructor(r: HTMLRevoGridElement, p: PluginProviders) {
-        super(r, p);
-        this.addEventListener('rowdragstart', e => {
-          const name = e.detail.model?.['name'];
-          if (typeof name === 'string' && name) {
-            e.detail.text = name;
-          }
-        });
-      }
-    },
-  ];
-  if (stretchProp.value !== null) {
-    list.push(
-      columnStretchPlugin(stretchProp.value, stretchCol.value?.minSize),
-    );
-  }
-  return list;
-});
-// ─── Column kinds ──────────────────────────────────────────────────────────
-// Declares how each column "kind" renders and edits, mirroring `gridEditors`.
-// `resolveColumnKind` decides which kind a column declaration maps to.
-
-type ColumnKind =
-  | 'text'
-  | 'number'
-  | 'length'
-  | 'diameter'
-  | 'color'
-  | 'select'
-  | 'select-button'
-  | 'formatted'
-  | 'checkbox'
-  | 'texture';
-
-interface ColumnKindDef {
-  editor?: (col: WellGridColumn) => string;
-  numeric?: boolean;
-  readonly?: boolean;
-  cellProperties?: (col: WellGridColumn) => ColumnRegular['cellProperties'];
-  cellTemplate?: (col: WellGridColumn) => ColumnRegular['cellTemplate'];
-}
-
-const columnKinds: Record<ColumnKind, ColumnKindDef> = {
-  text: {},
-  number: { numeric: true },
-  length: {
-    editor: () => 'length',
-    numeric: true,
-    cellTemplate: () => VGridVueTemplate(GridUnitCell, { unitType: 'length' }),
-  },
-  diameter: {
-    editor: () => 'diameter',
-    numeric: true,
-    cellTemplate: () =>
-      VGridVueTemplate(GridUnitCell, { unitType: 'diameter' }),
-  },
-  color: {
-    editor: () => 'color',
-    cellTemplate: () => VGridVueTemplate(GridColorCell),
-  },
-  select: {
-    editor: col => `select_${col.prop}`,
-    cellTemplate: col =>
-      VGridVueTemplate(GridSelectCell, {
-        options: (col as Extract<WellGridColumn, { type: 'select' }>).options,
-      }),
-  },
-  formatted: {
-    cellTemplate: col =>
-      VGridVueTemplate(GridFormattedCell, { formatter: col.formatter }),
-  },
-  checkbox: {
-    readonly: true,
-    cellProperties: () => () => ({ class: 'well-grid-checkbox-cell' }),
-    cellTemplate: col =>
-      VGridVueTemplate(GridCheckboxCell, {
-        prop: col.prop,
-        onToggle: (rowIndex: number, prop: string, value: boolean) =>
-          emit('change', rowIndex, prop, value),
-      }),
-  },
-  'select-button': {
-    readonly: true,
-    cellProperties: () => () => ({ class: 'well-grid-checkbox-cell' }),
-    cellTemplate: col =>
-      VGridVueTemplate(GridSelectButtonCell, {
-        prop: col.prop,
-        options: (col as Extract<WellGridColumn, { type: 'select-button' }>)
-          .options,
-        onChange: (rowIndex: number, prop: string, value: unknown) =>
-          emit('change', rowIndex, prop, value),
-      }),
-  },
-  texture: {
-    editor: () => 'texture',
-    cellTemplate: () => VGridVueTemplate(GridTextureSelectCell),
-  },
-};
-
-function resolveColumnKind(col: WellGridColumn): ColumnKind {
-  if (col.type === 'texture') return 'texture';
-  if (col.type === 'select') return 'select';
-  if (col.type === 'select-button') return 'select-button';
-  if (col.type === 'color') return 'color';
-  if (col.type === 'checkbox') return 'checkbox';
-  if (col.unitType) return col.unitType;
-  if (col.formatter) return 'formatted';
-  return col.type === 'number' ? 'number' : 'text';
-}
-
-const unitLabels: Record<'length' | 'diameter', () => string> = {
-  length: () => uiStore.lengthUnit,
-  diameter: () => uiStore.diameterUnit,
-};
-
-// ─── Column definitions ───────────────────────────────────────────────────────
-
-const revoColumns = computed<ColumnRegular[]>(() => {
-  const onDelete = (rowIndex: number) => emit('delete', rowIndex);
-
-  const dataCols: ColumnRegular[] = props.columns.map(col => {
-    const kind = columnKinds[resolveColumnKind(col)];
-    const unit = col.unitType ? unitLabels[col.unitType]() : null;
-    const readonly = col.readonly ?? kind.readonly ?? false;
-
-    return {
-      prop: col.prop,
-      name: unit ? `${col.label} (${unit})` : col.label,
-      autoSize: !col.size && !col.stretch,
-      size: col.size,
-      readonly,
-      editor: readonly
-        ? undefined
-        : (kind.editor?.(col) ??
-          col.editor ??
-          (col.type === 'number' ? 'number' : 'text')),
-      pin: col.pin,
-      cellProperties:
-        kind.cellProperties?.(col) ??
-        (kind.numeric ? () => ({ class: 'num' }) : undefined),
-      cellTemplate: kind.cellTemplate?.(col),
-    };
-  });
-
-  const deleteCol: ColumnRegular = {
-    prop: '_delete',
-    name: '',
-    size: 40,
-    readonly: true,
-    pin: 'colPinEnd',
-    cellProperties: () => ({ class: 'well-grid-delete-cell' }),
-    cellTemplate: VGridVueTemplate(GridDeleteCell, {
-      requestDelete: onDelete,
-    }),
-  };
-
-  return [
-    {
-      prop: '_drag',
-      name: '',
-      size: 30,
-      pin: 'colPinStart',
-      rowDrag: true,
-      cellProperties: () => ({ class: 'well-grid-drag-cell' }),
-    } as ColumnRegular,
-    ...dataCols,
-    deleteCol,
-  ];
+const {
+  gridEditors,
+  revoColumns,
+  gridStretch,
+  plugins,
+  handleAfterEdit,
+  gridContainerRef,
+  handleAfterFocus,
+  handleGridMousedown,
+  handleGridClick,
+} = useWellGridColumns({
+  columns: () => props.columns,
+  onDelete: rowIndex => emit('delete', rowIndex),
+  onChange: (rowIndex, prop, value) => emit('change', rowIndex, prop, value),
 });
 
 // ─── Source ───────────────────────────────────────────────────────────────────
@@ -328,72 +58,10 @@ const gridHeight = computed(() => {
 
 // ─── Event handlers ───────────────────────────────────────────────────────────
 
-function handleAfterEdit(event: CustomEvent<AfterEditEvent>) {
-  const detail = event.detail;
-
-  console.log(event.detail);
-  // Narrow to single-cell edit (BeforeSaveDataDetails has rowIndex + prop)
-  if (!('rowIndex' in detail)) return;
-  const { rowIndex, prop, val } = detail as BeforeSaveDataDetails;
-  emit('change', rowIndex, String(prop), val);
-}
-
 function handleRowOrderChanged(
   event: CustomEvent<{ from: number; to: number }>,
 ) {
-  console.log('Row order changed:', event.detail);
   emit('reorder', event.detail.from, event.detail.to);
-}
-
-// ─── Click-on-focused-cell → enter edit mode ───────────────────────────────
-// `afterfocus` only fires when focus moves to a new cell. A click that
-// triggers such a focus change is suppressed; a second click on the cell
-// that's already focused enters edit mode for it.
-
-const gridContainerRef = ref<HTMLElement | null>(null);
-const focusedCell = ref<{
-  rowIndex: number;
-  colIndex: number;
-  prop: ColumnProp;
-} | null>(null);
-let suppressNextClick = false;
-
-function handleAfterFocus(event: CustomEvent<FocusAfterRenderEvent>) {
-  const { rowIndex, colIndex, column } = event.detail;
-  focusedCell.value = column ? { rowIndex, colIndex, prop: column.prop } : null;
-  suppressNextClick = true;
-}
-
-function handleGridMousedown() {
-  suppressNextClick = false;
-}
-
-function handleGridClick(event: MouseEvent) {
-  if (suppressNextClick) {
-    suppressNextClick = false;
-    return;
-  }
-  const cell = focusedCell.value;
-  if (!cell) return;
-
-  const target = (event.target as HTMLElement).closest<HTMLElement>(
-    '[data-rgrow][data-rgcol]',
-  );
-  if (!target) return;
-  if (
-    Number(target.dataset.rgrow) !== cell.rowIndex ||
-    Number(target.dataset.rgcol) !== cell.colIndex
-  ) {
-    return;
-  }
-
-  const col = props.columns.find(c => c.prop === cell.prop);
-  if (!col || col.readonly) return;
-
-  const gridEl = gridContainerRef.value?.querySelector('revo-grid') as
-    | HTMLRevoGridElement
-    | undefined;
-  gridEl?.setCellEdit(cell.rowIndex, cell.prop);
 }
 </script>
 
@@ -613,10 +281,12 @@ revo-grid .revo-drag-icon::before {
   display: block;
   width: 12px;
   height: 12px;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpath fill='%23aaaaaa' d='M102 60a10 10 0 1 1-10-10a10 10 0 0 1 10 10m62 10a10 10 0 1 0-10-10a10 10 0 0 0 10 10m-72 48a10 10 0 1 0 10 10a10 10 0 0 0-10-10m72 0a10 10 0 1 0 10 10a10 10 0 0 0-10-10m-72 68a10 10 0 1 0 10 10a10 10 0 0 0-10-10m72 0a10 10 0 1 0 10 10a10 10 0 0 0-10-10'/%3E%3C/svg%3E");
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
+  color: var(--color-content-0);
+  background-color: currentColor;
+  mask-image: url('/drag-handle.svg');
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  mask-position: center;
   opacity: 0.7;
   transition: opacity 200ms ease;
 }

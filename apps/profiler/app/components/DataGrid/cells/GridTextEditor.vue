@@ -12,15 +12,14 @@ const localValue = ref<string>('');
 
 onMounted(() => nextTick(() => inputRef.value?.$el?.focus()));
 
-function commit() {
-  console.log(`commit ${localValue.value}`);
-  props.save(localValue.value);
+function commit(preventFocus = true) {
+  props.save(localValue.value, preventFocus);
 }
 
 function onKeydown(e: KeyboardEvent) {
   if (e.key === 'Enter') {
     e.stopPropagation();
-    commit();
+    commit(false);
   } else if (e.key === 'Escape') {
     e.stopPropagation();
     props.close();
@@ -41,7 +40,7 @@ function update(value: string | undefined) {
     }"
     :model-value="localValue"
     @update:model-value="update"
-    @blur="commit"
+    @blur="() => commit(true)"
     @keydown="onKeydown"
   />
 </template>
