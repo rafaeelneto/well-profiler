@@ -188,7 +188,12 @@ export default defineNuxtConfig({
   },
 
   nitro: {
-    preset: 'cloudflare-pages',
+    preset: 'cloudflare-module',
+    experimental: { tasks: true },
+    // Cron string must match wrangler.json's `triggers.crons` exactly.
+    scheduledTasks: {
+      '0 3 * * *': ['shares:cleanup'],
+    },
     prerender: {
       crawlLinks: true,
       routes: ['/sitemap.xml', '/robots.txt'],

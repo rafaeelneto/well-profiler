@@ -8,7 +8,7 @@ Nuxt 4 web application for geological well log visualization, deployed at [welld
 pnpm install
 pnpm dev        # localhost:3000
 pnpm build      # production build
-pnpm preview    # Cloudflare Pages preview via wrangler
+pnpm preview    # Cloudflare Workers preview via wrangler
 pnpm lint
 ```
 

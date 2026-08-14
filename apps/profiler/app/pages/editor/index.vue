@@ -13,6 +13,8 @@ definePageMeta({ layout: 'editor' });
 const { t } = useI18n();
 const viewport = useViewport();
 
+useSharedProfileLoader();
+
 const isMobile = computed(() => viewport.isLessThan('lg'));
 const mobileView = ref<'perfil' | 'dados'>('dados');
 const activeTabKey = ref<string>('5');

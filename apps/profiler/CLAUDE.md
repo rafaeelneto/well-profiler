@@ -1,6 +1,6 @@
 # apps/profiler — Welldot (Nuxt 4)
 
-**Active production app.** This is the replacement for `apps/well-profiler`. Built with Nuxt 4 + Vue 3, deployed to Cloudflare Pages at `welldot.org`.
+**Active production app.** This is the replacement for `apps/well-profiler`. Built with Nuxt 4 + Vue 3, deployed to Cloudflare Workers at `welldot.org`.
 
 ## Stack
 
@@ -13,7 +13,7 @@
 - **PWA:** `@vite-pwa/nuxt` (auto-update, disabled in dev)
 - **Fonts:** Space Grotesk, IBM Plex Serif, JetBrains Mono (via `@nuxt/fonts`)
 - **Icons:** Phosphor (`ph:`) via `@nuxt/icon` — **preferred**. Heroicons (`heroicons:`) remain as secondary usange when there is no phosphor good icon or is explicit said. Custom SVG icons in `app/assets/icons/` (prefix `welldot:`)
-- **Deploy:** Cloudflare Pages (Nitro `cloudflare-pages` preset); preview via `wrangler`
+- **Deploy:** Cloudflare Workers (Nitro `cloudflare-module` preset, static assets binding); preview via `wrangler dev`
 
 ## Directory layout
 
@@ -53,9 +53,9 @@ nuxt.config.ts
 
 ```bash
 pnpm dev        # nuxt dev (localhost:3000)
-pnpm build      # nuxt build → dist/
+pnpm build      # nuxt build → .output/
 pnpm generate   # static generation
-pnpm preview    # wrangler pages dev (Cloudflare preview)
+pnpm preview    # wrangler dev (Cloudflare Workers preview)
 pnpm lint       # eslint
 ```
 
@@ -66,6 +66,12 @@ pnpm lint       # eslint
 - Breakpoints are managed by `nuxt-viewport`; prefer `useViewport()` over raw media queries.
 - Locale strings live in `i18n/locales/*.json`; use `useI18n().t('key')` in components.
 - The `EventBus` in `core/EventBus/` is the preferred pattern for cross-component communication not suited to Pinia.
+
+## Server routes & scheduled tasks
+
+- `server/api/` — Nitro API routes. Profile sharing (`share.post.ts`, `share/[id].get.ts`) hashes/stores well JSON in Supabase via `server/utils/supabase.ts` (service-role key, server-only — never exposed to the client). Shares are capped at `MAX_SHARE_BYTES` and expire after `SHARE_TTL_DAYS` (`server/utils/shareConfig.ts`); the GET route edge-caches successful lookups via the Workers Cache API.
+- `server/tasks/` — Nitro scheduled tasks (`experimental.tasks` in `nuxt.config.ts`). `shares:cleanup` (`server/tasks/shares/cleanup.ts`) purges expired `well_shares` rows. Wiring a task requires **both**: a `nitro.scheduledTasks` entry in `nuxt.config.ts` mapping a cron string to the task name, **and** the identical cron string in `wrangler.json`'s `triggers.crons` — Cloudflare only invokes `scheduled()` for crons declared there, and Nitro only runs a task if its cron matches an entry in `scheduledTasks`.
+- `getRuntimeEnv`/`getSupabaseClient` (`server/utils/env.ts`, `supabase.ts`) accept a structural `RuntimeEnvSource`, not `H3Event`, specifically so scheduled tasks (which get a Nitro `TaskEvent`, not an `H3Event`) can reuse them.
 
 ## Documentation requirements
 
@@ -113,6 +119,6 @@ Use `severity` props (`"primary"`, `"success"`, `"warn"`, `"danger"`, `"info"`) 
 
 - `@welldot/render` uses D3 and mutates the DOM — wrap renderer calls in `onMounted` or `<ClientOnly>`.
 - SSR is enabled; avoid `window`/`document` access outside of client lifecycle hooks or `process.client` guards.
-- Deployed to Cloudflare Pages — no Node.js server runtime. All server routes must be Cloudflare-compatible.
+- Deployed to Cloudflare Workers (Nitro `cloudflare-module` preset) — no Node.js server runtime. All server routes must be Cloudflare/workerd-compatible.
 - **Icons:** Use Phosphor (`ph:`) for all new UI. Prefer the **duotone** variant (`ph:icon-name-duotone`) as the default — it matches the editorial aesthetic. Fall back to `ph:icon-name` (regular) only when duotone is unavailable. Browse at https://icones.js.org/collection/ph. Do not use Heroicons in new components; the landing page (`layouts/landing.vue`) may keep its existing `heroicons:` usage.
 - **Tailwind canonical classes only** — no arbitrary values (`w-[37px]`, `bg-[#eef0f3]`, `text-[14px]`). Use the design-token utilities (`bg-surface-*`, `text-content-*`, spacing scale, etc.) or standard Tailwind scale values. Arbitrary values bypass the token system, don't respond to mode changes, and make refactoring the theme harder.

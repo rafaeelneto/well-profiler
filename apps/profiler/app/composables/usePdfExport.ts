@@ -74,6 +74,10 @@ export function usePdfExport(draftContainer: Ref<HTMLElement | null>) {
 
     try {
       const well = normalizeWell(exportableWell);
+      const baseUrl = useRequestURL().origin;
+      const share = await useProfileShare()
+        .getShare()
+        .catch(() => null);
       const options: PdfExportOptions = {
         header: pdfExportStore.header,
         breakPages: pdfExportStore.breakPages,
@@ -84,6 +88,9 @@ export function usePdfExport(draftContainer: Ref<HTMLElement | null>) {
         lengthUnit: uiStore.lengthUnit,
         diameterUnit: uiStore.diameterUnit,
         coordinateFormat: uiStore.coordinateFormat,
+        baseUrl,
+        shareUrl: share ? `${baseUrl}/editor?share=${share.id}` : undefined,
+        shareExpiresAt: share?.expiresAt,
       };
 
       const firstPageAvailableHeight = computeFirstPageAvailableHeight({
