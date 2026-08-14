@@ -10,6 +10,7 @@ import { Profile } from '@/src/types/profile.types';
 import { DiameterUnits, LengthUnits, useUIStore } from '@/src/store/ui.store';
 import { formatCoord } from '@/src/utils/coords.utils';
 
+import { deserializeWell, serializeWell } from '@welldot/core';
 import { DeepPartial, RenderConfig, WellRenderer } from '@welldot/render';
 import { calculateHoleFillVolume } from '@welldot/utils';
 import {
@@ -213,6 +214,12 @@ export const exportPdfProfile = async (
   metadataPosition: 'before' | 'after' | null = null,
   renderConfig?: DeepPartial<RenderConfig>,
 ) => {
+  // Legacy lithology entries may still use the v1 `fgdc_texture` field
+  // instead of the v2 `texture: { code, vocabulary }` shape @welldot/render
+  // requires. Round-trip through the core serializer to normalize.
+  const normalizedProfile =
+    (deserializeWell(serializeWell(profile)) as Profile | null) ?? profile;
+
   const { coord_format: coordFormat } = useUIStore.getState();
   const fmtLen = (m: number) =>
     lengthUnits === 'ft'
@@ -480,7 +487,7 @@ export const exportPdfProfile = async (
   const firstPageAvailableHeight = A4_SVG_HEIGHT - firstPageUsedHeight;
 
   const svgs: SvgInfo[] = buildSvgProfiles({
-    profile,
+    profile: normalizedProfile,
     breakPages: breakPages,
     zoomLevel,
     firstPageAvailableHeight,
@@ -541,8 +548,8 @@ export const exportPdfProfile = async (
   (svgDraftContainer ?? document.body).appendChild(legendSvgEl);
 
   await renderer.prepareSvg();
-  renderer.draw(profile);
-  renderer.renderLegend(`#${legendId}`, profile);
+  renderer.draw(normalizedProfile);
+  renderer.renderLegend(`#${legendId}`, normalizedProfile);
 
   await new Promise(resolve => requestAnimationFrame(resolve));
 

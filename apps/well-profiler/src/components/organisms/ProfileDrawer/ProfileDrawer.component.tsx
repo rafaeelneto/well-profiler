@@ -1,7 +1,13 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { useUIStore } from '@/src/store/ui.store';
-import { isWellEmpty, type Lithology, type Well } from '@welldot/core';
+import {
+  deserializeWell,
+  isWellEmpty,
+  serializeWell,
+  type Lithology,
+  type Well,
+} from '@welldot/core';
 import {
   DeepPartial,
   Highlights,
@@ -26,6 +32,14 @@ const ProfileDrawer = ({ profile }: ProfileDrawerProps) => {
   const [containerWidth, setContainerWidth] = useState(0);
   const [hoveredLithology, setHoveredLithology] = useState<Lithology | null>(
     null,
+  );
+
+  // Legacy lithology entries may still use the v1 `fgdc_texture` field
+  // instead of the v2 `texture: { code, vocabulary }` shape @welldot/render
+  // requires. Round-trip through the core serializer to normalize.
+  const normalizedProfile = useMemo(
+    () => deserializeWell(serializeWell(profile)) ?? profile,
+    [profile],
   );
 
   const MARGINS = { TOP: 30, RIGHT: 30, BOTTOM: 15, LEFT: 50 };
@@ -73,12 +87,12 @@ const ProfileDrawer = ({ profile }: ProfileDrawerProps) => {
         },
       );
       await profileDrawer.current.prepareSvg();
-      profileDrawer.current.draw(profile, {
+      profileDrawer.current.draw(normalizedProfile, {
         units: { length: length_units, diameter: diameter_units },
       });
     };
     drawProfile();
-    // profileDrawer.current.renderLegend('#svg_legend', profile);
+    // profileDrawer.current.renderLegend('#svg_legend', normalizedProfile);
   }, [svgContainer.current, config, containerWidth]);
 
   // Redraw when profile, units, or hovered lithology changes.
@@ -89,12 +103,12 @@ const ProfileDrawer = ({ profile }: ProfileDrawerProps) => {
           lithology: [{ from: hoveredLithology.from, to: hoveredLithology.to }],
         }
       : {};
-    profileDrawer.current.draw(profile, {
+    profileDrawer.current.draw(normalizedProfile, {
       units: { length: length_units, diameter: diameter_units },
       highlights,
     });
-    profileDrawer.current.renderLegend('#svg_legend', profile);
-  }, [profile, length_units, diameter_units, hoveredLithology]);
+    profileDrawer.current.renderLegend('#svg_legend', normalizedProfile);
+  }, [normalizedProfile, length_units, diameter_units, hoveredLithology]);
 
   // Clear hover when profile swaps so we don't carry a stale datum.
   useEffect(() => {
