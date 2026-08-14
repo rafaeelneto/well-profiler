@@ -39,11 +39,10 @@ export function useImmer<T>(
   const _cursor = ref(-1);
   const _length = ref(0); // mirrors _patches.length reactively
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   function update(recipe: (draft: Draft<T>) => any): void {
     // Immer's produceWithPatches overloads don't accept nullable base states;
     // the any cast is intentional and safe — we own T's variance here.
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     const [nextState, forward, inverse] = (produceWithPatches as any)(
       state.value,
       recipe,
@@ -69,7 +68,7 @@ export function useImmer<T>(
   function undo(): void {
     if (_cursor.value < 0) return;
     const entry = _patches[_cursor.value]!;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     state.value = applyPatches(state.value as any, entry[1]) as T;
     _cursor.value--;
   }
@@ -78,7 +77,7 @@ export function useImmer<T>(
     if (_cursor.value >= _patches.length - 1) return;
     _cursor.value++;
     const entry = _patches[_cursor.value]!;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     state.value = applyPatches(state.value as any, entry[0]) as T;
   }
 

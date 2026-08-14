@@ -31,22 +31,34 @@ export function sparklinePoints(event: HydrodynamicEvent): string {
   const maxE = Math.max(...readings.map(r => r.elapsed));
   const minD = Math.min(...readings.map(r => r.depth));
   const maxD = Math.max(...readings.map(r => r.depth));
-  const W = 200, H = 40, P = 3;
+  const W = 200,
+    H = 40,
+    P = 3;
   const rX = maxE - minE || 1;
   const rY = maxD - minD || 1;
-  return readings.map(r => {
-    const x = P + ((r.elapsed - minE) / rX) * (W - P * 2);
-    const y = P + ((r.depth - minD) / rY) * (H - P * 2);
-    return `${x.toFixed(1)},${y.toFixed(1)}`;
-  }).join(' ');
+  return readings
+    .map(r => {
+      const x = P + ((r.elapsed - minE) / rX) * (W - P * 2);
+      const y = P + ((r.depth - minD) / rY) * (H - P * 2);
+      return `${x.toFixed(1)},${y.toFixed(1)}`;
+    })
+    .join(' ');
 }
 
 export function recoveryReadingsCount(event: HydrodynamicEvent): number {
-  return ((event as Record<string, unknown>).recovery as { readings?: unknown[] } | undefined)?.readings?.length ?? 0;
+  return (
+    (
+      (event as Record<string, unknown>).recovery as
+        | { readings?: unknown[] }
+        | undefined
+    )?.readings?.length ?? 0
+  );
 }
 
 export function stepRate(event: HydrodynamicEvent, index = 0): number | null {
-  const steps = (event as Record<string, unknown>).steps as Array<{ rate: number }> | undefined;
+  const steps = (event as Record<string, unknown>).steps as
+    | Array<{ rate: number }>
+    | undefined;
   return steps?.[index]?.rate ?? null;
 }
 

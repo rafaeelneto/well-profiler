@@ -14,7 +14,9 @@
               :name="message.icon"
               class="size-5 text-warning-500 shrink-0 mt-0.5"
             />
-            <p class="text-sm leading-relaxed text-content-200">{{ message.message }}</p>
+            <p class="text-sm leading-relaxed text-content-200">
+              {{ message.message }}
+            </p>
           </div>
         </template>
       </ConfirmDialog>

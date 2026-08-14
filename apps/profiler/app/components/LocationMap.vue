@@ -10,7 +10,6 @@ let marker: Marker | null = null;
 let resizeObserver: ResizeObserver | null = null;
 
 function updateCoordinate(coord: 'lat' | 'lng', value: number) {
-  console.log(`Updating ${coord} to ${value}`);
   if (coord === 'lat') lat.value = clampLat(value);
   else lng.value = clampLng(value);
 }

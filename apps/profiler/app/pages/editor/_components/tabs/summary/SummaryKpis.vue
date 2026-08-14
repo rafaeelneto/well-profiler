@@ -12,7 +12,9 @@ const kpis = computed(() => [
   {
     key: 'depth',
     label: t('editor.summary.kpis.depth'),
-    value: formatNumber(toDisplay(profileStore.maxDepth), { fractionDigits: 2 }),
+    value: formatNumber(toDisplay(profileStore.maxDepth), {
+      fractionDigits: 2,
+    }),
     unit: lengthUnit.value,
   },
   {
@@ -37,12 +39,19 @@ const kpis = computed(() => [
       :key="kpi.key"
       class="rounded-[10px] border border-surface-200 bg-gradient-to-b from-surface-0/85 to-surface-50/55 p-3 shadow-[0_1px_0_rgba(255,255,255,0.7)_inset] dark:shadow-[0_1px_0_rgba(255,255,255,0.04)_inset]"
     >
-      <div class="mb-1 font-mono text-[9.5px] tracking-[0.08em] uppercase text-content-400">
+      <div
+        class="mb-1 font-mono text-[9.5px] tracking-[0.08em] uppercase text-content-400"
+      >
         {{ kpi.label }}
       </div>
-      <div class="font-serif text-[22px] font-medium tracking-[-0.01em] text-content-0">
+      <div
+        class="font-serif text-[22px] font-medium tracking-[-0.01em] text-content-0"
+      >
         {{ kpi.value }}
-        <small v-if="kpi.unit" class="ml-0.5 font-mono text-[11px] font-normal text-content-400">
+        <small
+          v-if="kpi.unit"
+          class="ml-0.5 font-mono text-[11px] font-normal text-content-400"
+        >
           {{ kpi.unit }}
         </small>
       </div>

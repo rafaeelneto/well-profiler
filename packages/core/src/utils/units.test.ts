@@ -75,7 +75,9 @@ describe('cubicMeterPerHourToLitersPerSecond / inverse', () => {
   });
   it('round-trips', () => {
     expect(
-      litersPerSecondToCubicMeterPerHour(cubicMeterPerHourToLitersPerSecond(10)),
+      litersPerSecondToCubicMeterPerHour(
+        cubicMeterPerHourToLitersPerSecond(10),
+      ),
     ).toBeCloseTo(10, 10);
   });
 });
@@ -154,17 +156,32 @@ describe('dmsToDecimalDegrees', () => {
   });
   it('S direction returns negative', () => {
     expect(
-      dmsToDecimalDegrees({ degrees: 1, minutes: 30, seconds: 0, direction: 'S' }),
+      dmsToDecimalDegrees({
+        degrees: 1,
+        minutes: 30,
+        seconds: 0,
+        direction: 'S',
+      }),
     ).toBeCloseTo(-1.5, 10);
   });
   it('W direction returns negative', () => {
     expect(
-      dmsToDecimalDegrees({ degrees: 48, minutes: 0, seconds: 0, direction: 'W' }),
+      dmsToDecimalDegrees({
+        degrees: 48,
+        minutes: 0,
+        seconds: 0,
+        direction: 'W',
+      }),
     ).toBeCloseTo(-48, 10);
   });
   it('N direction returns positive', () => {
     expect(
-      dmsToDecimalDegrees({ degrees: 1, minutes: 0, seconds: 0, direction: 'N' }),
+      dmsToDecimalDegrees({
+        degrees: 1,
+        minutes: 0,
+        seconds: 0,
+        direction: 'N',
+      }),
     ).toBeCloseTo(1, 10);
   });
 });

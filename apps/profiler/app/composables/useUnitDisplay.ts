@@ -1,4 +1,9 @@
-import { metersToFeet, feetToMeters, mmToInches, inchesToMm } from '@welldot/core';
+import {
+  feetToMeters,
+  inchesToMm,
+  metersToFeet,
+  mmToInches,
+} from '@welldot/core';
 
 export function useUnitDisplay(unitType: 'length' | 'diameter') {
   const uiStore = useUiStore();
@@ -11,7 +16,9 @@ export function useUnitDisplay(unitType: 'length' | 'diameter') {
     if (unitType === 'length') {
       return uiStore.lengthUnit === 'ft' ? metersToFeet(canonical) : canonical;
     }
-    return uiStore.diameterUnit === 'inches' ? mmToInches(canonical) : canonical;
+    return uiStore.diameterUnit === 'inches'
+      ? mmToInches(canonical)
+      : canonical;
   }
 
   function toCanonical(display: number): number {

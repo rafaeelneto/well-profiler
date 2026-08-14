@@ -12,7 +12,10 @@ const DEFAULT_COL_SIZE = 150;
  * Usage:
  *   plugins: [columnStretchPlugin('myProp', 120)]
  */
-export function columnStretchPlugin(stretchProp: ColumnProp, minSize = FALLBACK_MIN_SIZE) {
+export function columnStretchPlugin(
+  stretchProp: ColumnProp,
+  minSize = FALLBACK_MIN_SIZE,
+) {
   return class extends BasePlugin {
     private ro: ResizeObserver;
     private raf: number | null = null;
