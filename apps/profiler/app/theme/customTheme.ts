@@ -524,9 +524,12 @@ const MyPreset = definePreset(Aura, {
         light: {
           root: {
             primary: {
-              background: 'linear-gradient(180deg, {primary.400}, {primary.600})',
-              hoverBackground: 'linear-gradient(180deg, {primary.300}, {primary.500})',
-              activeBackground: 'linear-gradient(180deg, {primary.500}, {primary.700})',
+              background:
+                'linear-gradient(180deg, {primary.400}, {primary.600})',
+              hoverBackground:
+                'linear-gradient(180deg, {primary.300}, {primary.500})',
+              activeBackground:
+                'linear-gradient(180deg, {primary.500}, {primary.700})',
               borderColor: 'transparent',
               hoverBorderColor: 'transparent',
               activeBorderColor: 'transparent',
@@ -698,9 +701,12 @@ const MyPreset = definePreset(Aura, {
         dark: {
           root: {
             primary: {
-              background: 'linear-gradient(180deg, {primary.300}, {primary.500})',
-              hoverBackground: 'linear-gradient(180deg, {primary.200}, {primary.400})',
-              activeBackground: 'linear-gradient(180deg, {primary.400}, {primary.600})',
+              background:
+                'linear-gradient(180deg, {primary.300}, {primary.500})',
+              hoverBackground:
+                'linear-gradient(180deg, {primary.200}, {primary.400})',
+              activeBackground:
+                'linear-gradient(180deg, {primary.400}, {primary.600})',
               borderColor: 'transparent',
               hoverBorderColor: 'transparent',
               activeBorderColor: 'transparent',
@@ -784,8 +790,10 @@ const MyPreset = definePreset(Aura, {
           },
           outlined: {
             primary: {
-              hoverBackground: 'color-mix(in srgb, {primary.400} 15%, transparent)',
-              activeBackground: 'color-mix(in srgb, {primary.400} 25%, transparent)',
+              hoverBackground:
+                'color-mix(in srgb, {primary.400} 15%, transparent)',
+              activeBackground:
+                'color-mix(in srgb, {primary.400} 25%, transparent)',
               borderColor: '{primary.700}',
               color: '{primary.400}',
             },
@@ -796,26 +804,34 @@ const MyPreset = definePreset(Aura, {
               color: '{content.200}',
             },
             success: {
-              hoverBackground: 'color-mix(in srgb, {success.400} 15%, transparent)',
-              activeBackground: 'color-mix(in srgb, {success.400} 25%, transparent)',
+              hoverBackground:
+                'color-mix(in srgb, {success.400} 15%, transparent)',
+              activeBackground:
+                'color-mix(in srgb, {success.400} 25%, transparent)',
               borderColor: '{success.700}',
               color: '{success.400}',
             },
             info: {
-              hoverBackground: 'color-mix(in srgb, {info.400} 15%, transparent)',
-              activeBackground: 'color-mix(in srgb, {info.400} 25%, transparent)',
+              hoverBackground:
+                'color-mix(in srgb, {info.400} 15%, transparent)',
+              activeBackground:
+                'color-mix(in srgb, {info.400} 25%, transparent)',
               borderColor: '{info.700}',
               color: '{info.400}',
             },
             warn: {
-              hoverBackground: 'color-mix(in srgb, {warning.400} 15%, transparent)',
-              activeBackground: 'color-mix(in srgb, {warning.400} 25%, transparent)',
+              hoverBackground:
+                'color-mix(in srgb, {warning.400} 15%, transparent)',
+              activeBackground:
+                'color-mix(in srgb, {warning.400} 25%, transparent)',
               borderColor: '{warning.700}',
               color: '{warning.400}',
             },
             danger: {
-              hoverBackground: 'color-mix(in srgb, {error.400} 15%, transparent)',
-              activeBackground: 'color-mix(in srgb, {error.400} 25%, transparent)',
+              hoverBackground:
+                'color-mix(in srgb, {error.400} 15%, transparent)',
+              activeBackground:
+                'color-mix(in srgb, {error.400} 25%, transparent)',
               borderColor: '{error.700}',
               color: '{error.400}',
             },
@@ -828,8 +844,10 @@ const MyPreset = definePreset(Aura, {
           },
           text: {
             primary: {
-              hoverBackground: 'color-mix(in srgb, {primary.400} 15%, transparent)',
-              activeBackground: 'color-mix(in srgb, {primary.400} 25%, transparent)',
+              hoverBackground:
+                'color-mix(in srgb, {primary.400} 15%, transparent)',
+              activeBackground:
+                'color-mix(in srgb, {primary.400} 25%, transparent)',
               color: '{primary.400}',
             },
             secondary: {
@@ -838,23 +856,31 @@ const MyPreset = definePreset(Aura, {
               color: '{content.300}',
             },
             success: {
-              hoverBackground: 'color-mix(in srgb, {success.400} 15%, transparent)',
-              activeBackground: 'color-mix(in srgb, {success.400} 25%, transparent)',
+              hoverBackground:
+                'color-mix(in srgb, {success.400} 15%, transparent)',
+              activeBackground:
+                'color-mix(in srgb, {success.400} 25%, transparent)',
               color: '{success.400}',
             },
             info: {
-              hoverBackground: 'color-mix(in srgb, {info.400} 15%, transparent)',
-              activeBackground: 'color-mix(in srgb, {info.400} 25%, transparent)',
+              hoverBackground:
+                'color-mix(in srgb, {info.400} 15%, transparent)',
+              activeBackground:
+                'color-mix(in srgb, {info.400} 25%, transparent)',
               color: '{info.400}',
             },
             warn: {
-              hoverBackground: 'color-mix(in srgb, {warning.400} 15%, transparent)',
-              activeBackground: 'color-mix(in srgb, {warning.400} 25%, transparent)',
+              hoverBackground:
+                'color-mix(in srgb, {warning.400} 15%, transparent)',
+              activeBackground:
+                'color-mix(in srgb, {warning.400} 25%, transparent)',
               color: '{warning.400}',
             },
             danger: {
-              hoverBackground: 'color-mix(in srgb, {error.400} 15%, transparent)',
-              activeBackground: 'color-mix(in srgb, {error.400} 25%, transparent)',
+              hoverBackground:
+                'color-mix(in srgb, {error.400} 15%, transparent)',
+              activeBackground:
+                'color-mix(in srgb, {error.400} 25%, transparent)',
               color: '{error.400}',
             },
             contrast: {
@@ -867,6 +893,24 @@ const MyPreset = definePreset(Aura, {
             color: '{primary.400}',
             hoverColor: '{primary.300}',
             activeColor: '{primary.500}',
+          },
+        },
+      },
+    },
+    inputtext: {
+      colorScheme: {
+        light: {
+          root: {
+            filledBackground: '{surface.100}',
+            filledHoverBackground: '{surface.200}',
+            filledFocusBackground: '{surface.100}',
+          },
+        },
+        dark: {
+          root: {
+            filledBackground: '{surface.200}',
+            filledHoverBackground: '{surface.300}',
+            filledFocusBackground: '{surface.200}',
           },
         },
       },
