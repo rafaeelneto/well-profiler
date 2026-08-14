@@ -101,6 +101,7 @@ const makeClasses = (): ComponentsClassNames => ({
   holeFill: { group: '', rect: '' },
   wellCase: { group: '', rect: '' },
   wellScreen: { group: '', rect: '' },
+  reduction: { group: '', item: '' },
   conflict: { group: '', rect: '' },
   unitLabels: { group: '', geoRect: '', aqRect: '', text: '' },
   legend: {

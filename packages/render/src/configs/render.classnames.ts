@@ -55,6 +55,10 @@ export const DEFAULT_COMPONENTS_CLASS_NAMES: ComponentsClassNames = {
     group: 'well-screen',
     rect: 'well-screen-rect',
   },
+  reduction: {
+    group: 'reduction',
+    item: 'reduction-poly',
+  },
   conflict: {
     group: 'conflict',
     rect: 'conflict-rect',

@@ -10,6 +10,7 @@ import type {
   Fracture,
   HoleFill,
   Lithology,
+  Reduction,
   SurfaceCase,
   Units,
   WellCase,
@@ -98,6 +99,14 @@ export const populateTooltips = (
               <span class="${customClasses.tooltip.secondaryInfo}">
                 <strong>Ranhura:</strong> ${esc(d.screen_slot)} mm
               </span>
+          `,
+    reduction: (_: unknown, d: Reduction) => `
+          <span class="${customClasses.tooltip.title}">REDUÇÃO</span>
+              <span class="${customClasses.tooltip.primaryInfo}">De ${esc(formatLength(d.from, units.length))} ${esc(units.length)} até ${esc(formatLength(d.to, units.length))} ${esc(units.length)}</span>
+              <span class="${customClasses.tooltip.secondaryInfo}">
+                <strong>Diâmetro:</strong> ${esc(formatDiameter(d.diam_from, units.diameter))} → ${esc(formatDiameter(d.diam_to, units.diameter))} ${esc(units.diameter)}
+              </span>
+              <span class="${customClasses.tooltip.secondaryInfo}"><strong>Tipo:</strong> ${esc(d.type)}</span>
           `,
     conflict: (_: unknown, d: { from: number; to: number }) => `
           <span class="${customClasses.tooltip.title}">CONFLITO</span>
