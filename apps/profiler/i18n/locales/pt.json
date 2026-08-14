@@ -260,7 +260,7 @@
       "deleteItem": "Remover",
       "pageBreaks": {
         "title": "Quebra de páginas",
-        "split": "Dividir perfil em páginas de 80 m"
+        "split": "Dividir perfil em páginas"
       },
       "metadataSection": {
         "title": "Seção de metadados",
@@ -298,7 +298,16 @@
       "preview": {
         "label": "Pré-visualização",
         "pages": "páginas",
-        "fit": "Ajustar"
+        "fit": "Ajustar",
+        "empty": "Carregue um perfil para ver a pré-visualização do PDF",
+        "error": "Não foi possível gerar a pré-visualização do PDF. Tente novamente ou ajuste as opções de exportação."
+      },
+      "content": {
+        "total": "Total",
+        "volumeTotal": "Volume total",
+        "slot": "Ranhura",
+        "footerTagline": "veja esse perfil\nonline",
+        "page": "Página"
       }
     },
     "zoom": {
