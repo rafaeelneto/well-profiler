@@ -25,6 +25,20 @@ const numberFormater = new Intl.NumberFormat('pt-BR', {
   maximumFractionDigits: 2,
 });
 
+// `pdfmake`'s createPdf().getDataUrl() is Promise-based in the npm package
+// (v0.3.x, used in local dev) but callback-based in the custom build copied
+// over production builds (v0.2.x — see well-profiler-deploy.yml). Support
+// both regardless of which build is active at runtime.
+const getPdfDataUrl = (pdfDoc: {
+  getDataUrl: (cb: (dataUrl: string) => void) => void | Promise<string>;
+}): Promise<string> =>
+  new Promise((resolve, reject) => {
+    const maybePromise = pdfDoc.getDataUrl(resolve);
+    if (maybePromise && typeof maybePromise.then === 'function') {
+      maybePromise.then(resolve, reject);
+    }
+  });
+
 // @ts-ignore
 // eslint-disable-next-line no-import-assign
 pdfMake.vfs = pdfFonts.default;
@@ -972,7 +986,7 @@ export const innerRenderPdf = async (
   // console.log('Generated docDefinition for printing:', docDefinition);
 
   try {
-    const pdfDataUrl = await pdfMake.createPdf(docDefinition).getDataUrl();
+    const pdfDataUrl = await getPdfDataUrl(pdfMake.createPdf(docDefinition));
 
     const blobUrl = base64ToBlob(pdfDataUrl, 'application/pdf');
     if (iframeId) {
