@@ -138,7 +138,6 @@ export async function buildSvgProfiles(
     animation: { duration: 0 },
     legend: {
       ...STATIC_RENDER_CONFIG.legend,
-      height: 30,
       maxWidth: LEGEND_MAX_WIDTH,
     },
   };
