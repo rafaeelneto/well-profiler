@@ -10,18 +10,23 @@ interface MetaField {
   value: string;
 }
 
-/** Packs `label \n value` cells `columns`-per-row, padding the last row with blanks. */
-export function packLabelValueRows(
-  fields: MetaField[],
-  columns: number,
-): TableCell[][] {
-  const cells: TableCell[] = fields.map(field => ({
+function labelValueCell(field: MetaField, colSpan?: number): TableCell {
+  return {
     width: '*',
     text: [
       { text: `${field.label} \n`, style: 'metadataLabel' },
       { text: field.value, style: 'metadataValue' },
     ],
-  }));
+    ...(colSpan ? { colSpan } : {}),
+  };
+}
+
+/** Packs `label \n value` cells `columns`-per-row, padding the last row with blanks. */
+export function packLabelValueRows(
+  fields: MetaField[],
+  columns: number,
+): TableCell[][] {
+  const cells: TableCell[] = fields.map(field => labelValueCell(field));
 
   const rows: TableCell[][] = [];
   cells.forEach((cell, i) => {
@@ -80,21 +85,25 @@ export function buildMetadataTable(
       value: formatLength(well.location.elevation),
     });
   }
-  if (well.obs) {
-    fields.push({
-      label: t('editor.general.observationsLabel'),
-      value: well.obs,
-    });
-  }
+  const observations: MetaField | null = well.obs
+    ? { label: t('editor.general.observationsLabel'), value: well.obs }
+    : null;
 
-  if (fields.length === 0) return null;
+  if (fields.length === 0 && !observations) return null;
+
+  const body = packLabelValueRows(fields, 3);
+  // Always its own full-width row at the end, starting at the first column —
+  // free-text notes read poorly squeezed into a single narrow column.
+  if (observations) {
+    body.push([labelValueCell(observations, 3), {}, {}]);
+  }
 
   return {
     layout: 'noBorders',
     table: {
       widths: ['*', '*', '*'],
       dontBreakRows: false,
-      body: packLabelValueRows(fields, 3),
+      body,
     },
   };
 }

@@ -69,7 +69,7 @@ const endInfoCount = computed(() =>
     <div class="flex flex-col lg:flex-row h-full overflow-hidden bg-surface-0">
       <!-- ─── Options panel ──────────────────────────────────────────── -->
       <aside
-        class="flex flex-col w-full lg:w-[500px] shrink-0 h-full overflow-y-auto lg:border-r border-surface-200"
+        class="flex flex-col w-full lg:w-[500px] shrink-0 h-full overflow-y-auto overflow-x-hidden lg:border-r border-surface-200"
       >
         <!-- Panel header -->
         <div class="flex items-center justify-between gap-3 px-6 pt-6 pb-5">
@@ -155,13 +155,15 @@ const endInfoCount = computed(() =>
             <span :class="kickerClass">{{
               t('editor.exportPdfDialog.scale.title')
             }}</span>
-            <div class="flex flex-col justify-end gap-6">
-              <Slider
-                v-model="pdfExportStore.scale"
-                :min="1"
-                :max="850"
-                class="flex-1"
-              />
+            <div class="flex flex-col items-end gap-6">
+              <div class="flex items-center gap-3 w-full">
+                <Slider
+                  v-model="pdfExportStore.scale"
+                  :min="1"
+                  :max="850"
+                  class="flex-1"
+                />
+              </div>
               <div class="flex items-center gap-1 shrink-0">
                 <span class="font-mono text-xs text-content-400">1 :</span>
                 <InputNumber
@@ -169,8 +171,7 @@ const endInfoCount = computed(() =>
                   :min="1"
                   :max="850"
                   :use-grouping="false"
-                  class="w-full max-w-6"
-                  input-class="font-mono text-xs"
+                  input-class="font-mono text-xs w-full max-w-20"
                 />
               </div>
             </div>
@@ -262,8 +263,6 @@ const endInfoCount = computed(() =>
       </div>
     </div>
 
-    <ClientOnly>
-      <div ref="draftContainerRef" v-show="false" />
-    </ClientOnly>
+    <div ref="draftContainerRef" v-show="false" />
   </Dialog>
 </template>
