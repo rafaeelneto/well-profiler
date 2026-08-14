@@ -45,7 +45,9 @@ well-profiler/
 │   │       ├── renderers/          ← one file per visual component
 │   │       ├── configs/
 │   │       ├── types/
-│   │       └── utils/
+│   │       ├── utils/
+│   │       └── data/
+│   │           └── fgdcTextures.json  ← FGDC pattern data (consumed by textures.js)
 │   │
 │   ├── utils/                      ← @welldot/utils (published)
 │   │   └── src/
@@ -76,26 +78,32 @@ well-profiler/
 **Purpose:** Canonical `.well` data model — single source of truth for schema, validation, and serialization.
 **Location:** `packages/core/src/`
 **Key files:**
-- `types/well.types.ts` — Well, Constructive, Geologic, BoreHole, Lithology, etc.
+
+- `types/well.types.ts` — Well (v2), BoreHole, Lithology, Location, WellId, HydrodynamicEvent, AquiferAnalysis, etc.
 - `validators/well.validators.ts` — Zod schemas + `parseWell()`
-- `utils/well.utils.ts` — `serializeWell()`, `deserializeWell()`, legacy migration
+- `utils/well.utils.ts` — `serializeWell()`, `deserializeWell()` (with v1→v2 migration), legacy migration
 - `utils/fgdc.textures.ts` — FGDC geological pattern library
+- `utils/units.ts` — unit conversion utilities
 
 ### `packages/render`
 
 **Purpose:** D3-based SVG rendering engine for well profiles.
 **Location:** `packages/render/src/`
 **Key files:**
+
 - `Renderer.ts` — `WellRenderer` class, main public API
 - `renderers/*.renderer.ts` — specialized drawers (lithology, construction, fractures, etc.)
 - `configs/render.configs.ts` — `DEFAULT_WELL_THEME`, `DEFAULT_RENDER_CONFIG`
-- `types/render.types.ts` — `DrawContext`, `WellTheme`, `RenderConfig`, `SvgInstance`
+- `types/render.types.ts` — `DrawContext`, `WellTheme`, `RenderConfig`, `RenderableWell`, `WithKey`, `SvgInstance`
+- `utils/key.utils.ts` — stable D3 data-join key generation
+- `data/fgdcTextures.json` — FGDC pattern data
 
 ### `packages/utils`
 
 **Purpose:** Pure analysis functions for well profile data.
 **Location:** `packages/utils/src/`
 **Key files:**
+
 - `profile.utils.ts` — depth, diameter, volume helpers
 
 ### `packages/lint`
@@ -109,6 +117,7 @@ well-profiler/
 **Purpose:** Production Nuxt 4 web app — the user-facing well profiler tool.
 **Location:** `apps/profiler/app/`
 **Key directories:**
+
 - `composables/` — Vue composables (auto-imported)
 - `core/` — EventBus, app initialization
 - `theme/` — PrimeVue + Tailwind customization
@@ -116,23 +125,28 @@ well-profiler/
 ## Where Things Live
 
 **Well data schema:**
+
 - Types: `packages/core/src/types/well.types.ts`
 - Validation: `packages/core/src/validators/well.validators.ts`
 - Serialization: `packages/core/src/utils/well.utils.ts`
 
 **SVG visualization:**
+
 - Orchestrator: `packages/render/src/Renderer.ts`
 - Renderers: `packages/render/src/renderers/`
 - Theme/config defaults: `packages/render/src/configs/render.configs.ts`
 
 **FGDC texture patterns:**
+
 - Library: `packages/core/src/utils/fgdc.textures.ts`
 - Importer: `packages/render/src/utils/fgdcTextures.ts`
 
 **App UI (active):**
+
 - `apps/profiler/app/` — Nuxt pages, components, composables
 
 **App UI (deprecated):**
+
 - `apps/well-profiler/src/` — React/Next.js components
 - `apps/well-profiler/src_old/` — legacy code (do not modify)
 

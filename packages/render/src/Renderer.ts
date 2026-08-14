@@ -14,11 +14,15 @@ const d3 = { ...d3module, tip: d3tip };
 import {
   isWellEmpty,
   type Constructive,
+  type Reduction,
   type SurfaceCase,
   type Units,
   type Well,
 } from '@welldot/core';
-import { getProfileLastItemsDepths } from '@welldot/utils';
+import {
+  getProfileDiamValues,
+  getProfileLastItemsDepths,
+} from '@welldot/utils';
 import {
   ComponentsClassNames,
   DeepPartial,
@@ -77,6 +81,7 @@ export class WellRenderer {
   private instanceStates: InstanceState[] = [];
   private textures: WellTextures = createWellTextures();
   private onError?: (err: Error) => void;
+  private onZoom?: (scale: number) => void;
 
   classes = DEFAULT_COMPONENTS_CLASS_NAMES;
   private renderConfig: RenderConfig = INTERACTIVE_RENDER_CONFIG;
@@ -93,6 +98,7 @@ export class WellRenderer {
    * @param options.renderConfig - Rendering behaviour (zoom, pan, animation, layout). Defaults to `INTERACTIVE_RENDER_CONFIG`.
    * @param options.theme - Visual theme overrides. Merged on top of `DEFAULT_WELL_THEME`.
    * @param options.onError - Called when a draw error occurs (e.g., a renderer throws). Falls back to `console.error` if omitted.
+   * @param options.onZoom - Called with the current zoom scale (`1` = initial/fit) whenever the user zooms or pans, and whenever `zoomBy`/`resetZoom` are called. No-op if `renderConfig.zoom`/`pan` are both disabled.
    */
   constructor(
     svgs: SvgInstance[],
@@ -102,6 +108,7 @@ export class WellRenderer {
       renderConfig?: DeepPartial<RenderConfig>;
       theme?: DeepPartial<WellTheme>;
       onError?: (err: Error) => void;
+      onZoom?: (scale: number) => void;
     } = {},
   ) {
     if (svgs.length === 0) {
@@ -112,6 +119,7 @@ export class WellRenderer {
     }
     this.svgInstances = svgs;
     if (options.onError) this.onError = options.onError;
+    if (options.onZoom) this.onZoom = options.onZoom;
 
     if (options.classNames) {
       this.classes = defu(
@@ -198,6 +206,7 @@ export class WellRenderer {
     construction.append('g').attr('class', this.classes.holeFill.group);
     construction.append('g').attr('class', this.classes.wellCase.group);
     construction.append('g').attr('class', this.classes.wellScreen.group);
+    construction.append('g').attr('class', this.classes.reduction.group);
     construction.append('g').attr('class', this.classes.conflict.group);
     construction
       .append('g')
@@ -222,6 +231,43 @@ export class WellRenderer {
   }
 
   /**
+   * Multiplies the current zoom scale by `factor` (e.g. `1.25` to zoom in,
+   * `1 / 1.25` to zoom out) on every panel. No-op if both `renderConfig.zoom`
+   * and `renderConfig.pan` are disabled (no zoom behavior was attached).
+   */
+  public zoomBy(factor: number): void {
+    for (const state of this.instanceStates) {
+      if (!state.zoomNode) continue;
+      asSvgElement<SVGSVGElement>(state.svg)
+        .transition()
+        .call(state.zoomNode.scaleBy, factor);
+    }
+  }
+
+  /**
+   * Resets zoom/pan on every panel back to `renderConfig.zoomLevel`
+   * (defaults to `1`, i.e. the initial fit-to-container view).
+   */
+  public resetZoom(): void {
+    const target = d3.zoomIdentity.scale(this.renderConfig.zoomLevel ?? 1);
+    for (const state of this.instanceStates) {
+      if (!state.zoomNode) continue;
+      asSvgElement<SVGSVGElement>(state.svg)
+        .transition()
+        .call(state.zoomNode.transform, target);
+    }
+  }
+
+  /**
+   * Current zoom scale factor of the first panel (`1` = initial/fit).
+   * Returns `1` if zoom/pan is disabled or `prepareSvg()` hasn't run yet.
+   */
+  public getZoomScale(): number {
+    const node = this.instanceStates[0]?.svg.node();
+    return node ? d3.zoomTransform(node as Element).k : 1;
+  }
+
+  /**
    * Initialises the SVG DOM structure and preloads FGDC textures.
    * Must be called once before the first `draw()`.
    */
@@ -243,6 +289,14 @@ export class WellRenderer {
     options: { units?: Units; highlights?: Highlights } = {},
   ) {
     if (isWellEmpty(profile)) return;
+
+    if (profile.version !== 2) {
+      console.warn(
+        `[WellRenderer] Received a .well file with version ${profile.version ?? 'unknown'}. ` +
+          `Only v2 is supported. Normalize with deserializeWell() from @welldot/core before rendering.`,
+      );
+    }
+
     this.units = { ...this.units, ...options.units };
     const highlights = options.highlights ?? {};
 
@@ -306,6 +360,7 @@ export class WellRenderer {
     const holeFillGroup = svg.select(`.${this.classes.holeFill.group}`);
     const wellCaseGroup = svg.select(`.${this.classes.wellCase.group}`);
     const wellScreenGroup = svg.select(`.${this.classes.wellScreen.group}`);
+    const reductionGroup = svg.select(`.${this.classes.reduction.group}`);
     const conflictGroup = svg.select(`.${this.classes.conflict.group}`);
     const constructionLabelsGroup = svg.select(
       `.${this.classes.constructionLabels.group}`,
@@ -427,6 +482,7 @@ export class WellRenderer {
       holeFillGroup,
       wellCaseGroup,
       wellScreenGroup,
+      reductionGroup,
       conflictGroup,
       highlightsGeologicGroup,
       highlightsConstructionGroup,
@@ -503,6 +559,26 @@ export class WellRenderer {
             .attr('y2', y + h);
         });
 
+      // Reduction: recompute trapezoid points (x is zoom-invariant, only y moves)
+      const maxXValsReduction = getProfileDiamValues(constructionData);
+      const xScaleReduction = d3
+        .scaleLinear()
+        .domain([0, d3.max(maxXValsReduction) || 0])
+        .range([0, POCO_WIDTH]);
+
+      reductionGroup
+        .selectAll(`polygon.${this.classes.reduction.item}`)
+        .attr('points', (d: unknown) => {
+          const r = d as Reduction;
+          const yTop = transform.applyY(spanY(r));
+          const yBot = yTop + transform.k * spanH(r);
+          const xTopLeft = (POCO_CENTER - xScaleReduction(r.diam_from)) / 2;
+          const xTopRight = (POCO_CENTER + xScaleReduction(r.diam_from)) / 2;
+          const xBotLeft = (POCO_CENTER - xScaleReduction(r.diam_to)) / 2;
+          const xBotRight = (POCO_CENTER + xScaleReduction(r.diam_to)) / 2;
+          return `${xTopLeft},${yTop} ${xTopRight},${yTop} ${xBotRight},${yBot} ${xBotLeft},${yBot}`;
+        });
+
       // Fractures: recompute transform so rotation pivot tracks the scaled depth
       fracturesGroup
         .selectAll(`g.${this.classes.fractures.item}`)
@@ -530,6 +606,7 @@ export class WellRenderer {
         well_screen: constructionData.well_screen.filter(inDepth),
       });
       drawHighlights(zoomedCtx, highlights);
+      this.onZoom?.(transform.k);
     };
 
     const drawProfile = () => {
@@ -575,10 +652,18 @@ export class WellRenderer {
     if (zoomEnabled || panEnabled) {
       const zoomNode = d3.zoom<SVGSVGElement, unknown>();
       if (zoomEnabled || panEnabled) zoomNode.on('zoom', zooming);
-      if (!zoomEnabled) zoomNode.scaleExtent([1, 1]);
+      zoomNode.scaleExtent(
+        zoomEnabled
+          ? [
+              this.renderConfig.minZoomScale ?? 0,
+              this.renderConfig.maxZoomScale ?? Infinity,
+            ]
+          : [1, 1],
+      );
       if (!panEnabled)
         zoomNode.filter(e => e.type === 'wheel' || e.type === 'dblclick');
       asSvgElement<SVGSVGElement>(svg).call(zoomNode);
+      state.zoomNode = zoomNode;
 
       const initialZoom = this.renderConfig.zoomLevel ?? 1;
       if (initialZoom !== 1) {

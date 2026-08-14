@@ -28,6 +28,11 @@ export default defineNuxtConfig({
 
   css: ['@/assets/styles/main.css'],
 
+  components: [
+    { path: '~/components/DataGrid', pathPrefix: false },
+    { path: '~/components', pathPrefix: true, ignore: ['**/DataGrid/**'] },
+  ],
+
   pages: {
     pattern: ['**/*.vue', '!**/_*/**'],
   },
@@ -37,13 +42,33 @@ export default defineNuxtConfig({
     '@nuxt/fonts',
     '@nuxt/icon',
     '@nuxt/image',
+    '@nuxtjs/i18n',
     '@primevue/nuxt-module',
     '@pinia/nuxt',
     'pinia-plugin-persistedstate/nuxt',
     'nuxt-viewport',
     '@nuxtjs/seo',
     '@vite-pwa/nuxt',
+    '@vueuse/nuxt',
   ],
+
+  i18n: {
+    strategy: 'no_prefix',
+    langDir: 'locales',
+    locales: [
+      { code: 'en', language: 'en-US', name: 'English', file: 'en.json' },
+      { code: 'pt', language: 'pt-BR', name: 'Português', file: 'pt.json' },
+    ],
+    defaultLocale: 'en',
+    vueI18n: './i18n.config.ts',
+    detectBrowserLanguage: {
+      useCookie: true,
+      cookieKey: 'welldot_locale',
+      cookieSecure: true,
+      alwaysRedirect: false,
+      redirectOn: 'root',
+    },
+  },
 
   // @ts-ignore
   viewport: {
@@ -108,6 +133,9 @@ export default defineNuxtConfig({
 
   vite: {
     plugins: [tailwindcss()],
+    optimizeDeps: {
+      include: ['@vueuse/core', 'd3', 'd3-tip', 'textures', 'sanitize-html'],
+    },
   },
 
   site: {
@@ -149,6 +177,7 @@ export default defineNuxtConfig({
       link: [
         { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
         { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
+        { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' },
         { rel: 'manifest', href: '/manifest.json' },
       ],
       meta: [
@@ -165,4 +194,4 @@ export default defineNuxtConfig({
       routes: ['/sitemap.xml', '/robots.txt'],
     },
   },
-});
+} as Parameters<typeof defineNuxtConfig>[0]);

@@ -1,0 +1,118 @@
+# apps/profiler — Welldot (Nuxt 4)
+
+**Active production app.** This is the replacement for `apps/well-profiler`. Built with Nuxt 4 + Vue 3, deployed to Cloudflare Pages at `welldot.org`.
+
+## Stack
+
+- **Framework:** Nuxt 4 (`srcDir: app/`) with SSR enabled
+- **UI:** PrimeVue 4 (theme via `customTheme.ts` + `customPt.js` pass-through)
+- **Styling:** Tailwind CSS 4 (Vite plugin), global styles in `app/assets/styles/main.css`
+- **State:** Pinia with `pinia-plugin-persistedstate`
+- **i18n:** `@nuxtjs/i18n` — English and Brazilian Portuguese (`i18n/locales/`)
+- **SEO:** `@nuxtjs/seo` (schema.org, OG, sitemap, robots)
+- **PWA:** `@vite-pwa/nuxt` (auto-update, disabled in dev)
+- **Fonts:** Space Grotesk, IBM Plex Serif, JetBrains Mono (via `@nuxt/fonts`)
+- **Icons:** Phosphor (`ph:`) via `@nuxt/icon` — **preferred**. Heroicons (`heroicons:`) remain as secondary usange when there is no phosphor good icon or is explicit said. Custom SVG icons in `app/assets/icons/` (prefix `welldot:`)
+- **Deploy:** Cloudflare Pages (Nitro `cloudflare-pages` preset); preview via `wrangler`
+
+## Directory layout
+
+```
+app/                      ← srcDir
+  app.vue                 ← root component
+  pages/
+    index.vue             ← landing page (only page so far)
+  layouts/
+    landing.vue           ← layout for the landing page
+  components/
+    landing/              ← landing-page components (HeroVisual, WellJsonViewer, etc.)
+  composables/
+    useBus.ts             ← typed event bus composable (wraps EventBus)
+  core/
+    EventBus/             ← mitt-based typed event bus (bus.ts, Events.ts, types.ts)
+  stores/                 ← Pinia stores
+  theme/
+    customTheme.ts        ← PrimeVue design token overrides
+    customPt.js           ← PrimeVue pass-through classes
+  plugins/
+    01.canonical.ts       ← injects canonical URL
+  utils/
+    date.ts
+    clipboard.ts
+  assets/
+    styles/main.css
+    icons/                ← custom SVG icon set (welldot: prefix)
+i18n/
+  locales/en.json
+  locales/pt.json
+i18n.config.ts
+nuxt.config.ts
+```
+
+## Commands
+
+```bash
+pnpm dev        # nuxt dev (localhost:3000)
+pnpm build      # nuxt build → dist/
+pnpm generate   # static generation
+pnpm preview    # wrangler pages dev (Cloudflare preview)
+pnpm lint       # eslint
+```
+
+## Key patterns
+
+- Nuxt auto-imports components, composables, and `utils/` — no explicit imports needed for those.
+- PrimeVue components are auto-imported. Check `customPt.js` before adding Tailwind classes to PrimeVue elements.
+- Breakpoints are managed by `nuxt-viewport`; prefer `useViewport()` over raw media queries.
+- Locale strings live in `i18n/locales/*.json`; use `useI18n().t('key')` in components.
+- The `EventBus` in `core/EventBus/` is the preferred pattern for cross-component communication not suited to Pinia.
+
+## Documentation requirements
+
+Update this `CLAUDE.md` when:
+- A new Nuxt module is added (Stack section + any config file it introduces)
+- A new top-level directory appears under `app/` (Directory layout section)
+- A significant pattern changes (state management, i18n, deploy target, theme system)
+- A new environment variable is required at build or runtime
+
+`README.md` covers setup, the color system, and PrimeVue usage for human contributors. Keep it in sync when those topics change.
+
+## Color system
+
+Two mirrored scales — `surface` (backgrounds) and `content` (text, borders, icons) — cover all neutral colors. The scales flip between modes so no `dark:` variant is ever needed for neutrals. `primary`, `error`, `warning`, `success`, and `info` handle semantic highlights.
+
+**Pairing rule:** `surface-N` and `content-N` at the same index always contrast, because the scales are inverses. Mixing distant indexes breaks contrast in one mode (`surface-100 + text-content-900` = near-black on near-black in dark mode).
+
+| Scale | Role | Normal range |
+|---|---|---|
+| `surface` | Backgrounds only — never text/icons | `0–200`; higher only for intentional inversion |
+| `content` | Text, borders, icon strokes | `0` (body) → `300` (muted) → `600` (subtle border); `800+` almost always wrong |
+| `primary` | CTAs, active states, focus rings, interactive highlights | varies |
+| `error/warning/success/info` | State communication | `500` default; `50–100` for bg, `700–800` for text on light bg |
+
+Key rules:
+- `surface` for backgrounds exclusively; `content` for everything neutral on top of it.
+- Pair at the same index. Slight offset toward higher values for hierarchy is fine; a large gap (>400 steps) is a bug.
+- High `surface` values (`400+`) signal a deliberate inversion (dark hero, inverted sidebar) — rare. High `content` values (`800+`) are nearly always wrong.
+- Tailwind utilities (`bg-surface-*`, `text-content-*`, `bg-primary-*`, etc.) are bridged from PrimeVue CSS vars in `app/assets/styles/main.css`. Never use Tailwind grays, raw `bg-white`, or hardcoded hex — they break dark mode.
+
+## PrimeVue components
+
+Always prefer a PrimeVue component over a hand-rolled one. Customise in this order — stop at the first layer that solves the problem:
+
+1. **API** — props and slots (`primevue.org/<component>`).
+2. **`customTheme.ts`** — global visual change (design token override under `components`). Right for color, radius, spacing that should apply to every instance.
+3. **`customPt.js`** — pass-through for structural/utility tweaks (Tailwind class or HTML attr on an internal element). One-off layout adjustments only; not for color changes.
+4. **Custom component** — last resort, only when the three layers above are genuinely insufficient.
+
+Never target PrimeVue internal class names in scoped CSS — they're unstable across minor versions. Use pass-through instead.
+
+Use `severity` props (`"primary"`, `"success"`, `"warn"`, `"danger"`, `"info"`) on PrimeVue components rather than manually applying color classes. The theme maps severities to the semantic scales automatically.
+
+## Constraints
+
+- `@welldot/render` uses D3 and mutates the DOM — wrap renderer calls in `onMounted` or `<ClientOnly>`.
+- SSR is enabled; avoid `window`/`document` access outside of client lifecycle hooks or `process.client` guards.
+- Deployed to Cloudflare Pages — no Node.js server runtime. All server routes must be Cloudflare-compatible.
+- **Icons:** Use Phosphor (`ph:`) for all new UI. Prefer the **duotone** variant (`ph:icon-name-duotone`) as the default — it matches the editorial aesthetic. Fall back to `ph:icon-name` (regular) only when duotone is unavailable. Browse at https://icones.js.org/collection/ph. Do not use Heroicons in new components; the landing page (`layouts/landing.vue`) may keep its existing `heroicons:` usage.
+- **Tailwind canonical classes only** — no arbitrary values (`w-[37px]`, `bg-[#eef0f3]`, `text-[14px]`). Use the design-token utilities (`bg-surface-*`, `text-content-*`, spacing scale, etc.) or standard Tailwind scale values. Arbitrary values bypass the token system, don't respond to mode changes, and make refactoring the theme harder.

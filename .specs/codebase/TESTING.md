@@ -21,12 +21,15 @@
 **Approach:** Pure function unit tests. Input → assertion. No mocking of internal dependencies.
 
 **Locations:**
-- `packages/core/src/utils/well.utils.test.ts` — serialization/deserialization, legacy migration
-- `packages/utils/src/profile.utils.test.ts` — depth/diameter/volume calculations
+
+- `packages/core/src/utils/well.utils.test.ts` — serialization/deserialization, v1→v2 migration
+- `packages/core/src/utils/units.test.ts` — unit conversion utilities
+- `packages/utils/src/profile.utils.test.ts` — depth, diameter, volume, hydrodynamic calculations
 - `packages/render/src/utils/render.utils.test.ts` — texture utilities
 - `packages/render/src/utils/render.styles.test.ts` — CSS generation functions
 
 **Structure pattern:**
+
 ```typescript
 describe('getProfileLastItemsDepths', () => {
   it('returns 0 for empty component arrays', () => {
@@ -45,6 +48,7 @@ describe('getProfileLastItemsDepths', () => {
 ## Test Execution
 
 **Single package:**
+
 ```bash
 cd packages/utils && pnpm test     # vitest run
 cd packages/render && pnpm test
@@ -52,6 +56,7 @@ cd packages/core && pnpm test
 ```
 
 **All packages (via Turbo):**
+
 ```bash
 pnpm test
 ```

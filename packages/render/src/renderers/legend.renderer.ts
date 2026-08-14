@@ -30,6 +30,7 @@ type LegendItem =
         | 'holeFillSeal'
         | 'wellCase'
         | 'wellScreen'
+        | 'reduction'
         | 'cementPad'
         | 'conflict';
     };
@@ -49,6 +50,7 @@ export function drawWellLegend(
   const boreHoles = profile.bore_hole ?? [];
   const wellCases = profile.well_case ?? [];
   const wellScreens = profile.well_screen ?? [];
+  const reductions = profile.reduction ?? [];
   const holeFills = profile.hole_fill ?? [];
 
   const hasSimple = fractures.some(f => !f.swarm && !f.water_intake);
@@ -63,6 +65,7 @@ export function drawWellLegend(
   const hasHoleFillSeal = holeFills.some(h => h.type === 'seal');
   const hasWellCase = wellCases.length > 0;
   const hasWellScreen = wellScreens.length > 0;
+  const hasReduction = reductions.length > 0;
   const hasCementPad = !!profile.cement_pad?.thickness;
   const hasConflict =
     mergeConflicts(
@@ -156,6 +159,12 @@ export function drawWellLegend(
       kind: 'construction',
       label: cfg.labels.wellScreen,
       subKind: 'wellScreen',
+    });
+  if (hasReduction)
+    items.push({
+      kind: 'construction',
+      label: cfg.labels.reduction,
+      subKind: 'reduction',
     });
   if (hasConflict)
     items.push({
@@ -304,6 +313,21 @@ export function drawWellLegend(
         .attr('y2', rowSymY + rh / 2)
         .attr('stroke', theme.surfaceCase.stroke)
         .attr('stroke-width', 2);
+    } else if (item.subKind === 'reduction') {
+      const topW = rw * 0.5;
+      const y1 = rowSymY - rh / 2;
+      const y2 = rowSymY + rh / 2;
+      const midX = cx + rw / 2;
+      symG
+        .append('polygon')
+        .attr('class', cls.constructionRect)
+        .attr(
+          'points',
+          `${midX - topW / 2},${y1} ${midX + topW / 2},${y1} ${cx + rw},${y2} ${cx},${y2}`,
+        )
+        .attr('fill', theme.reduction.fill)
+        .attr('stroke', theme.reduction.stroke)
+        .attr('stroke-width', theme.legend.itemStrokeWidth);
     } else {
       const symMap: Record<
         string,

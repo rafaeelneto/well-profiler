@@ -37,24 +37,28 @@ Library packages (`@welldot/core`, `@welldot/utils`, `@welldot/render`) are **fu
 ## Iconography
 
 **Service:** Iconify + `@nuxt/icon`
-**Icon sets:** `@iconify-json/heroicons` (Heroicons)
-**Custom icons:** `apps/profiler/app/assets/icons/` — local Welldot-specific SVG icons
+**Icon sets (priority order):**
+1. **Phosphor** (`ph:`) — primary icon set for all new components; prefer duotone variant (`ph:icon-name-duotone`), fall back to regular (`ph:icon-name`)
+2. **Heroicons** (`heroicons:`) — legacy; still present in some older components, not used in new ones
+3. **Custom** (`welldot:`) — project-specific SVG icons in `apps/profiler/app/assets/icons/`
+
+**Custom icons:** `apps/profiler/app/assets/icons/` — local Welldot-specific SVG icons (auto-registered as `welldot:` prefix)
 
 ---
 
 ## Third-Party Libraries (no external network calls)
 
-| Library | Version | Purpose | Package |
-|---|---|---|---|
-| D3.js | ^7.0.0 | SVG visualization | `@welldot/render` |
-| textures.js | ^1.2.3 | Geological pattern fills | `@welldot/render` |
-| d3-tip | ^0.9.1 | SVG tooltips | `@welldot/render` |
-| Zod | ^3.23.8 | Runtime schema validation | `@welldot/core` |
-| defu | ^6.1.4 | Deep merge for config options | `@welldot/render` |
-| sanitize-html | ^2.17.3 | Tooltip HTML sanitization | `@welldot/render` |
-| VueUse | ^14.3.0 | Vue composition utilities | `apps/profiler` |
-| date-fns | ^4.1.0 | Date formatting | `apps/profiler` |
-| Pinia | ^3.0.4 | Vue state management | `apps/profiler` |
+| Library       | Version | Purpose                       | Package           |
+| ------------- | ------- | ----------------------------- | ----------------- |
+| D3.js         | ^7.0.0  | SVG visualization             | `@welldot/render` |
+| textures.js   | ^1.2.3  | Geological pattern fills      | `@welldot/render` |
+| d3-tip        | ^0.9.1  | SVG tooltips                  | `@welldot/render` |
+| Zod           | ^3.23.8 | Runtime schema validation     | `@welldot/core`   |
+| defu          | ^6.1.4  | Deep merge for config options | `@welldot/render` |
+| sanitize-html | ^2.17.3 | Tooltip HTML sanitization     | `@welldot/render` |
+| VueUse        | ^14.3.0 | Vue composition utilities     | `apps/profiler`   |
+| date-fns      | ^4.1.0  | Date formatting               | `apps/profiler`   |
+| Pinia         | ^3.0.4  | Vue state management          | `apps/profiler`   |
 
 ---
 
@@ -75,6 +79,7 @@ These integrations exist only in the deprecated Next.js app and are **not being 
 **Library packages:** None required.
 
 **`apps/profiler`:**
+
 - Standard `NODE_ENV` (`development` / `production`)
 - No secrets or API keys identified in source
 

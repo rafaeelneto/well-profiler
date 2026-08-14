@@ -58,25 +58,47 @@ new WellRenderer(svgs: SvgInstance[], options?: {
   units?:        Units;
   classNames?:   DeepPartial<ComponentsClassNames>;
   onError?:      (err: Error) => void;
+  onZoom?:       (scale: number) => void;
 })
 ```
 
-| Option | Type | Description |
-|--------|------|-------------|
-| `svgs` | `SvgInstance[]` | One or more SVG panel descriptors (`{ selector, height, width, margins }`) |
-| `renderConfig` | `DeepPartial<RenderConfig>` | Controls zoom, pan, animation, labels, tooltips, layout |
-| `theme` | `DeepPartial<WellTheme>` | Visual style overrides (merged with `DEFAULT_WELL_THEME`) |
-| `units` | `Units` | `{ length: 'm' \| 'ft'; diameter: 'mm' \| 'inches' }` |
-| `classNames` | `DeepPartial<ComponentsClassNames>` | Override CSS class names for any SVG element |
-| `onError` | `(err: Error) => void` | Error callback |
+| Option         | Type                                | Description                                                                |
+| -------------- | ----------------------------------- | -------------------------------------------------------------------------- |
+| `svgs`         | `SvgInstance[]`                     | One or more SVG panel descriptors (`{ selector, height, width, margins }`) |
+| `renderConfig` | `DeepPartial<RenderConfig>`         | Controls zoom, pan, animation, labels, tooltips, layout                    |
+| `theme`        | `DeepPartial<WellTheme>`            | Visual style overrides (merged with `DEFAULT_WELL_THEME`)                  |
+| `units`        | `Units`                             | `{ length: 'm' \| 'ft'; diameter: 'mm' \| 'inches' }`                      |
+| `classNames`   | `DeepPartial<ComponentsClassNames>` | Override CSS class names for any SVG element                               |
+| `onError`      | `(err: Error) => void`              | Error callback                                                             |
+| `onZoom`       | `(scale: number) => void`           | Called with the current zoom scale (`1` = initial/fit) on every wheel/drag zoom-pan tick, and on `zoomBy`/`resetZoom` calls |
 
 #### Methods
 
-| Method | Description |
-|--------|-------------|
-| `prepareSvg(): Promise<void>` | Initialise SVG DOM structure and preload FGDC textures. Call once before the first `draw`. |
-| `draw(profile: Well, options?: { units?: Units; highlights?: Highlights }): void` | Render or re-render the full well profile. |
-| `renderLegend(selector: string, profile: Well): void` | Render a standalone legend into a separate SVG. |
+| Method                                                                            | Description                                                                                |
+| --------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| `prepareSvg(): Promise<void>`                                                     | Initialise SVG DOM structure and preload FGDC textures. Call once before the first `draw`. |
+| `draw(profile: RenderableWell, options?: { units?: Units; highlights?: Highlights }): void` | Render or re-render the full well profile.                                                 |
+| `renderLegend(selector: string, profile: Well): void`                             | Render a standalone legend into a separate SVG.                                            |
+| `zoomBy(factor: number): void`                                                    | Multiply the current zoom scale by `factor` (e.g. `1.25` in, `1 / 1.25` out). No-op if `zoom`/`pan` are both disabled. |
+| `resetZoom(): void`                                                               | Reset zoom/pan back to `renderConfig.zoomLevel` (default `1` — the initial fit-to-container view). |
+| `getZoomScale(): number`                                                          | Current zoom scale of the first panel (`1` = initial/fit).                                 |
+
+`RenderableWell` extends `Well` with an optional `key` field on each feature array element, enabling stable D3 data-join keys across re-renders. A plain `Well` object is directly assignable to `RenderableWell`. **`key` is runtime-only** — keep it in memory across edits for stable animation, but strip it before serializing to a `.well` file.
+
+#### Driving zoom from your own UI (zoom in/out/fit buttons)
+
+`zoom`/`pan` (when enabled in `renderConfig`) already wire up mouse wheel and drag directly on the SVG. `zoomBy`/`resetZoom`/`getZoomScale` operate on that same internal zoom behavior, so wheel/drag and a custom toolbar stay in sync — including through the `onZoom` callback, which fires for both interaction sources. `renderConfig.minZoomScale`/`maxZoomScale` (default `0`–`150`, i.e. 0%–15000%) bound the scale for wheel, drag, and `zoomBy`/`resetZoom` alike, since they're enforced on the shared d3-zoom behavior itself rather than by any one call site.
+
+```ts
+const renderer = new WellRenderer(svgs, {
+  renderConfig: { ...INTERACTIVE_RENDER_CONFIG, zoom: true, pan: true },
+  onZoom: scale => updateScaleLabel(scale),
+});
+
+zoomInButton.onclick = () => renderer.zoomBy(1.25);
+zoomOutButton.onclick = () => renderer.zoomBy(1 / 1.25);
+fitButton.onclick = () => renderer.resetZoom();
+```
 
 ---
 
@@ -89,8 +111,10 @@ drawWellLegend(
   selector: string,
   profile:  Well,
   options?: {
-    config?:  Partial<LegendRenderConfig>;
-    cssVars?: Partial<CssVarsConfig>;
+    config?:     Partial<LegendRenderConfig>;
+    theme?:      Partial<WellTheme>;
+    classNames?: ComponentsClassNames['legend'];
+    textures?:   TexturesConfig;
   }
 ): void
 ```
@@ -101,48 +125,48 @@ Does nothing if the profile contains no fractures or caves.
 
 ### Config presets
 
-| Export | Description |
-|--------|-------------|
+| Export                      | Description                                        |
+| --------------------------- | -------------------------------------------------- |
 | `INTERACTIVE_RENDER_CONFIG` | Full-featured preset: zoom, pan, animation enabled |
-| `STATIC_RENDER_CONFIG` | Zoom and pan disabled; suitable for static exports |
-| `DEFAULT_WELL_THEME` | Complete default visual theme |
+| `STATIC_RENDER_CONFIG`      | Zoom and pan disabled; suitable for static exports |
+| `DEFAULT_WELL_THEME`        | Complete default visual theme                      |
 
 ---
 
 ### Format utilities
 
-| Export | Signature | Description |
-|--------|-----------|-------------|
-| `formatLength` | `(m: number, units: LengthUnits) => string` | Depth in metres → unit-aware string |
-| `formatDiameter` | `(mm: number, units: DiameterUnits) => string` | Diameter in mm → unit-aware string |
-| `getLengthUnit` | `(units: LengthUnits) => string` | Returns `'m'` or `'ft'` |
-| `getDiameterUnit` | `(units: DiameterUnits) => string` | Returns `'mm'` or `'"'` |
+| Export            | Signature                                      | Description                         |
+| ----------------- | ---------------------------------------------- | ----------------------------------- |
+| `formatLength`    | `(m: number, units: LengthUnits) => string`    | Depth in metres → unit-aware string |
+| `formatDiameter`  | `(mm: number, units: DiameterUnits) => string` | Diameter in mm → unit-aware string  |
+| `getLengthUnit`   | `(units: LengthUnits) => string`               | Returns `'m'` or `'ft'`             |
+| `getDiameterUnit` | `(units: DiameterUnits) => string`             | Returns `'mm'` or `'"'`             |
 
 ---
 
 ## Theming
 
-Visual appearance is controlled by CSS custom properties (`--wp-*`) defined on `:root`. Import the package stylesheet or override properties inline:
+Visual appearance is controlled by the `theme` option passed to `WellRenderer`. All colors, stroke widths, and opacities are defined as a `WellTheme` object. Use `DEFAULT_WELL_THEME` as a base and pass a `DeepPartial<WellTheme>` to override specific values:
 
 ```ts
-// Override via renderConfig at construction time
 new WellRenderer(svgs, {
-  renderConfig: {
-    cssVars: {
-      fractureWetStroke: '#0077cc',
-      wellCaseFill: '#f5f5f5',
-    },
+  theme: {
+    lithology: { stroke: '#222222', strokeWidth: 1.5 },
+    wellCase: { fill: '#f5f5f5', stroke: '#333333', strokeWidth: 2 },
+    reduction: { fill: '#f5f5f5', stroke: '#333333', strokeWidth: 2 },
   },
 });
 ```
 
-All CSS variables (colors, stroke widths, opacities) are listed in `src/styles/main.css`.
+See `DEFAULT_WELL_THEME` in `src/configs/render.configs.ts` for all available keys.
 
 ---
 
 ## Data format
 
 `@welldot/render` renders [`Well`](https://www.npmjs.com/package/@welldot/core) objects from `@welldot/core`. See that package for the `.well` file format specification, types, and validators.
+
+**Version requirement:** Only `.well` v2 (`version: 2`) is supported. Pass raw JSON through `deserializeWell()` from `@welldot/core` before calling `draw()` — it normalizes v1 files to v2 automatically.
 
 ---
 
