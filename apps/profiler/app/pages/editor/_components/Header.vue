@@ -151,8 +151,8 @@ const toolItems = computed<ToolItem[]>(() => [
   {
     label: t('editor.exportPdf'),
     icon: 'ph:file-pdf-duotone',
-    disabled: !hasWell.value,
-    onClick: () => (exportPdfVisible.value = true),
+    disabled: true,
+    comingSoon: true,
   },
   {
     label: t('editor.importSiagas'),
@@ -315,16 +315,13 @@ const viewOptions = computed(() => [
     <div class="w-px h-5 bg-surface-200/80 shrink-0" />
 
     <!-- Export PDF (primary CTA) -->
-    <Button
-      :label="t('editor.exportPdf')"
-      :disabled="!hasWell"
-      size="small"
-      @click="exportPdfVisible = true"
-    >
-      <template #icon>
-        <Icon name="ph:file-pdf-duotone" class="size-4 shrink-0" />
-      </template>
-    </Button>
+    <span v-tooltip.bottom="t('editor.exportPdfComingSoon')">
+      <Button :label="t('editor.exportPdf')" disabled size="small">
+        <template #icon>
+          <Icon name="ph:file-pdf-duotone" class="size-4 shrink-0" />
+        </template>
+      </Button>
+    </span>
   </nav>
 
   <!-- ─── Mobile sticky header (hidden on desktop) ──────────────────── -->
