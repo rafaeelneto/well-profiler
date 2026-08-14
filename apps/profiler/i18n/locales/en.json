@@ -260,7 +260,7 @@
       "deleteItem": "Remove",
       "pageBreaks": {
         "title": "Page breaks",
-        "split": "Split profile into 80 m pages"
+        "split": "Split profile into pages"
       },
       "metadataSection": {
         "title": "Metadata section",
@@ -298,7 +298,16 @@
       "preview": {
         "label": "Preview",
         "pages": "pages",
-        "fit": "Fit"
+        "fit": "Fit",
+        "empty": "Load a profile to see the PDF preview",
+        "error": "Couldn't generate the PDF preview. Try again or adjust the export options."
+      },
+      "content": {
+        "total": "Total",
+        "volumeTotal": "Total volume",
+        "slot": "Slot",
+        "footerTagline": "See this profile\nonline",
+        "page": "Page"
       }
     },
     "zoom": {
