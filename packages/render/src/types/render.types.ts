@@ -48,6 +48,7 @@ export type Highlights = {
   hole_fill?: HighlightItem[];
   well_case?: HighlightItem[];
   well_screen?: HighlightItem[];
+  reduction?: HighlightItem[];
 };
 
 export type SvgSelection = Selection<BaseType, unknown, HTMLElement, unknown>;
@@ -98,6 +99,7 @@ export type ConstructionTheme = {
   holeFill: { stroke: string; strokeWidth: number };
   wellCase: { fill: string; stroke: string; strokeWidth: number };
   wellScreen: { stroke: string; strokeWidth: number };
+  reduction: { fill: string; stroke: string; strokeWidth: number };
   conflict: { stroke: string; strokeWidth: number };
 };
 export type LabelsTheme = {
@@ -225,6 +227,10 @@ export type ComponentsClassNames = {
     group: string;
     rect: string;
   };
+  reduction: {
+    group: string;
+    item: string;
+  };
   conflict: {
     group: string;
     rect: string;
@@ -263,6 +269,7 @@ export type TooltipKey =
   | 'holeFill'
   | 'wellCase'
   | 'wellScreen'
+  | 'reduction'
   | 'conflict'
   | 'fracture'
   | 'cementPad'
@@ -401,6 +408,7 @@ export type LegendRenderConfig = {
     holeFillSeal: string;
     wellCase: string;
     wellScreen: string;
+    reduction: string;
     cementPad: string;
     conflict: string;
   };
@@ -440,6 +448,7 @@ export type DrawGroups = {
   holeFillGroup: SvgSelection;
   wellCaseGroup: SvgSelection;
   wellScreenGroup: SvgSelection;
+  reductionGroup: SvgSelection;
   conflictGroup: SvgSelection;
   highlightsGeologicGroup: SvgSelection;
   highlightsConstructionGroup: SvgSelection;

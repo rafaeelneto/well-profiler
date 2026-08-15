@@ -1,38 +1,39 @@
 export interface FormatNumberOptions {
   /** Fixed decimal precision — sets both min and max. Takes precedence over the pair below. */
-  fractionDigits?: number
+  fractionDigits?: number;
   /** Minimum fraction digits (ignored if fractionDigits is set). */
-  minimumFractionDigits?: number
+  minimumFractionDigits?: number;
   /** Maximum fraction digits (ignored if fractionDigits is set). */
-  maximumFractionDigits?: number
+  maximumFractionDigits?: number;
   /** String appended after the number, separated by a space (e.g. 'm', 'ft', 'm³'). */
-  suffix?: string
+  suffix?: string;
   /** BCP 47 locale string (e.g. 'en-US', 'pt-BR'). Defaults to 'en-US'. */
-  locale?: string
+  locale?: string;
   /** Returned for null, undefined, or NaN inputs. Defaults to '—'. */
-  fallback?: string
+  fallback?: string;
 }
 
 export function formatNumber(
   value: number | null | undefined,
   options?: FormatNumberOptions,
 ): string {
-  const fallback = options?.fallback ?? '—'
-  if (value === null || value === undefined || Number.isNaN(value)) return fallback
+  const fallback = options?.fallback ?? '—';
+  if (value === null || value === undefined || Number.isNaN(value))
+    return fallback;
 
-  const locale = options?.locale ?? 'en-US'
-  const intlOpts: Intl.NumberFormatOptions = {}
+  const locale = options?.locale ?? 'en-US';
+  const intlOpts: Intl.NumberFormatOptions = {};
 
   if (options?.fractionDigits !== undefined) {
-    intlOpts.minimumFractionDigits = options.fractionDigits
-    intlOpts.maximumFractionDigits = options.fractionDigits
+    intlOpts.minimumFractionDigits = options.fractionDigits;
+    intlOpts.maximumFractionDigits = options.fractionDigits;
   } else {
     if (options?.minimumFractionDigits !== undefined)
-      intlOpts.minimumFractionDigits = options.minimumFractionDigits
+      intlOpts.minimumFractionDigits = options.minimumFractionDigits;
     if (options?.maximumFractionDigits !== undefined)
-      intlOpts.maximumFractionDigits = options.maximumFractionDigits
+      intlOpts.maximumFractionDigits = options.maximumFractionDigits;
   }
 
-  const formatted = new Intl.NumberFormat(locale, intlOpts).format(value)
-  return options?.suffix ? `${formatted} ${options.suffix}` : formatted
+  const formatted = new Intl.NumberFormat(locale, intlOpts).format(value);
+  return options?.suffix ? `${formatted} ${options.suffix}` : formatted;
 }

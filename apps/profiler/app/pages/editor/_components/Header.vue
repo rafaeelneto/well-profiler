@@ -151,7 +151,6 @@ const toolItems = computed<ToolItem[]>(() => [
   {
     label: t('editor.exportPdf'),
     icon: 'ph:file-pdf-duotone',
-    disabled: !hasWell.value,
     onClick: () => (exportPdfVisible.value = true),
   },
   {
@@ -314,12 +313,10 @@ const viewOptions = computed(() => [
     <!-- Divider -->
     <div class="w-px h-5 bg-surface-200/80 shrink-0" />
 
-    <!-- Export PDF (primary CTA) -->
     <Button
       :label="t('editor.exportPdf')"
-      :disabled="!hasWell"
-      size="small"
       @click="exportPdfVisible = true"
+      size="small"
     >
       <template #icon>
         <Icon name="ph:file-pdf-duotone" class="size-4 shrink-0" />
@@ -401,16 +398,17 @@ const viewOptions = computed(() => [
   </div>
 
   <!-- ─── Share dialog ──────────────────────────────────────────────── -->
-  <ShareProfile v-model="shareVisible" />
+  <ShareProfile v-if="shareVisible" v-model="shareVisible" />
 
   <!-- ─── Settings dialog ───────────────────────────────────────────── -->
-  <SettingsModal v-model="settingsVisible" />
+  <SettingsModal v-if="settingsVisible" v-model="settingsVisible" />
 
   <!-- ─── Export PDF dialog ─────────────────────────────────────────── -->
-  <ExportPdfDialog v-model="exportPdfVisible" />
+  <ExportPdfDialog v-if="exportPdfVisible" v-model="exportPdfVisible" />
 
   <!-- ─── Tools menu ────────────────────────────────────────────────── -->
   <ToolsMenu
+    v-if="toolsMenuVisible"
     v-model="toolsMenuVisible"
     :items="isMobile ? toolItems : extraToolItems"
   />

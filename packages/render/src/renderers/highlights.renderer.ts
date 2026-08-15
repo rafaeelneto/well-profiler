@@ -236,4 +236,14 @@ export function drawHighlights(ctx: DrawContext, hl: Highlights): void {
     stdX,
     stdW,
   );
+  drawConstrHighlights(
+    hl.reduction,
+    ctx.constructionData.reduction.map(d => ({
+      from: d.from,
+      to: d.to,
+      diameter: Math.max(d.diam_from, d.diam_to),
+    })),
+    stdX,
+    stdW,
+  );
 }

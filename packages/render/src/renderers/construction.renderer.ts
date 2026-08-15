@@ -5,6 +5,7 @@ import type {
   CementPad,
   Constructive,
   HoleFill,
+  Reduction,
   SurfaceCase,
   WellCase,
   WellScreen,
@@ -270,6 +271,49 @@ export function drawConstructive(ctx: DrawContext, data: Constructive): void {
   withTransition(mergedWellScreen, ctx.transition)
     .attr('y', getYPos)
     .attr('height', getHeight);
+
+  // ── Reduction ──────────────────────────────────────────────────────────────
+
+  const reductionPoints = (
+    d: Reduction,
+    yTop: number,
+    yBot: number,
+  ): string => {
+    const xTopLeft = (ctx.POCO_CENTER - xScale(d.diam_from)) / 2;
+    const xTopRight = (ctx.POCO_CENTER + xScale(d.diam_from)) / 2;
+    const xBotLeft = (ctx.POCO_CENTER - xScale(d.diam_to)) / 2;
+    const xBotRight = (ctx.POCO_CENTER + xScale(d.diam_to)) / 2;
+    return `${xTopLeft},${yTop} ${xTopRight},${yTop} ${xBotRight},${yBot} ${xBotLeft},${yBot}`;
+  };
+
+  const reduction = ctx.groups.reductionGroup
+    .selectAll(`.${ctx.classes.reduction.item}`)
+    .data(data.reduction, makeIntervalKey('reduction'));
+
+  reduction.exit().transition(ctx.transition).style('opacity', 0).remove();
+
+  const collapsedPoints = (d: unknown): string => {
+    const r = d as Reduction;
+    const y = getYPos(r);
+    return reductionPoints(r, y, y);
+  };
+
+  const newReduction = reduction
+    .enter()
+    .append('polygon')
+    .attr('class', ctx.classes.reduction.item)
+    .attr('fill', ctx.theme.reduction.fill)
+    .attr('stroke', ctx.theme.reduction.stroke)
+    .attr('stroke-width', ctx.theme.reduction.strokeWidth)
+    .on('mouseover', ctx.tooltips.reduction.show)
+    .on('mouseout', ctx.tooltips.reduction.hide)
+    .attr('points', collapsedPoints);
+
+  const mergedReduction = mergeEnter(newReduction, reduction);
+  withTransition(mergedReduction, ctx.transition).attr(
+    'points',
+    (d: Reduction) => reductionPoints(d, getYPos(d), getYPos(d) + getHeight(d)),
+  );
 
   // ── Conflict zones ─────────────────────────────────────────────────────────
 

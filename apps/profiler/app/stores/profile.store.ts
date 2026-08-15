@@ -64,7 +64,6 @@ function withKeys<T extends object>(items: T[]): (T & { key: string })[] {
 /** Strip any runtime render key from a feature array before serialisation. */
 function stripKeys<T extends object>(items: T[]): T[] {
   return items.map(item => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { key: _key, ...rest } = item as T & { key?: unknown };
     return rest as T;
   });
@@ -353,7 +352,11 @@ export const useProfileStore = defineStore(
           const raw = item as unknown as { from: number; to: number };
           const lastTo = arr.length > 0 ? arr[arr.length - 1]!.to : 0;
           const thickness = raw.to - raw.from > 0 ? raw.to - raw.from : 10;
-          arr.push({ ...(item as object), from: lastTo, to: lastTo + thickness } as {
+          arr.push({
+            ...(item as object),
+            from: lastTo,
+            to: lastTo + thickness,
+          } as {
             from: number;
             to: number;
           });

@@ -13,11 +13,11 @@
  * Symbol keys pass through unproxied (Vue/JS internals).
  * Array mutation methods (push, splice…) are NOT intercepted — call `updater` directly for those.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 export function makeDeepProxy<T extends object>(
   target: T,
   path: (string | number)[],
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   updater: (recipe: (draft: any) => void) => void,
 ): T {
   return new Proxy(target, {
@@ -41,7 +41,6 @@ export function makeDeepProxy<T extends object>(
       // would throw a TypeError in strict mode.
       if (typeof key === 'symbol') return true;
       updater(draft => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         let node: any = draft;
         for (const segment of path) node = node[segment];
         node[key] = value;

@@ -153,6 +153,7 @@ new WellRenderer(svgs, {
   theme: {
     lithology: { stroke: '#222222', strokeWidth: 1.5 },
     wellCase: { fill: '#f5f5f5', stroke: '#333333', strokeWidth: 2 },
+    reduction: { fill: '#f5f5f5', stroke: '#333333', strokeWidth: 2 },
   },
 });
 ```

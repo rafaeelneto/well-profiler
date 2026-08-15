@@ -1,7 +1,7 @@
 <script setup lang="ts">
-defineOptions({ inheritAttrs: false })
+defineOptions({ inheritAttrs: false });
 
-const { resolvedLocale } = useNumberFormat()
+const { resolvedLocale } = useNumberFormat();
 </script>
 
 <template>

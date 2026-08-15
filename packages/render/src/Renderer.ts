@@ -14,11 +14,15 @@ const d3 = { ...d3module, tip: d3tip };
 import {
   isWellEmpty,
   type Constructive,
+  type Reduction,
   type SurfaceCase,
   type Units,
   type Well,
 } from '@welldot/core';
-import { getProfileLastItemsDepths } from '@welldot/utils';
+import {
+  getProfileDiamValues,
+  getProfileLastItemsDepths,
+} from '@welldot/utils';
 import {
   ComponentsClassNames,
   DeepPartial,
@@ -196,16 +200,17 @@ export class WellRenderer {
       .append('g')
       .attr('class', this.classes.highlights.fracturesGroup);
 
-    construction
-      .append('g')
-      .attr('class', this.classes.constructionLabels.group);
     construction.append('g').attr('class', this.classes.cementPad.group);
     construction.append('g').attr('class', this.classes.boreHole.group);
     construction.append('g').attr('class', this.classes.surfaceCase.group);
     construction.append('g').attr('class', this.classes.holeFill.group);
     construction.append('g').attr('class', this.classes.wellCase.group);
     construction.append('g').attr('class', this.classes.wellScreen.group);
+    construction.append('g').attr('class', this.classes.reduction.group);
     construction.append('g').attr('class', this.classes.conflict.group);
+    construction
+      .append('g')
+      .attr('class', this.classes.constructionLabels.group);
     construction
       .append('g')
       .attr('class', this.classes.highlights.constructionGroup);
@@ -355,6 +360,7 @@ export class WellRenderer {
     const holeFillGroup = svg.select(`.${this.classes.holeFill.group}`);
     const wellCaseGroup = svg.select(`.${this.classes.wellCase.group}`);
     const wellScreenGroup = svg.select(`.${this.classes.wellScreen.group}`);
+    const reductionGroup = svg.select(`.${this.classes.reduction.group}`);
     const conflictGroup = svg.select(`.${this.classes.conflict.group}`);
     const constructionLabelsGroup = svg.select(
       `.${this.classes.constructionLabels.group}`,
@@ -476,6 +482,7 @@ export class WellRenderer {
       holeFillGroup,
       wellCaseGroup,
       wellScreenGroup,
+      reductionGroup,
       conflictGroup,
       highlightsGeologicGroup,
       highlightsConstructionGroup,
@@ -550,6 +557,26 @@ export class WellRenderer {
           g.selectAll('.surface-case-side')
             .attr('y1', y)
             .attr('y2', y + h);
+        });
+
+      // Reduction: recompute trapezoid points (x is zoom-invariant, only y moves)
+      const maxXValsReduction = getProfileDiamValues(constructionData);
+      const xScaleReduction = d3
+        .scaleLinear()
+        .domain([0, d3.max(maxXValsReduction) || 0])
+        .range([0, POCO_WIDTH]);
+
+      reductionGroup
+        .selectAll(`polygon.${this.classes.reduction.item}`)
+        .attr('points', (d: unknown) => {
+          const r = d as Reduction;
+          const yTop = transform.applyY(spanY(r));
+          const yBot = yTop + transform.k * spanH(r);
+          const xTopLeft = (POCO_CENTER - xScaleReduction(r.diam_from)) / 2;
+          const xTopRight = (POCO_CENTER + xScaleReduction(r.diam_from)) / 2;
+          const xBotLeft = (POCO_CENTER - xScaleReduction(r.diam_to)) / 2;
+          const xBotRight = (POCO_CENTER + xScaleReduction(r.diam_to)) / 2;
+          return `${xTopLeft},${yTop} ${xTopRight},${yTop} ${xBotRight},${yBot} ${xBotLeft},${yBot}`;
         });
 
       // Fractures: recompute transform so rotation pivot tracks the scaled depth

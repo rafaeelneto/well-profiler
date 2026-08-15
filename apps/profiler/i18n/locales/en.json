@@ -183,6 +183,7 @@
     "open": "Open",
     "share": "Share",
     "exportPdf": "Export PDF",
+    "exportPdfComingSoon": "Coming soon",
     "back": "Back",
     "menu": "Menu",
     "importSiagas": "Import from SIAGAS",
@@ -237,6 +238,21 @@
       "accept": "Clear",
       "reject": "Cancel"
     },
+    "confirmLoadShared": {
+      "header": "Load shared profile",
+      "message": "You have unsaved changes. Loading this shared profile will discard them.",
+      "accept": "Load anyway",
+      "reject": "Cancel"
+    },
+    "shareNotFound": {
+      "header": "Link not found",
+      "message": "This link is invalid or has expired.",
+      "accept": "OK"
+    },
+    "shareLoadFailed": {
+      "header": "Couldn't load shared profile",
+      "message": "Something went wrong loading this link. Please try again."
+    },
     "shareDialog": {
       "title": "Share well",
       "copyJson": "Copy JSON",
@@ -244,7 +260,13 @@
       "downloadWell": "Download .well",
       "downloadWellDesc": "Download the profile as a file",
       "copyLink": "Copy as link",
-      "copyLinkDesc": "Share a deep link to this well",
+      "copyLinkDesc": "Share a deep link to this well, valid for 30 days",
+      "copyLinkError": "Failed to generate link. Try again.",
+      "copyLinkTooLarge": "This profile is too large to share.",
+      "copyLinkAgain": "Copy link again",
+      "linkReady": "Link copied to clipboard",
+      "linkCopied": "Copied!",
+      "linkValidUntil": "Valid until {date}",
       "comingSoon": "Soon"
     },
     "exportPdfDialog": {
@@ -259,7 +281,7 @@
       "deleteItem": "Remove",
       "pageBreaks": {
         "title": "Page breaks",
-        "split": "Split profile into 80 m pages"
+        "split": "Split profile into pages"
       },
       "metadataSection": {
         "title": "Metadata section",
@@ -297,7 +319,18 @@
       "preview": {
         "label": "Preview",
         "pages": "pages",
-        "fit": "Fit"
+        "fit": "Fit",
+        "empty": "Load a profile to see the PDF preview",
+        "error": "Couldn't generate the PDF preview. Try again or adjust the export options."
+      },
+      "content": {
+        "total": "Total",
+        "volumeTotal": "Total volume",
+        "slot": "Slot",
+        "footerTagline": "See this profile\nonline",
+        "footerTaglineFallback": "See more wells\nonline",
+        "footerValidUntilLabel": "Expires",
+        "page": "Page"
       }
     },
     "zoom": {

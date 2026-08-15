@@ -10,5 +10,14 @@ export default [
       },
     },
   },
-  { ignores: ['dist/**', 'node_modules/**', '.turbo/**', 'tsup.config.ts', 'eslint.config.js'] },
+  {
+    ignores: [
+      'dist/**',
+      'node_modules/**',
+      '.turbo/**',
+      'tsup.config.ts',
+      'vitest.config.ts',
+      'eslint.config.js',
+    ],
+  },
 ];

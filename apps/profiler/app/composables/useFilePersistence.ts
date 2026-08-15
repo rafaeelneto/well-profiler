@@ -56,7 +56,10 @@ export function useFilePersistence() {
     }
   }
 
-  async function saveAs(json: string, suggestedName?: string): Promise<boolean> {
+  async function saveAs(
+    json: string,
+    suggestedName?: string,
+  ): Promise<boolean> {
     if (import.meta.server) return false;
     if (!hasFileSystemAccess) {
       _downloadFallback(json, suggestedName ?? 'well.well');
@@ -82,7 +85,15 @@ export function useFilePersistence() {
     _fileHandle.value = null;
   }
 
-  return { hasFileSystemAccess, hasFileHandle, fileName, open, save, saveAs, clearHandle };
+  return {
+    hasFileSystemAccess,
+    hasFileHandle,
+    fileName,
+    open,
+    save,
+    saveAs,
+    clearHandle,
+  };
 }
 
 function _downloadFallback(json: string, name: string): void {

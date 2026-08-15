@@ -3,26 +3,41 @@ import * as pdfMake from 'pdfmake/build/pdfmake';
 import * as pdfFonts from 'pdfmake/build/vfs_fonts';
 import { encode as encodeQR } from 'uqr';
 
-import { SvgInfo, infoType } from '../../../src_old/types/profile2Export.types';
+import { infoType, SvgInfo } from '../../../src_old/types/profile2Export.types';
 
 import { Profile } from '@/src/types/profile.types';
 
 import { DiameterUnits, LengthUnits, useUIStore } from '@/src/store/ui.store';
 import { formatCoord } from '@/src/utils/coords.utils';
 
+import { deserializeWell, serializeWell } from '@welldot/core';
 import { DeepPartial, RenderConfig, WellRenderer } from '@welldot/render';
 import { calculateHoleFillVolume } from '@welldot/utils';
 import {
   A4_SVG_HEIGHT,
+  buildSvgProfiles,
   PDF_CONTENT_WIDTH,
   PDF_MARGINS,
-  buildSvgProfiles,
 } from './buildSvgProfiles';
 
 const numberFormater = new Intl.NumberFormat('pt-BR', {
   minimumFractionDigits: 2,
   maximumFractionDigits: 2,
 });
+
+// `pdfmake`'s createPdf().getDataUrl() is Promise-based in the npm package
+// (v0.3.x, used in local dev) but callback-based in the custom build copied
+// over production builds (v0.2.x — see well-profiler-deploy.yml). Support
+// both regardless of which build is active at runtime.
+const getPdfDataUrl = (pdfDoc: {
+  getDataUrl: (cb: (dataUrl: string) => void) => void | Promise<string>;
+}): Promise<string> =>
+  new Promise((resolve, reject) => {
+    const maybePromise = pdfDoc.getDataUrl(resolve);
+    if (maybePromise && typeof maybePromise.then === 'function') {
+      maybePromise.then(resolve, reject);
+    }
+  });
 
 // @ts-ignore
 // eslint-disable-next-line no-import-assign
@@ -83,6 +98,68 @@ function qrSvg(text: string, sizePt: number): string {
     )
     .join('');
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${sizePt} ${sizePt}"><rect width="${sizePt}" height="${sizePt}" fill="white"/><g fill="#222">${rects}</g></svg>`;
+}
+
+function buildFooterContent(breakPages = true) {
+  return {
+    // ...(breakPages ? { text: '  ' } : {}),
+    stack: [
+      {
+        canvas: [
+          {
+            type: 'line',
+            x1: 0,
+            y1: 0,
+            x2: 535,
+            y2: 0,
+            lineWidth: 0.5,
+            lineColor: '#cccccc',
+          },
+        ],
+        margin: [0, 0, 0, 5],
+      },
+      {
+        columns: [
+          {
+            text: `.well v1 - ${format(new Date(), 'yyyy-MM-dd')}`,
+            font: 'jetBrainsMono',
+            fontSize: 7,
+            color: '#404040',
+            width: 84,
+            alignment: 'left',
+          },
+          {
+            text: 'wellprofiler.com',
+            font: 'spaceGrotesk',
+            fontSize: 7,
+            color: '#494949',
+            alignment: 'center',
+            width: '*',
+          },
+          {
+            columns: [
+              {
+                text: 'veja esse\nperfil online',
+                font: 'spaceGrotesk',
+                fontSize: 7,
+                color: '#494949',
+                alignment: 'right',
+                width: 46,
+              },
+              {
+                svg: qrSvg('https://wellprofiler.com', 34),
+                width: 34,
+                height: 34,
+              },
+            ],
+            columnGap: 4,
+            width: 84,
+          },
+        ],
+      },
+    ],
+    margin: breakPages ? [30, 10, 30, 10] : [0, 0, 0, 0],
+  };
 }
 
 function base64ToBlob(base64String, contentType = '') {
@@ -151,6 +228,12 @@ export const exportPdfProfile = async (
   metadataPosition: 'before' | 'after' | null = null,
   renderConfig?: DeepPartial<RenderConfig>,
 ) => {
+  // Legacy lithology entries may still use the v1 `fgdc_texture` field
+  // instead of the v2 `texture: { code, vocabulary }` shape @welldot/render
+  // requires. Round-trip through the core serializer to normalize.
+  const normalizedProfile =
+    (deserializeWell(serializeWell(profile)) as Profile | null) ?? profile;
+
   const { coord_format: coordFormat } = useUIStore.getState();
   const fmtLen = (m: number) =>
     lengthUnits === 'ft'
@@ -255,9 +338,15 @@ export const exportPdfProfile = async (
       width: 595.28,
       height: breakPages ? 841.89 : 'auto',
     },
-    pageMargins: [MARGIN, MARGIN + 10, MARGIN, MARGIN + 30],
+    pageMargins: [
+      MARGIN,
+      MARGIN + (breakPages ? 10 : 0),
+      MARGIN,
+      MARGIN + (breakPages ? 30 : 0),
+    ],
+
     header: (currentPage: any, _pageCount: any, pageSize: any) => {
-      // you can apply any logic and return any valid pdfmake element
+      console.log('header', { currentPage, pageSize });
       return [
         {
           stack: [
@@ -330,64 +419,8 @@ export const exportPdfProfile = async (
       ];
     },
     footer: (_currentPage: any, _pageCount: any) => {
-      return {
-        stack: [
-          {
-            canvas: [
-              {
-                type: 'line',
-                x1: 0,
-                y1: 0,
-                x2: 535,
-                y2: 0,
-                lineWidth: 0.5,
-                lineColor: '#cccccc',
-              },
-            ],
-            margin: [0, 0, 0, 5],
-          },
-          {
-            columns: [
-              {
-                text: `.well v1 - ${format(new Date(), 'yyyy-MM-dd')}`,
-                font: 'jetBrainsMono',
-                fontSize: 7,
-                color: '#404040',
-                width: 84,
-                alignment: 'left',
-              },
-              {
-                text: 'wellprofiler.com',
-                font: 'spaceGrotesk',
-                fontSize: 7,
-                color: '#494949',
-                alignment: 'center',
-                width: '*',
-              },
-              {
-                columns: [
-                  {
-                    text: 'veja esse\nperfil online',
-                    font: 'spaceGrotesk',
-                    fontSize: 7,
-                    color: '#494949',
-                    alignment: 'right',
-                    width: 46,
-                  },
-                  {
-                    svg: qrSvg('https://wellprofiler.com', 34),
-                    width: 34,
-                    height: 34,
-                  },
-                ],
-                columnGap: 4,
-                width: 84,
-              },
-            ],
-          },
-        ],
-        margin: [30, 10, 30, 10],
-      };
+      if (!breakPages) return undefined;
+      return buildFooterContent();
     },
     styles: {
       title: {
@@ -468,7 +501,7 @@ export const exportPdfProfile = async (
   const firstPageAvailableHeight = A4_SVG_HEIGHT - firstPageUsedHeight;
 
   const svgs: SvgInfo[] = buildSvgProfiles({
-    profile,
+    profile: normalizedProfile,
     breakPages: breakPages,
     zoomLevel,
     firstPageAvailableHeight,
@@ -529,8 +562,8 @@ export const exportPdfProfile = async (
   (svgDraftContainer ?? document.body).appendChild(legendSvgEl);
 
   await renderer.prepareSvg();
-  renderer.draw(profile);
-  renderer.renderLegend(`#${legendId}`, profile);
+  renderer.draw(normalizedProfile);
+  renderer.renderLegend(`#${legendId}`, normalizedProfile);
 
   await new Promise(resolve => requestAnimationFrame(resolve));
 
@@ -914,6 +947,10 @@ export const exportPdfProfile = async (
     });
   }
 
+  if (!breakPages) {
+    content.push(buildFooterContent(false));
+  }
+
   docDefinition.content = content;
 
   // @ts-ignore
@@ -946,9 +983,10 @@ export const innerRenderPdf = async (
     renderConfig,
   );
 
+  // console.log('Generated docDefinition for printing:', docDefinition);
+
   try {
-    const pdfDocGenerator = pdfMake.createPdf(docDefinition);
-    const pdfDataUrl = await pdfMake.createPdf(docDefinition).getDataUrl();
+    const pdfDataUrl = await getPdfDataUrl(pdfMake.createPdf(docDefinition));
 
     const blobUrl = base64ToBlob(pdfDataUrl, 'application/pdf');
     if (iframeId) {
@@ -985,6 +1023,7 @@ export const printPdf = async (
     metadataPosition,
     renderConfig,
   );
+  // console.log('Generated docDefinition for printing:', docDefinition);
   // @ts-ignore
   const pdfDocGenerator = pdfMake.createPdf(docDefinition);
   pdfDocGenerator.print();
