@@ -194,7 +194,7 @@ async function recopyLink() {
           </Button>
         </div>
 
-        <!-- eslint-disable vue/no-v-html -- SVG we render ourselves from our own share URL via uqr, not user-supplied markup -->
+        <!-- eslint-disable vue/no-v-html -->
         <div
           class="p-2 bg-surface-0 rounded-md [&_svg]:size-32"
           v-html="qrSvg"
