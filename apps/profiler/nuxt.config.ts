@@ -187,6 +187,11 @@ export default defineNuxtConfig({
     },
   },
 
+  routeRules: {
+    '/': { swr: 60 },
+    '/editor': { swr: 60 },
+  },
+
   nitro: {
     preset: 'cloudflare-module',
     experimental: { tasks: true },
