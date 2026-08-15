@@ -2,8 +2,34 @@
   "name": "welldot",
   "compatibility_date": "2025-09-15",
   "compatibility_flags": ["nodejs_compat"],
-  "pages_build_output_dir": "./dist",
+  "main": "./.output/server/index.mjs",
+  "assets": {
+    "directory": "./.output/public",
+    "binding": "ASSETS"
+  },
+  "triggers": {
+    "crons": ["0 3 * * *"]
+  },
   "observability": {
     "enabled": true
+  },
+  "ratelimits": [
+    {
+      "name": "SHARE_RATE_LIMITER",
+      "namespace_id": "1001",
+      "simple": { "limit": 10, "period": 60 }
+    }
+  ],
+  "env": {
+    "preview": {
+      "name": "preview-welldot",
+      "ratelimits": [
+        {
+          "name": "SHARE_RATE_LIMITER",
+          "namespace_id": "1001",
+          "simple": { "limit": 10, "period": 60 }
+        }
+      ]
+    }
   }
 }

@@ -20,6 +20,10 @@ function baseWell(overrides: Partial<Well> = {}): Well {
   };
 }
 
+// Deliberately not welldot.org-shaped, so a passing assertion can't be
+// explained by a hardcoded fallback matching this value by coincidence.
+const BASE_URL = 'https://example.test';
+
 const baseOptions: PdfExportOptions = {
   header: 'My Well Profile',
   breakPages: false,
@@ -30,6 +34,7 @@ const baseOptions: PdfExportOptions = {
   lengthUnit: 'm',
   diameterUnit: 'mm',
   coordinateFormat: 'DD',
+  baseUrl: BASE_URL,
 };
 
 const t = (key: string) => key;
@@ -162,7 +167,7 @@ describe('buildDocDefinition', () => {
 
   it('appends the footer inline only when breakPages is false', () => {
     const single = buildDocDefinition(baseWell(), [svg], null, baseOptions, t);
-    expect(JSON.stringify(single.content)).toContain('welldot.org');
+    expect(JSON.stringify(single.content)).toContain('example.test');
 
     const paged = buildDocDefinition(
       baseWell(),
@@ -171,8 +176,28 @@ describe('buildDocDefinition', () => {
       { ...baseOptions, breakPages: true },
       t,
     );
-    expect(JSON.stringify(paged.content)).not.toContain('welldot.org');
+    expect(JSON.stringify(paged.content)).not.toContain('example.test');
     expect(paged.footer?.(1, 2)).toBeDefined();
     expect(paged.footer && !paged.footer(1, 2)).toBeFalsy();
+  });
+
+  it('threads options.shareUrl through to the footer QR', () => {
+    const withoutShareUrl = buildDocDefinition(
+      baseWell(),
+      [svg],
+      null,
+      baseOptions,
+      t,
+    );
+    const withShareUrl = buildDocDefinition(
+      baseWell(),
+      [svg],
+      null,
+      { ...baseOptions, shareUrl: `${BASE_URL}/s/abc123` },
+      t,
+    );
+    expect(JSON.stringify(withShareUrl.content)).not.toEqual(
+      JSON.stringify(withoutShareUrl.content),
+    );
   });
 });

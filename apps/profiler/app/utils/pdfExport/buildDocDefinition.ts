@@ -85,8 +85,14 @@ export function buildDocDefinition(
 
   content.push(...buildSectionTables(well, options, t));
 
+  const footerShare = {
+    baseUrl: options.baseUrl,
+    shareUrl: options.shareUrl,
+    shareExpiresAt: options.shareExpiresAt,
+  };
+
   if (!breakPages) {
-    content.push(buildFooterContent(false, t));
+    content.push(buildFooterContent(false, t, footerShare));
   }
 
   return {
@@ -164,7 +170,7 @@ export function buildDocDefinition(
       },
     ],
     footer: (_currentPage, _pageCount) =>
-      breakPages ? buildFooterContent(true, t) : undefined,
+      breakPages ? buildFooterContent(true, t, footerShare) : undefined,
     styles: {
       title: {
         bold: true,

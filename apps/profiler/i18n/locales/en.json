@@ -238,6 +238,21 @@
       "accept": "Clear",
       "reject": "Cancel"
     },
+    "confirmLoadShared": {
+      "header": "Load shared profile",
+      "message": "You have unsaved changes. Loading this shared profile will discard them.",
+      "accept": "Load anyway",
+      "reject": "Cancel"
+    },
+    "shareNotFound": {
+      "header": "Link not found",
+      "message": "This link is invalid or has expired.",
+      "accept": "OK"
+    },
+    "shareLoadFailed": {
+      "header": "Couldn't load shared profile",
+      "message": "Something went wrong loading this link. Please try again."
+    },
     "shareDialog": {
       "title": "Share well",
       "copyJson": "Copy JSON",
@@ -245,7 +260,13 @@
       "downloadWell": "Download .well",
       "downloadWellDesc": "Download the profile as a file",
       "copyLink": "Copy as link",
-      "copyLinkDesc": "Share a deep link to this well",
+      "copyLinkDesc": "Share a deep link to this well, valid for 30 days",
+      "copyLinkError": "Failed to generate link. Try again.",
+      "copyLinkTooLarge": "This profile is too large to share.",
+      "copyLinkAgain": "Copy link again",
+      "linkReady": "Link copied to clipboard",
+      "linkCopied": "Copied!",
+      "linkValidUntil": "Valid until {date}",
       "comingSoon": "Soon"
     },
     "exportPdfDialog": {
@@ -307,6 +328,8 @@
         "volumeTotal": "Total volume",
         "slot": "Slot",
         "footerTagline": "See this profile\nonline",
+        "footerTaglineFallback": "See more wells\nonline",
+        "footerValidUntilLabel": "Expires",
         "page": "Page"
       }
     },

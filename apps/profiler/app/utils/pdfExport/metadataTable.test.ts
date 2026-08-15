@@ -30,6 +30,7 @@ const baseOptions: PdfExportOptions = {
   lengthUnit: 'm',
   diameterUnit: 'mm',
   coordinateFormat: 'DD',
+  baseUrl: 'https://example.test',
 };
 
 const t = (key: string) => key;

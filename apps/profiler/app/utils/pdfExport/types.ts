@@ -21,6 +21,12 @@ export interface PdfExportOptions {
   lengthUnit: LengthUnits;
   diameterUnit: DiameterUnits;
   coordinateFormat: CoordinateFormat;
+  /** Origin the PDF is being generated from (e.g. `useRequestURL().origin`). Footer QR/branding fall back to this when there's no `shareUrl`. */
+  baseUrl: string;
+  /** Share link for the exported profile. Falls back to the `baseUrl` QR when absent. */
+  shareUrl?: string;
+  /** ISO timestamp the share expires at; shown as "valid until" next to the footer QR when `shareUrl` is set. */
+  shareExpiresAt?: string;
 }
 
 export interface RenderedSvg {

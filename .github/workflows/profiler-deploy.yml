@@ -37,11 +37,33 @@ jobs:
 
       - name: Build
         run: pnpm turbo build --filter=profiler
+        env:
+          NODE_OPTIONS: --max-old-space-size=8192
 
-      - name: Deploy to Cloudflare Pages
+      - name: Set deploy environment
+        id: env
+        run: |
+          if [ "${{ github.ref_name }}" = "preview" ]; then
+            echo "wrangler_env=--env preview" >> "$GITHUB_OUTPUT"
+          else
+            echo "wrangler_env=" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Deploy to Cloudflare Workers
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: apps/profiler
-          command: pages deploy ./dist --project-name=welldot --branch=${{ github.ref_name }}
+          command: deploy ${{ steps.env.outputs.wrangler_env }}
+
+      - name: Sync Supabase secrets to Cloudflare Workers
+        working-directory: apps/profiler
+        run: |
+          printf '%s' "$SUPABASE_URL" | npx wrangler secret put SUPABASE_URL ${{ steps.env.outputs.wrangler_env }}
+          printf '%s' "$SUPABASE_SECRET_KEY" | npx wrangler secret put SUPABASE_SECRET_KEY ${{ steps.env.outputs.wrangler_env }}
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}

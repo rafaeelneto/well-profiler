@@ -238,6 +238,21 @@
       "accept": "Limpar",
       "reject": "Cancelar"
     },
+    "confirmLoadShared": {
+      "header": "Carregar perfil compartilhado",
+      "message": "Há alterações não salvas. Carregar este perfil compartilhado irá descartá-las.",
+      "accept": "Carregar mesmo assim",
+      "reject": "Cancelar"
+    },
+    "shareNotFound": {
+      "header": "Link não encontrado",
+      "message": "Este link é inválido ou expirou.",
+      "accept": "OK"
+    },
+    "shareLoadFailed": {
+      "header": "Não foi possível carregar o perfil compartilhado",
+      "message": "Algo deu errado ao carregar este link. Tente novamente."
+    },
     "shareDialog": {
       "title": "Compartilhar poço",
       "copyJson": "Copiar JSON",
@@ -245,7 +260,13 @@
       "downloadWell": "Baixar .well",
       "downloadWellDesc": "Baixar o perfil como arquivo",
       "copyLink": "Copiar como link",
-      "copyLinkDesc": "Compartilhar um link direto para este poço",
+      "copyLinkDesc": "Compartilhar um link direto para este poço, válido por 30 dias",
+      "copyLinkError": "Falha ao gerar o link. Tente novamente.",
+      "copyLinkTooLarge": "Este perfil é grande demais para compartilhar.",
+      "copyLinkAgain": "Copiar link novamente",
+      "linkReady": "Link copiado para a área de transferência",
+      "linkCopied": "Copiado!",
+      "linkValidUntil": "Válido até {date}",
       "comingSoon": "Em breve"
     },
     "exportPdfDialog": {
@@ -307,6 +328,8 @@
         "volumeTotal": "Volume total",
         "slot": "Ranhura",
         "footerTagline": "veja esse perfil\nonline",
+        "footerTaglineFallback": "veja mais poços\nonline",
+        "footerValidUntilLabel": "Expira",
         "page": "Página"
       }
     },
