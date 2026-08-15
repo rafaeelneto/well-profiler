@@ -534,6 +534,15 @@
         "kindScreen": "Screen",
         "total": "Total cased length"
       },
+      "reduction": {
+        "title": "Reduction",
+        "tag": "REDUCER",
+        "type": "Type",
+        "diamFrom": "Diam. From",
+        "diamTo": "Diam. To",
+        "from": "From",
+        "to": "To"
+      },
       "holeFill": {
         "title": "Annular Space",
         "tag": "GROUTING · PRE-FILTER",

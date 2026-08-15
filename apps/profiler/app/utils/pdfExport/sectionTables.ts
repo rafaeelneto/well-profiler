@@ -247,6 +247,60 @@ function buildWellCaseSection(
   });
 }
 
+function buildReductionSection(
+  well: Well,
+  options: PdfExportOptions,
+  t: PdfTranslate,
+): Content | null {
+  const items = well.reduction;
+  if (items.length === 0) return null;
+
+  const { formatLength, formatDiameter, diameterUnit, lengthUnit } =
+    createPdfFormatters(options);
+  const body: TableCell[][] = [
+    [
+      headerCell(t('editor.construction.reduction.type')),
+      headerCell(
+        `${t('editor.construction.reduction.diamFrom')} (${diameterUnit})`,
+        true,
+      ),
+      headerCell(
+        `${t('editor.construction.reduction.diamTo')} (${diameterUnit})`,
+        true,
+      ),
+      headerCell(
+        `${t('editor.construction.reduction.from')} (${lengthUnit})`,
+        true,
+      ),
+      headerCell(
+        `${t('editor.construction.reduction.to')} (${lengthUnit})`,
+        true,
+      ),
+    ],
+  ];
+
+  for (const item of items) {
+    body.push([
+      item.type,
+      rightCell(formatDiameter(item.diam_from)),
+      rightCell(formatDiameter(item.diam_to)),
+      rightCell(formatLength(item.from)),
+      rightCell(formatLength(item.to)),
+    ]);
+  }
+
+  return sectionWrapper(t('editor.construction.reduction.title'), {
+    layout: 'lightHorizontalLines',
+    table: {
+      widths: ['*', 'auto', 'auto', 'auto', 'auto'],
+      headerRows: 1,
+      dontBreakRows: true,
+      keepWithHeaderRows: true,
+      body,
+    },
+  });
+}
+
 function buildWellScreenSection(
   well: Well,
   options: PdfExportOptions,
@@ -325,8 +379,8 @@ function buildWellScreenSection(
 
 /**
  * Builds the per-feature summary tables (cement pad, bore hole, surface
- * casing, hole fill w/ gravel-pack volume, casing, screen), each omitted
- * when its corresponding `well.*` array/field is empty.
+ * casing, hole fill w/ gravel-pack volume, casing, reduction, screen), each
+ * omitted when its corresponding `well.*` array/field is empty.
  */
 export function buildSectionTables(
   well: Well,
@@ -349,6 +403,7 @@ export function buildSectionTables(
     ),
     buildHoleFillSection(well, options, t),
     buildWellCaseSection(well, options, t),
+    buildReductionSection(well, options, t),
     buildWellScreenSection(well, options, t),
   ];
 

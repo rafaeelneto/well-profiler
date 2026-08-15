@@ -119,6 +119,30 @@ const casingGroups = computed<SummaryGroup[]>(() => {
   ];
 });
 
+// ─── Redução (reduction) ────────────────────────────────────────────────────
+
+const reductionColumns = computed<SummaryColumn[]>(() => [
+  { key: 'type', label: t('editor.summary.reduction.type'), lead: true },
+  { key: 'diamFrom', label: t('editor.summary.reduction.diamFrom') },
+  { key: 'diamTo', label: t('editor.summary.reduction.diamTo') },
+  { key: 'from', label: t('editor.summary.reduction.from'), align: 'right' },
+  { key: 'to', label: t('editor.summary.reduction.to'), align: 'right' },
+]);
+
+const reductionGroups = computed<SummaryGroup[]>(() => {
+  const items = profileStore.well.reduction;
+  const rows = items.map(r => ({
+    cells: {
+      type: r.type || '—',
+      diamFrom: formatDiameter(r.diam_from),
+      diamTo: formatDiameter(r.diam_to),
+      from: formatLength(r.from),
+      to: formatLength(r.to),
+    },
+  }));
+  return [{ rows }];
+});
+
 // ─── Espaço Anular (hole_fill) ──────────────────────────────────────────────
 
 const holeFillColumns = computed<SummaryColumn[]>(() => [
@@ -260,6 +284,18 @@ const lithologyGroups = computed<SummaryGroup[]>(() => {
         </span>
       </div>
       <SummaryTable :columns="casingColumns" :groups="casingGroups" />
+    </section>
+
+    <section class="flex flex-col gap-5">
+      <div class="flex items-baseline justify-between">
+        <h3 class="font-serif text-[22px] font-medium tracking-[-0.015em] text-content-0 m-0">
+          {{ t('editor.summary.reduction.title') }}
+        </h3>
+        <span class="font-mono text-[10px] tracking-[0.08em] uppercase text-content-500">
+          {{ t('editor.summary.reduction.tag') }}
+        </span>
+      </div>
+      <SummaryTable :columns="reductionColumns" :groups="reductionGroups" />
     </section>
 
     <section class="flex flex-col gap-5">

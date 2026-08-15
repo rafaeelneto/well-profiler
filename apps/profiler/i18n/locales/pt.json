@@ -534,6 +534,15 @@
         "kindScreen": "Filtro",
         "total": "Total revestido"
       },
+      "reduction": {
+        "title": "Redução",
+        "tag": "REDUÇÃO",
+        "type": "Tipo",
+        "diamFrom": "Diâm. De",
+        "diamTo": "Diâm. Até",
+        "from": "De",
+        "to": "Até"
+      },
       "holeFill": {
         "title": "Espaço Anular",
         "tag": "CIMENTAÇÃO · PRÉ-FILTRO",
