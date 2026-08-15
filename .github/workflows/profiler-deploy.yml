@@ -37,6 +37,8 @@ jobs:
 
       - name: Build
         run: pnpm turbo build --filter=profiler
+        env:
+          NODE_OPTIONS: --max-old-space-size=8192
 
       - name: Set deploy environment
         id: env
