@@ -7,12 +7,17 @@ export interface FormatNumberOptions {
   maximumFractionDigits?: number;
   /** String appended after the number, separated by a space (e.g. 'm', 'ft', 'm³'). */
   suffix?: string;
-  /** BCP 47 locale string (e.g. 'en-US', 'pt-BR'). Defaults to 'en-US'. */
+  /** BCP 47 locale string (e.g. 'en-US', 'pt-BR', or bare 'en'/'pt'). Defaults to 'en-US'. */
   locale?: string;
   /** Returned for null, undefined, or NaN inputs. Defaults to '—'. */
   fallback?: string;
 }
 
+/**
+ * Formats a number for display with locale-aware decimal/grouping separators
+ * and bounded fraction digits, so floating-point noise (e.g. `39.99998784`)
+ * never reaches the UI unrounded.
+ */
 export function formatNumber(
   value: number | null | undefined,
   options?: FormatNumberOptions,

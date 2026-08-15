@@ -1,5 +1,5 @@
 import { metersToFeet, mmToInches } from '@welldot/core';
-import { formatNumber } from '~/utils/formatNumber';
+import { formatNumber } from '@welldot/utils';
 import { resolveDiameterUnitLabel } from '~/utils/unitLabel';
 import type { PdfExportOptions } from './types';
 

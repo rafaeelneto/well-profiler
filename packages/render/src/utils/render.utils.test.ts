@@ -889,8 +889,9 @@ describe('populateTooltips', () => {
         length: 1.5,
       };
       const html = getHtmlFn('cementPad')(null, pad);
-      expect(html).toContain('0.2');
-      expect(html).toContain('1.5');
+      // LOCALE is 'pt', so the decimal separator is a comma, not a period.
+      expect(html).toContain('0,2');
+      expect(html).toContain('1,5');
     });
 
     it('cave tooltip includes from and to depths', () => {

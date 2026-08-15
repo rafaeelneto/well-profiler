@@ -51,7 +51,7 @@ export function drawAnnotationLabels(
     data.lithology
       .filter(d => d.to <= ctx.depthTo)
       .forEach(d => {
-        const text = `${formatLength(d.to, ctx.units.length)}${getLengthUnit(ctx.units.length)}`;
+        const text = `${formatLength(d.to, ctx.units.length, ctx.locale)}${getLengthUnit(ctx.units.length)}`;
         const approxW = text.length * (st.fontSize * 0.52) + s.depthTipPadX * 2;
         const y = ctx.yScale(d.to) - s.depthTipHeight / 2;
 
@@ -95,7 +95,7 @@ export function drawAnnotationLabels(
           baseY: ctx.yScale(Math.max(d.from, ctx.depthFrom)),
           originX: ctx.geoXRight,
           originY: ctx.yScale(Math.max(d.from, ctx.depthFrom)),
-          header: `${formatLength(d.from, ctx.units.length)}–${formatLength(d.to, ctx.units.length)}${getLengthUnit(ctx.units.length)}`,
+          header: `${formatLength(d.from, ctx.units.length, ctx.locale)}–${formatLength(d.to, ctx.units.length, ctx.locale)}${getLengthUnit(ctx.units.length)}`,
           description: d.description || '',
         });
       });
@@ -114,7 +114,7 @@ export function drawAnnotationLabels(
           baseY: ctx.yScale(d.depth),
           originX: ctx.pocoCenterX,
           originY: ctx.yScale(d.depth),
-          header: `${formatLength(d.depth, ctx.units.length)}${getLengthUnit(ctx.units.length)} · ${typeLabel}`,
+          header: `${formatLength(d.depth, ctx.units.length, ctx.locale)}${getLengthUnit(ctx.units.length)} · ${typeLabel}`,
           description: d.description || '',
         });
       });
@@ -133,7 +133,7 @@ export function drawAnnotationLabels(
           baseY: ctx.yScale(Math.max(d.from, ctx.depthFrom)),
           originX: ctx.geoXRight,
           originY: ctx.yScale(Math.max(midDepth, ctx.depthFrom)),
-          header: `${formatLength(d.from, ctx.units.length)}–${formatLength(d.to, ctx.units.length)}${getLengthUnit(ctx.units.length)} · ${typeLabel}`,
+          header: `${formatLength(d.from, ctx.units.length, ctx.locale)}–${formatLength(d.to, ctx.units.length, ctx.locale)}${getLengthUnit(ctx.units.length)} · ${typeLabel}`,
           description: d.description || '',
         });
       });

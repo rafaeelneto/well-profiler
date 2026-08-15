@@ -10,9 +10,11 @@ Provides computational helpers for analyzing `.well` profiles: depth calculation
 
 ```
 src/
-  index.ts              ← re-exports everything from profile.utils.ts
-  profile.utils.ts      ← all exported functions
+  index.ts              ← re-exports everything from profile.utils.ts and number.utils.ts
+  profile.utils.ts      ← profile analysis functions
   profile.utils.test.ts ← Vitest tests (comprehensive coverage)
+  number.utils.ts       ← formatNumber (locale-aware number display formatting)
+  number.utils.test.ts  ← Vitest tests (comprehensive coverage)
 ```
 
 ## Key exports
@@ -33,8 +35,9 @@ src/
 | `calculateHydraulicConductivity(transmissivity, aquiferThickness)` | Hydraulic conductivity K (m/h)                                        |
 | `getLatestStaticLevel(well)`                                       | Most recent static water level from hydrodynamic events               |
 | `getLatestAquiferAnalysisField(well, field)`                       | Most recent value of a named field from aquifer_analysis              |
+| `formatNumber(value, options)`                                     | Locale-aware number display formatting (rounding, separators, suffix) |
 
-All functions operate on `Well` / `Constructive` types from `@welldot/core`. No side effects, no state.
+All profile-analysis functions operate on `Well` / `Constructive` types from `@welldot/core`. `formatNumber` is a pure display-formatting helper (no `.well` types involved) shared by `@welldot/render` and the apps so depth/diameter values are never shown as raw, unrounded floats. No side effects, no state.
 
 ## Commands
 

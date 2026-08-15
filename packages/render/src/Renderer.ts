@@ -20,6 +20,7 @@ import {
   type Well,
 } from '@welldot/core';
 import {
+  formatNumber,
   getProfileDiamValues,
   getProfileLastItemsDepths,
 } from '@welldot/utils';
@@ -443,11 +444,13 @@ export class WellRenderer {
       .domain([depthFrom * depthFactor, depthTo * depthFactor])
       .range([0, contentHeight]);
 
-    const yAxis = d3
-      .axisLeft(yScaleAxis)
-      .tickFormat(
-        (d: d3module.NumberValue) => `${d}${getLengthUnit(this.units.length)}`,
-      );
+    const yAxis = d3.axisLeft(yScaleAxis).tickFormat(
+      (d: d3module.NumberValue) =>
+        `${formatNumber(Number(d), {
+          maximumFractionDigits: this.units.length === 'ft' ? 1 : 2,
+          locale: this.locale,
+        })}${getLengthUnit(this.units.length)}`,
+    );
 
     const gY = svg.select<SVGGElement>(`.${this.classes.yAxis}`).call(yAxis);
 

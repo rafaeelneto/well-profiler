@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { formatNumber } from './formatNumber';
+import { formatNumber } from './number.utils';
 
 describe('formatNumber', () => {
   describe('fallback handling', () => {
@@ -29,6 +29,15 @@ describe('formatNumber', () => {
 
     it('formats with comma separator in pt-BR', () => {
       expect(formatNumber(3.28, { fractionDigits: 2, locale: 'pt-BR' })).toBe(
+        '3,28',
+      );
+    });
+
+    it('accepts bare language tags (en, pt) equivalently', () => {
+      expect(formatNumber(3.28, { fractionDigits: 2, locale: 'en' })).toBe(
+        '3.28',
+      );
+      expect(formatNumber(3.28, { fractionDigits: 2, locale: 'pt' })).toBe(
         '3,28',
       );
     });
@@ -65,6 +74,21 @@ describe('formatNumber', () => {
       expect(
         formatNumber(1.23456, { maximumFractionDigits: 2, locale: 'en-US' }),
       ).toBe('1.23');
+    });
+
+    it('rounds long floating-point noise away (e.g. depth drift)', () => {
+      expect(
+        formatNumber(39.99998784, {
+          maximumFractionDigits: 2,
+          locale: 'en-US',
+        }),
+      ).toBe('40');
+      expect(
+        formatNumber(13.99998784, {
+          maximumFractionDigits: 2,
+          locale: 'pt-BR',
+        }),
+      ).toBe('14');
     });
   });
 

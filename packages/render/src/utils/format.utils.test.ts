@@ -43,24 +43,40 @@ describe('resolveRenderLabel', () => {
   });
 });
 
-describe('formatLength / getLengthUnit (regression, unchanged)', () => {
+describe('formatLength / getLengthUnit', () => {
   it('passes through meters unconverted', () => {
-    expect(formatLength(7, 'm')).toBe('7');
+    expect(formatLength(7, 'm', 'pt')).toBe('7');
     expect(getLengthUnit('m')).toBe('m');
   });
 
-  it('converts to feet with one decimal', () => {
-    expect(formatLength(7, 'ft')).toBe((7 * 3.28084).toFixed(1));
+  it('converts to feet, rounded to at most one decimal', () => {
+    expect(formatLength(7, 'ft', 'en')).toBe('23');
+    expect(formatLength(7.01, 'ft', 'en')).toBe('23');
     expect(getLengthUnit('ft')).toBe('ft');
+  });
+
+  it('rounds long floating-point noise instead of printing it raw', () => {
+    expect(formatLength(39.99998784, 'm', 'en')).toBe('40');
+  });
+
+  it('uses the locale decimal separator', () => {
+    expect(formatLength(7.5, 'm', 'en')).toBe('7.5');
+    expect(formatLength(7.5, 'm', 'pt')).toBe('7,5');
   });
 });
 
-describe('formatDiameter (regression, unchanged)', () => {
+describe('formatDiameter', () => {
   it('passes through mm unconverted', () => {
-    expect(formatDiameter(350, 'mm')).toBe('350');
+    expect(formatDiameter(350, 'mm', 'pt')).toBe('350');
   });
 
   it('converts to inches with two decimals', () => {
-    expect(formatDiameter(350, 'inches')).toBe((350 * 0.0393701).toFixed(2));
+    expect(formatDiameter(350, 'inches', 'en')).toBe(
+      (350 * 0.0393701).toFixed(2),
+    );
+  });
+
+  it('rounds long floating-point noise instead of printing it raw', () => {
+    expect(formatDiameter(48.99998784, 'mm', 'en')).toBe('49');
   });
 });
