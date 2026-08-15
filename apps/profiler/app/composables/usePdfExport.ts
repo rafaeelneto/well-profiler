@@ -25,7 +25,7 @@ import type {
  * appended to it.
  */
 export function usePdfExport(draftContainer: Ref<HTMLElement | null>) {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const profileStore = useProfileStore();
   const pdfExportStore = usePdfExportStore();
   const uiStore = useUiStore();
@@ -88,6 +88,7 @@ export function usePdfExport(draftContainer: Ref<HTMLElement | null>) {
         lengthUnit: uiStore.lengthUnit,
         diameterUnit: uiStore.diameterUnit,
         coordinateFormat: uiStore.coordinateFormat,
+        locale: locale.value,
         baseUrl,
         shareUrl: share ? `${baseUrl}/editor?share=${share.id}` : undefined,
         shareExpiresAt: share?.expiresAt,
@@ -103,6 +104,7 @@ export function usePdfExport(draftContainer: Ref<HTMLElement | null>) {
         scale: options.scale,
         firstPageAvailableHeight,
         units: { length: options.lengthUnit, diameter: options.diameterUnit },
+        locale: options.locale,
       });
       if (token !== renderToken) return null;
 

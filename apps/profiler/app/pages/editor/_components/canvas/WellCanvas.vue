@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import type { DeepPartial, WellTheme } from '@welldot/render';
-import { WellRenderer, INTERACTIVE_RENDER_CONFIG } from '@welldot/render';
+import { WellRenderer, INTERACTIVE_RENDER_CONFIG, applyRenderLocale } from '@welldot/render';
 import { isWellEmpty } from '@welldot/core';
 import { useDark } from '@vueuse/core';
 import ZoomControls from './ZoomControls.vue';
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const profileStore = useProfileStore();
 const uiStore = useUiStore();
 
@@ -82,7 +82,8 @@ async function initRenderer() {
     [{ selector: `#${svgId}`, width, height, margins: MARGINS }],
     {
       units: { length: uiStore.lengthUnit, diameter: uiStore.diameterUnit },
-      renderConfig: INTERACTIVE_RENDER_CONFIG,
+      locale: locale.value as 'en' | 'pt',
+      renderConfig: applyRenderLocale(INTERACTIVE_RENDER_CONFIG, locale.value === 'en' ? 'en' : 'pt'),
       onZoom: scale => {
         currentScale.value = scale;
       },
@@ -105,6 +106,7 @@ function redraw() {
   if (!profile || isWellEmpty(profile)) return;
   wellRenderer.draw(profile, {
     units: { length: uiStore.lengthUnit, diameter: uiStore.diameterUnit },
+    locale: locale.value as 'en' | 'pt',
   });
 }
 
@@ -132,7 +134,10 @@ function fit() {
 
 watch(well, redraw);
 watch([() => uiStore.lengthUnit, () => uiStore.diameterUnit], redraw);
-watch(isDark, () => reinitAndRedraw());
+// Locale changes need a full reinit, not just redraw() — renderConfig's
+// translated strings (construction labels, tooltip text, legend, type words)
+// are resolved once via applyRenderLocale() in initRenderer(), not per-draw().
+watch([isDark, () => locale.value], () => reinitAndRedraw());
 
 // ── Mount lifecycle ──────────────────────────────────────────────────────
 

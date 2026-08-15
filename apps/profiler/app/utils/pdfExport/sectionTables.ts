@@ -1,5 +1,6 @@
 import type { Well } from '@welldot/core';
 import { calculateHoleFillVolume } from '@welldot/utils';
+import { resolveDiameterUnitLabel } from '~/utils/unitLabel';
 import { createPdfFormatters } from './formatters';
 import type { Content, TableCell, TableLayout } from './pdfmake.types';
 import type { PdfExportOptions, PdfTranslate } from './types';
@@ -76,7 +77,7 @@ function buildIntervalSection(
   const body: TableCell[][] = [
     [
       headerCell(
-        `${t('editor.construction.boreHole.diameter')} (${diameterUnit})`,
+        `${t('editor.construction.boreHole.diameter')} (${resolveDiameterUnitLabel(diameterUnit, options.locale)})`,
       ),
       headerCell(
         `${t('editor.construction.boreHole.from')} (${lengthUnit})`,
@@ -127,7 +128,7 @@ function buildHoleFillSection(
     [
       headerCell(t('editor.construction.holeFill.description')),
       headerCell(
-        `${t('editor.construction.holeFill.diameter')} (${diameterUnit})`,
+        `${t('editor.construction.holeFill.diameter')} (${resolveDiameterUnitLabel(diameterUnit, options.locale)})`,
         true,
       ),
       headerCell(
@@ -191,7 +192,7 @@ function buildWellCaseSection(
     [
       headerCell(t('editor.construction.wellCase.type')),
       headerCell(
-        `${t('editor.construction.wellCase.diameter')} (${diameterUnit})`,
+        `${t('editor.construction.wellCase.diameter')} (${resolveDiameterUnitLabel(diameterUnit, options.locale)})`,
         true,
       ),
       headerCell(
@@ -261,11 +262,11 @@ function buildReductionSection(
     [
       headerCell(t('editor.construction.reduction.type')),
       headerCell(
-        `${t('editor.construction.reduction.diamFrom')} (${diameterUnit})`,
+        `${t('editor.construction.reduction.diamFrom')} (${resolveDiameterUnitLabel(diameterUnit, options.locale)})`,
         true,
       ),
       headerCell(
-        `${t('editor.construction.reduction.diamTo')} (${diameterUnit})`,
+        `${t('editor.construction.reduction.diamTo')} (${resolveDiameterUnitLabel(diameterUnit, options.locale)})`,
         true,
       ),
       headerCell(
@@ -315,11 +316,11 @@ function buildWellScreenSection(
     [
       headerCell(t('editor.construction.wellScreen.type')),
       headerCell(
-        `${t('editor.construction.wellScreen.diameter')} (${diameterUnit})`,
+        `${t('editor.construction.wellScreen.diameter')} (${resolveDiameterUnitLabel(diameterUnit, options.locale)})`,
         true,
       ),
       headerCell(
-        `${t('editor.exportPdfDialog.content.slot')} (${diameterUnit})`,
+        `${t('editor.exportPdfDialog.content.slot')} (${resolveDiameterUnitLabel(diameterUnit, options.locale)})`,
         true,
       ),
       headerCell(

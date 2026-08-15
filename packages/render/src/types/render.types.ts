@@ -275,6 +275,71 @@ export type TooltipKey =
   | 'cementPad'
   | 'cave';
 
+/**
+ * A paired-locale string for renderer-drawn text, or a bare string when the
+ * value doesn't vary by locale. `pt` is the required fallback locale in the
+ * object form; `en` is optional. Resolve via `resolveRenderLabel()` — never
+ * read `.pt`/`.en` directly, since the value may be a plain string.
+ */
+export type RenderLocalizedText = { pt: string; en?: string } | string;
+
+/**
+ * Shape shared by `RenderConfig.tooltipLabels` (resolved, `T = string`) and
+ * `RenderLabelPack.tooltipLabels` (authoring, `T = RenderLocalizedText`) —
+ * defined once via the generic so the two shapes can't drift apart.
+ */
+export type TooltipLabels<T = string> = {
+  common: {
+    from: T;
+    to: T;
+    description: T;
+    diameter: T;
+    type: T;
+  };
+  geology: { title: T; geologicUnit: T; aquiferUnit: T };
+  hole: { title: T };
+  surfaceCase: { title: T };
+  holeFill: { title: T };
+  wellCase: { title: T };
+  wellScreen: { title: T; slot: T };
+  reduction: { title: T };
+  conflict: { title: T };
+  fracture: {
+    title: T;
+    titleSwarm: T;
+    depth: T;
+    waterIntake: T;
+    dip: T;
+    azimuth: T;
+  };
+  cementPad: { title: T; thickness: T; width: T; length: T };
+  cave: { title: T; waterIntake: T };
+};
+
+/**
+ * Canonical, paired-locale source for every string `@welldot/render` draws.
+ * `RENDER_LABELS` (in `configs/render.configs.ts`) is the sole instance;
+ * `applyRenderLocale()` resolves it down to a plain-string `DeepPartial<RenderConfig>`.
+ */
+export type RenderLabelPack = {
+  constructionLabels: {
+    wellCasePrefix: RenderLocalizedText;
+    wellScreenPrefix: RenderLocalizedText;
+    wellScreenSlotPrefix: RenderLocalizedText;
+  };
+  legend: {
+    title: RenderLocalizedText;
+    labels: Record<keyof LegendRenderConfig['labels'], RenderLocalizedText>;
+  };
+  tooltipLabels: TooltipLabels<RenderLocalizedText>;
+  typeLabels: {
+    fracture: RenderLocalizedText;
+    fractureWater: RenderLocalizedText;
+    cave: RenderLocalizedText;
+    caveWater: RenderLocalizedText;
+  };
+};
+
 /** Full rendering behaviour configuration. Use `INTERACTIVE_RENDER_CONFIG` or `STATIC_RENDER_CONFIG` as a starting point. */
 export type RenderConfig = {
   zoom: boolean;
@@ -287,6 +352,8 @@ export type RenderConfig = {
   minZoomScale?: number;
   /** undefined = show all; false or [] = show none; array = show only listed keys */
   tooltips?: TooltipKey[] | false;
+  /** Resolved (plain-string) tooltip titles/field labels — see `TooltipLabels`. */
+  tooltipLabels: TooltipLabels;
   animation: {
     duration: number;
     ease: (t: number) => number;
@@ -347,7 +414,9 @@ export type RenderConfig = {
     lithology?: boolean | ('depth' | 'description' | 'dividers')[];
     typeLabels?: {
       fracture?: string;
+      fractureWater?: string;
       cave?: string;
+      caveWater?: string;
     };
     depthTipHeight: number;
     depthTipPadX: number;
@@ -501,6 +570,7 @@ export type DrawContext = {
   classes: ComponentsClassNames;
   textures: WellTextures;
   units: Units;
+  locale: 'en' | 'pt';
   /** Full (unfiltered) construction profile — for x-scale domain. */
   constructionData: Constructive;
   groups: DrawGroups;

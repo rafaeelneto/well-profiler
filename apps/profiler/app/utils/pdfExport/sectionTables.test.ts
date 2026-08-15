@@ -30,6 +30,7 @@ const baseOptions: PdfExportOptions = {
   lengthUnit: 'm',
   diameterUnit: 'mm',
   coordinateFormat: 'DD',
+  locale: 'en',
   baseUrl: 'https://example.test',
 };
 
@@ -113,6 +114,6 @@ describe('buildSectionTables', () => {
     );
     const serialized = JSON.stringify(sections);
     expect(serialized).toContain('ft');
-    expect(serialized).toContain('inches');
+    expect(serialized).toContain('in.');
   });
 });

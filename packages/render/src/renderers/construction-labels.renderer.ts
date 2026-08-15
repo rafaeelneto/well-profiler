@@ -22,7 +22,7 @@ export function drawConstructionLabels(
   const clc = ctx.renderConfig.constructionLabels;
   const clct = ctx.theme.constructionLabels;
   const fmtD = (mm: number) => formatDiameter(mm, ctx.units.diameter);
-  const dUnit = getDiameterUnit(ctx.units.diameter);
+  const dUnit = getDiameterUnit(ctx.units.diameter, ctx.locale);
 
   const maxXValues = getProfileDiamValues(ctx.constructionData);
   const xScale = d3

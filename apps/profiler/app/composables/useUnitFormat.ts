@@ -1,3 +1,5 @@
+import type { DiameterUnits } from '@welldot/core';
+
 export function useUnitFormat() {
   const {
     toDisplay: lengthToDisplay,
@@ -10,6 +12,7 @@ export function useUnitFormat() {
     unit: diameterUnit,
   } = useUnitDisplay('diameter');
   const { formatNumber } = useNumberFormat();
+  const { locale } = useI18n();
 
   function formatLength(
     value: number | null | undefined,
@@ -29,7 +32,10 @@ export function useUnitFormat() {
     if (value == null) return '—';
     return formatNumber(diamToDisplay(value), {
       fractionDigits,
-      suffix: diameterUnit.value,
+      suffix: resolveDiameterUnitLabel(
+        diameterUnit.value as DiameterUnits,
+        locale.value,
+      ),
     });
   }
 

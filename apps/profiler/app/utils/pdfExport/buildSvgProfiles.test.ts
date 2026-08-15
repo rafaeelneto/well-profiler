@@ -16,6 +16,7 @@ import {
 const drawnSelectors: string[] = [];
 vi.mock('@welldot/render', () => ({
   STATIC_RENDER_CONFIG: { legend: { height: 44, maxWidth: 700 } },
+  applyRenderLocale: (config: unknown) => config,
   WellRenderer: class {
     private svgs: { selector: string }[];
     constructor(svgs: { selector: string }[]) {
@@ -102,6 +103,7 @@ describe('buildSvgProfiles', () => {
       breakPages: false,
       scale: 500,
       units: { length: 'm', diameter: 'mm' },
+      locale: 'pt',
     });
 
     expect(result.svgs).toHaveLength(1);
@@ -119,11 +121,13 @@ describe('buildSvgProfiles', () => {
       breakPages: false,
       scale: 500,
       units: { length: 'm', diameter: 'mm' },
+      locale: 'pt',
     });
     await buildSvgProfiles(makeWell(), container, {
       breakPages: false,
       scale: 500,
       units: { length: 'm', diameter: 'mm' },
+      locale: 'pt',
     });
 
     expect(container.querySelectorAll('svg')).toHaveLength(2);
