@@ -478,10 +478,11 @@
       "freeNotes": "Notas livres",
       "metadata": "Metadados",
       "wellTypes": {
-        "deepTubular": "Tubular profundo",
-        "shallowTubular": "Tubular raso",
+        "tubular": "Tubular",
         "artesian": "Artesiano",
-        "handDug": "Escavado"
+        "handDug": "Cacimba / poço escavado",
+        "horizontal": "Horizontal",
+        "infiltrationGallery": "Galeria de infiltração"
       },
       "wellIds": {
         "title": "Identificadores do Poço",

@@ -478,10 +478,11 @@
       "freeNotes": "Free notes",
       "metadata": "Metadata",
       "wellTypes": {
-        "deepTubular": "Deep tubular",
-        "shallowTubular": "Shallow tubular",
+        "tubular": "Tubular",
         "artesian": "Artesian",
-        "handDug": "Hand dug"
+        "handDug": "Hand dug",
+        "horizontal": "Horizontal",
+        "infiltrationGallery": "Infiltration gallery"
       },
       "wellIds": {
         "title": "Well Identifiers",
