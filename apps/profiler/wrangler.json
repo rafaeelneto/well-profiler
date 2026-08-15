@@ -12,5 +12,24 @@
   },
   "observability": {
     "enabled": true
+  },
+  "ratelimits": [
+    {
+      "name": "SHARE_RATE_LIMITER",
+      "namespace_id": "1001",
+      "simple": { "limit": 10, "period": 60 }
+    }
+  ],
+  "env": {
+    "preview": {
+      "name": "preview-welldot",
+      "ratelimits": [
+        {
+          "name": "SHARE_RATE_LIMITER",
+          "namespace_id": "1001",
+          "simple": { "limit": 10, "period": 60 }
+        }
+      ]
+    }
   }
 }

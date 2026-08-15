@@ -1,7 +1,23 @@
 /* eslint-disable camelcase -- `well_json` matches the Supabase column name */
 import { deserializeWell, isWellEmpty, serializeWell } from '@welldot/core';
+import type { RateLimiterBinding } from '../utils/rateLimit';
 
 export default defineEventHandler(async event => {
+  const rateLimiter = getRuntimeBinding<RateLimiterBinding>(
+    event,
+    'SHARE_RATE_LIMITER',
+  );
+  if (rateLimiter) {
+    const clientIp = getHeader(event, 'cf-connecting-ip') ?? 'unknown';
+    const { success } = await rateLimiter.limit({ key: clientIp });
+    if (!success) {
+      throw createError({
+        statusCode: 429,
+        statusMessage: 'Too many share requests — please try again shortly.',
+      });
+    }
+  }
+
   const body = await readBody<{ well?: unknown }>(event);
 
   let validated;
