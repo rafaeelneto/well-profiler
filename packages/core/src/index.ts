@@ -82,7 +82,7 @@ export {
   serializeWell,
 } from './utils/well.utils';
 
-export type { TextureCode, Texture as TextureType } from './types/textures';
+export type { TextureCode, TextureOption } from './types/textures';
 export { FGDC_TEXTURES_OPTIONS } from './utils/fgdc.textures';
 
 // Backward-compat alias for app migration

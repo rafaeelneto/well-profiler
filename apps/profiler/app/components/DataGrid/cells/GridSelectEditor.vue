@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import Select from 'primevue/select';
+import { useGridOverlayFocusGuard } from '../composables/useGridOverlayFocusGuard';
 
 const props = defineProps<{
   val?: unknown;
@@ -9,6 +10,7 @@ const props = defineProps<{
 }>();
 
 const selectRef = ref<InstanceType<typeof Select> | null>(null);
+const overlayFocusGuard = useGridOverlayFocusGuard();
 
 onMounted(() => nextTick(() => selectRef.value?.show()));
 
@@ -38,6 +40,7 @@ function onKeydown(e: KeyboardEvent) {
       root: 'well-cell-select',
       label: 'flex items-center',
       option: 'text-sm p-1',
+      overlay: () => overlayFocusGuard,
     }"
     @update:model-value="onSelect"
     @keydown="onKeydown"

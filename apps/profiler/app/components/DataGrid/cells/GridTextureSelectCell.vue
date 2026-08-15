@@ -1,14 +1,14 @@
 <script setup lang="ts">
-defineProps<{
+const props = defineProps<{
   value?: unknown;
 }>();
+
+const typedValue = computed(() => props.value as string | number | undefined);
 </script>
 
 <template>
   <span class="flex h-full w-full items-center gap-1.5">
-    <template v-if="value != null">
-      <TextureThumbnail :code="(value as string | number)" :size="28" />
-      <span class="font-mono text-[11px]">{{ value }}</span>
-    </template>
+    <TextureThumbnail :code="typedValue" :size="28" />
+    <span class="font-mono text-[11px]">{{ typedValue }}</span>
   </span>
 </template>
