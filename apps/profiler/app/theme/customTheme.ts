@@ -901,9 +901,9 @@ const MyPreset = definePreset(Aura, {
       colorScheme: {
         light: {
           root: {
-            filledBackground: '{surface.100}',
-            filledHoverBackground: '{surface.200}',
-            filledFocusBackground: '{surface.100}',
+            filledBackground: '{surface.0}',
+            filledHoverBackground: '{surface.100}',
+            filledFocusBackground: '{surface.50}',
           },
         },
         dark: {
