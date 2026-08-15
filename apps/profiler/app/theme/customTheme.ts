@@ -915,6 +915,92 @@ const MyPreset = definePreset(Aura, {
         },
       },
     },
+    listbox: {
+      root: {
+        borderRadius: '0.75rem',
+      },
+      colorScheme: {
+        light: {
+          root: {
+            background: '{surface.0}',
+            borderColor: '{surface.200}',
+            invalidBorderColor: '{error.500}',
+            color: '{content.0}',
+            shadow:
+              '0 8px 32px -4px rgba(14,30,51,0.14), 0 1px 6px -1px rgba(14,30,51,0.07)',
+          },
+          option: {
+            color: '{content.0}',
+            focusBackground: '{surface.100}',
+            focusColor: '{content.0}',
+            selectedBackground: '{primary.50}',
+            selectedColor: '{primary.700}',
+            selectedFocusBackground: '{primary.100}',
+            selectedFocusColor: '{primary.700}',
+            stripedBackground: '{surface.50}',
+          },
+          optionGroup: {
+            background: 'transparent',
+            color: '{content.400}',
+          },
+          checkmark: {
+            color: '{primary.600}',
+          },
+        },
+        dark: {
+          root: {
+            background: '{surface.100}',
+            borderColor: '{surface.200}',
+            invalidBorderColor: '{error.500}',
+            color: '{content.0}',
+            shadow:
+              '0 8px 32px -4px rgba(0,0,0,0.45), 0 1px 6px -1px rgba(0,0,0,0.28)',
+          },
+          option: {
+            color: '{content.0}',
+            focusBackground: '{surface.200}',
+            focusColor: '{content.0}',
+            selectedBackground: '{surface.200}',
+            selectedColor: '{content.0}',
+            selectedFocusBackground: '{surface.300}',
+            selectedFocusColor: '{content.0}',
+            stripedBackground: '{surface.200}',
+          },
+          optionGroup: {
+            background: 'transparent',
+            color: '{content.400}',
+          },
+          checkmark: {
+            color: '{primary.400}',
+          },
+        },
+      },
+    },
+    popover: {
+      root: {
+        borderRadius: '0.75rem',
+      },
+      colorScheme: {
+        light: {
+          root: {
+            background: '{surface.0}',
+            borderColor: '{surface.200}',
+            color: '{content.0}',
+            shadow:
+              '0 8px 32px -4px rgba(14,30,51,0.14), 0 1px 6px -1px rgba(14,30,51,0.07)',
+          },
+        },
+        dark: {
+          root: {
+            background: '{surface.100}',
+            borderColor: '{surface.200}',
+            color: '{content.0}',
+            shadow:
+              '0 8px 32px -4px rgba(0,0,0,0.45), 0 1px 6px -1px rgba(0,0,0,0.28)',
+          },
+        },
+      },
+    },
   } as ComponentsDesignTokens,
 } as Preset);
 
