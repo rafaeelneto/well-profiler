@@ -69,4 +69,26 @@ describe('buildMetadataTable', () => {
     const table = buildMetadataTable(well, baseOptions, t);
     expect(JSON.stringify(table)).toContain('05/03/2024');
   });
+
+  it('includes well identifiers, marking the primary one', () => {
+    const well = baseWell({
+      well_id: [
+        { authority: 'SIAGAS', id: 'SP-0042819', primary: true },
+        { authority: 'ANA', id: '12345' },
+        { authority: '', id: 'no-authority' },
+      ],
+    });
+    const serialized = JSON.stringify(buildMetadataTable(well, baseOptions, t));
+    expect(serialized).toContain('SIAGAS (editor.general.wellIds.primary)');
+    expect(serialized).toContain('SP-0042819');
+    expect(serialized).toContain('ANA');
+    expect(serialized).toContain('12345');
+    expect(serialized).toContain('editor.general.wellIds.id');
+    expect(serialized).toContain('no-authority');
+  });
+
+  it('skips well_id entries with no id', () => {
+    const well = baseWell({ well_id: [{ authority: 'SIAGAS', id: '' }] });
+    expect(buildMetadataTable(well, baseOptions, t)).toBeNull();
+  });
 });

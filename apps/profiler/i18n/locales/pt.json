@@ -568,7 +568,7 @@
     "historico": {
       "tag": "Histórico · Poço",
       "logs": {
-        "title": "History Logs",
+        "title": "Registro de Histórico",
         "tag": "REGISTRO",
         "empty": "Nenhum evento registrado",
         "noResults": "Nenhum registro corresponde à pesquisa",

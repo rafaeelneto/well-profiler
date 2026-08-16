@@ -1,16 +1,22 @@
 import type { Well } from '@welldot/core';
 import logoSvg from '~/assets/icons/logo.svg?raw';
 import { buildFooterContent } from './footer';
+import { buildHistoryLogSection } from './historyLogTable';
+import { buildHydrodynamicEventsSection } from './hydrodynamicEventsTable';
 import { buildMetadataTable, packLabelValueRows } from './metadataTable';
-import type { Content, TDocumentDefinition } from './pdfmake.types';
-import { buildSectionTables } from './sectionTables';
+import type {
+  Content,
+  ContentTable,
+  TDocumentDefinition,
+} from './pdfmake.types';
+import { buildSectionTables, withTableTitle } from './sectionTables';
 import type { PdfExportOptions, PdfTranslate, RenderedSvg } from './types';
 
 const PAGE_WIDTH = 595.28;
 const PAGE_HEIGHT = 841.89;
 const MARGIN = 30;
 
-function infoTable(items: { label: string; value: string }[]): Content {
+function infoTable(items: { label: string; value: string }[]): ContentTable {
   return {
     layout: 'noBorders',
     table: {
@@ -44,8 +50,9 @@ export function buildDocDefinition(
   const beforeMetadataTable =
     metadataPosition === 'before' ? buildMetadataTable(well, options, t) : null;
   if (beforeMetadataTable) {
-    content.push({ text: t('editor.general.generalInfo'), style: 'title' });
-    content.push(beforeMetadataTable);
+    content.push(
+      withTableTitle(t('editor.general.generalInfo'), beforeMetadataTable),
+    );
   }
 
   svgs.forEach((svg, index) => {
@@ -67,23 +74,29 @@ export function buildDocDefinition(
   }
 
   if (endInfo.length > 0) {
-    content.push({ text: ' ' });
-    content.push({
-      text: t('editor.exportPdfDialog.finalInfo.title'),
-      style: 'title',
-    });
-    content.push(infoTable(endInfo));
+    content.push(
+      withTableTitle(
+        t('editor.exportPdfDialog.finalInfo.title'),
+        infoTable(endInfo),
+      ),
+    );
   }
 
   const afterMetadataTable =
     metadataPosition === 'after' ? buildMetadataTable(well, options, t) : null;
   if (afterMetadataTable) {
-    content.push({ text: ' ' });
-    content.push({ text: t('editor.general.generalInfo'), style: 'title' });
-    content.push(afterMetadataTable);
+    content.push(
+      withTableTitle(t('editor.general.generalInfo'), afterMetadataTable),
+    );
   }
 
   content.push(...buildSectionTables(well, options, t));
+
+  const hydrodynamicSection = buildHydrodynamicEventsSection(well, options, t);
+  if (hydrodynamicSection) content.push(hydrodynamicSection);
+
+  const historySection = buildHistoryLogSection(well, options, t);
+  if (historySection) content.push(historySection);
 
   const footerShare = {
     baseUrl: options.baseUrl,

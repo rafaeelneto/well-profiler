@@ -2,32 +2,81 @@ import type { Well } from '@welldot/core';
 import { calculateHoleFillVolume } from '@welldot/utils';
 import { resolveDiameterUnitLabel } from '~/utils/unitLabel';
 import { createPdfFormatters } from './formatters';
-import type { Content, TableCell, TableLayout } from './pdfmake.types';
+import type {
+  Content,
+  ContentTable,
+  TableCell,
+  TableLayout,
+} from './pdfmake.types';
 import type { PdfExportOptions, PdfTranslate } from './types';
 
-const LIGHT_LINES_LAYOUT: TableLayout = {
+/** Shared `pdfmake` table styling/layout helpers, reused by other `pdfExport/*` section builders. */
+export const LIGHT_LINES_LAYOUT: TableLayout = {
   hLineWidth: (i, node) => (i === node.table.body.length || i === 0 ? 1 : 0),
   vLineWidth: () => 0,
   hLineColor: () => '#3d3d3d',
 };
 
-function headerCell(text: string, alignRight = false): TableCell {
+/**
+ * Short horizontal rule separating entries in a flowing (non-table) block
+ * listing. A factory, not a shared constant — `pdfmake` mutates canvas
+ * nodes in place during layout, so reusing one object instance at multiple
+ * positions in the content tree corrupts it after the first occurrence.
+ */
+export function buildEntryDivider(): Content {
+  return {
+    canvas: [
+      {
+        type: 'line',
+        x1: 0,
+        y1: 0,
+        x2: 535,
+        y2: 0,
+        lineWidth: 0.5,
+        lineColor: '#e5e5e5',
+      },
+    ],
+    margin: [0, 4, 0, 4],
+  };
+}
+
+export function headerCell(text: string, alignRight = false): TableCell {
   return {
     text,
     style: alignRight ? ['tableHeader', 'columnRight'] : 'tableHeader',
   };
 }
 
-function rightCell(text: string): TableCell {
+export function rightCell(text: string): TableCell {
   return { text, style: 'columnRight' };
 }
 
-function sectionTitle(text: string): Content {
-  return { text, style: 'title' };
-}
-
-function sectionWrapper(title: string, table: Content): Content {
-  return { stack: [{ text: ' ' }, sectionTitle(title), table] };
+/**
+ * Prepends a colSpan title row to a table's body and folds it into
+ * `headerRows`/`keepWithHeaderRows`, so the title repeats (with the rest of
+ * the header) on every page the table spans and stays bound to the first
+ * data row — the section heading can never render alone at a page bottom.
+ */
+export function withTableTitle(
+  title: string,
+  content: ContentTable,
+  keepWithFirstRows = 1,
+): ContentTable {
+  const columns = content.table.widths?.length ?? 1;
+  const titleRow: TableCell[] = [
+    { text: title, style: 'title', colSpan: columns },
+    ...Array(Math.max(0, columns - 1)).fill({}),
+  ];
+  return {
+    ...content,
+    table: {
+      ...content.table,
+      body: [titleRow, ...content.table.body],
+      headerRows: (content.table.headerRows ?? 0) + 1,
+      keepWithHeaderRows: keepWithFirstRows,
+    },
+    margin: [0, 16, 0, 0],
+  };
 }
 
 function buildCementPadSection(
@@ -58,7 +107,7 @@ function buildCementPadSection(
     ],
   ];
 
-  return sectionWrapper(t('editor.construction.wellhead.cementPad'), {
+  return withTableTitle(t('editor.construction.wellhead.cementPad'), {
     layout: LIGHT_LINES_LAYOUT,
     table: { widths: ['*', '*'], dontBreakRows: true, body },
   });
@@ -97,13 +146,12 @@ function buildIntervalSection(
     ]);
   }
 
-  return sectionWrapper(title, {
+  return withTableTitle(title, {
     layout: 'lightHorizontalLines',
     table: {
       widths: ['auto', 'auto', 'auto'],
       headerRows: 1,
       dontBreakRows: true,
-      keepWithHeaderRows: true,
       body,
     },
   });
@@ -166,13 +214,12 @@ function buildHoleFillSection(
     }
   });
 
-  return sectionWrapper(t('editor.construction.holeFill.title'), {
+  return withTableTitle(t('editor.construction.holeFill.title'), {
     layout: 'lightHorizontalLines',
     table: {
       widths: ['*', 'auto', 'auto', 'auto'],
       headerRows: 1,
       dontBreakRows: true,
-      keepWithHeaderRows: true,
       body,
     },
   });
@@ -236,13 +283,12 @@ function buildWellCaseSection(
     }
   });
 
-  return sectionWrapper(t('editor.construction.wellCase.title'), {
+  return withTableTitle(t('editor.construction.wellCase.title'), {
     layout: 'lightHorizontalLines',
     table: {
       widths: ['*', 'auto', 'auto', 'auto'],
       headerRows: 1,
       dontBreakRows: true,
-      keepWithHeaderRows: true,
       body,
     },
   });
@@ -290,13 +336,12 @@ function buildReductionSection(
     ]);
   }
 
-  return sectionWrapper(t('editor.construction.reduction.title'), {
+  return withTableTitle(t('editor.construction.reduction.title'), {
     layout: 'lightHorizontalLines',
     table: {
       widths: ['*', 'auto', 'auto', 'auto', 'auto'],
       headerRows: 1,
       dontBreakRows: true,
-      keepWithHeaderRows: true,
       body,
     },
   });
@@ -366,13 +411,12 @@ function buildWellScreenSection(
     }
   });
 
-  return sectionWrapper(t('editor.construction.wellScreen.title'), {
+  return withTableTitle(t('editor.construction.wellScreen.title'), {
     layout: 'lightHorizontalLines',
     table: {
       widths: ['*', 'auto', 'auto', 'auto', 'auto'],
       headerRows: 1,
       dontBreakRows: true,
-      keepWithHeaderRows: true,
       body,
     },
   });

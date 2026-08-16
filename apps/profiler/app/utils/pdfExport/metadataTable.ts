@@ -3,7 +3,7 @@ import { format, parseISO } from 'date-fns';
 import { formatCoord } from '~/utils/coords';
 import { resolveWellTypeLabel } from '~/utils/wellType';
 import { createPdfFormatters } from './formatters';
-import type { Content, TableCell } from './pdfmake.types';
+import type { ContentTable, TableCell } from './pdfmake.types';
 import type { PdfExportOptions, PdfTranslate } from './types';
 
 interface MetaField {
@@ -51,7 +51,7 @@ export function buildMetadataTable(
   well: Well,
   options: PdfExportOptions,
   t: PdfTranslate,
-): Content | null {
+): ContentTable | null {
   const { formatLength } = createPdfFormatters(options);
 
   const fields: MetaField[] = [];
@@ -88,6 +88,15 @@ export function buildMetadataTable(
       label: t('editor.general.elevation'),
       value: formatLength(well.location.elevation),
     });
+  }
+  for (const entry of well.well_id ?? []) {
+    if (!entry.id) continue;
+    const label = entry.authority
+      ? entry.primary
+        ? `${entry.authority} (${t('editor.general.wellIds.primary')})`
+        : entry.authority
+      : t('editor.general.wellIds.id');
+    fields.push({ label, value: entry.id });
   }
   const observations: MetaField | null = well.obs
     ? { label: t('editor.general.observationsLabel'), value: well.obs }
