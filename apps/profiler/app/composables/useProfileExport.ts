@@ -42,7 +42,10 @@ export function useProfileExport() {
     if (import.meta.server) return;
     const json = getRawJson();
     if (!json) return;
-    const ok = await persistence.save(json, _defaultName(store.getExportableWell()));
+    const ok = await persistence.save(
+      json,
+      _defaultName(store.getExportableWell()),
+    );
     if (ok) store.markClean();
   }
 

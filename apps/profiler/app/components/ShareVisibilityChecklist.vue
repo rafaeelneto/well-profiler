@@ -19,7 +19,9 @@ const shareVisibilityStore = useShareVisibilityStore();
           shareVisibilityStore.visibility[key] &&
           shareVisibilityStore.visibleCount === 1
         "
-        @update:model-value="value => shareVisibilityStore.setVisible(key, value)"
+        @update:model-value="
+          value => shareVisibilityStore.setVisible(key, value)
+        "
       />
       {{ t(`editor.shareVisibility.sections.${key}`) }}
     </label>

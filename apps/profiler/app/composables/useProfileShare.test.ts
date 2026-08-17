@@ -65,7 +65,10 @@ describe('useProfileShare', () => {
     const first = await getShare();
     const second = await getShare();
 
-    expect(first).toEqual({ id: 'abc123', expiresAt: '2026-09-14T00:00:00.000Z' });
+    expect(first).toEqual({
+      id: 'abc123',
+      expiresAt: '2026-09-14T00:00:00.000Z',
+    });
     expect(second).toEqual(first);
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
