@@ -1,16 +1,20 @@
 <script setup lang="ts">
-import { isWellEmpty } from '@welldot/core';
+import { isWellEmpty, redactWell } from '@welldot/core';
 import { format } from 'date-fns';
 import { renderSVG } from 'uqr';
 
 const visible = defineModel<boolean>({ default: false });
 
 const { t } = useI18n();
-const { download, getRawJson } = useProfileExport();
+const { download, getShareableJson } = useProfileExport();
 const { copyShareLink, isGenerating } = useProfileShare();
 const profileStore = useProfileStore();
+const shareVisibilityStore = useShareVisibilityStore();
 
-const isEmpty = computed(() => isWellEmpty(profileStore.well));
+const isEmpty = computed(() =>
+  isWellEmpty(redactWell(profileStore.well, shareVisibilityStore.visibility)),
+);
+const showVisibilityChecklist = ref(false);
 const linkErrorReason = ref<'tooLarge' | 'error' | null>(null);
 const shareUrl = ref<string | null>(null);
 const shareExpiresAt = ref<string | null>(null);
@@ -39,7 +43,7 @@ watch(visible, isVisible => {
 });
 
 async function copyJson() {
-  const json = getRawJson();
+  const json = getShareableJson();
   if (json) await copyToClipboard(json);
   visible.value = false;
 }
@@ -83,6 +87,29 @@ async function recopyLink() {
     :style="{ width: '24rem' }"
   >
     <div class="flex flex-col gap-2 pt-1">
+      <button
+        type="button"
+        class="flex items-center gap-1.5 self-start text-xs font-medium text-content-400 hover:text-content-0 transition-colors cursor-pointer"
+        @click="showVisibilityChecklist = !showVisibilityChecklist"
+      >
+        <Icon
+          :name="
+            showVisibilityChecklist
+              ? 'ph:caret-down-bold'
+              : 'ph:caret-right-bold'
+          "
+          class="size-3 shrink-0"
+        />
+        {{ t('editor.shareVisibility.title') }}
+      </button>
+
+      <div
+        v-if="showVisibilityChecklist"
+        class="p-3 rounded-lg border border-surface-200 mb-1"
+      >
+        <ShareVisibilityChecklist />
+      </div>
+
       <button
         class="flex items-center gap-4 p-3 rounded-lg border border-surface-200 hover:border-primary-300 hover:bg-surface-50 transition-colors text-left w-full cursor-pointer"
         @click="copyJson"
