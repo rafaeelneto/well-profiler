@@ -6,6 +6,7 @@ import {
   deserializeWell,
   isWellEmpty,
   profileToWell,
+  redactWell,
   serializeWell,
 } from './well.utils';
 
@@ -19,6 +20,7 @@ import type {
   HoleFill,
   Lithology,
   Reduction,
+  SectionVisibility,
   SurfaceCase,
   Well,
   WellCase,
@@ -1439,5 +1441,125 @@ describe('mergeWell defu behavior', () => {
       );
       expect(result!.bore_hole).toHaveLength(1);
     });
+  });
+});
+
+// ─── redactWell ──────────────────────────────────────────────────────────────
+
+describe('redactWell', () => {
+  const ALL_VISIBLE: SectionVisibility = {
+    general: true,
+    constructive: true,
+    geology: true,
+    hydrodynamic: true,
+    history: true,
+  };
+
+  function fullV2Well(): Well {
+    return {
+      ...fullWell(),
+      well_id: [{ authority: 'ANA', id: '12345' }],
+      lat: -1.4558,
+      lng: -48.5044,
+      elevation: 12,
+      hydrodynamic_events: [
+        { type: 'spot_measurement', date: '2023-06-15' },
+      ] as unknown as Well['hydrodynamic_events'],
+      aquifer_analysis: [
+        { date: '2023-06-15', transmissivity: 10 },
+      ] as unknown as Well['aquifer_analysis'],
+      history_logs: [
+        { date: '2023-06-15', category: 'inspection', severity: 'low' },
+      ] as unknown as Well['history_logs'],
+    };
+  }
+
+  it('returns a well deep-equal to the input when all sections are visible', () => {
+    const well = fullV2Well();
+    expect(redactWell(well, ALL_VISIBLE)).toEqual(well);
+  });
+
+  it('does not mutate the input well', () => {
+    const well = fullV2Well();
+    const snapshot = structuredClone(well);
+    redactWell(well, { ...ALL_VISIBLE, general: false });
+    expect(well).toEqual(snapshot);
+  });
+
+  it('clears general fields when general is hidden', () => {
+    const result = redactWell(fullV2Well(), {
+      ...ALL_VISIBLE,
+      general: false,
+    });
+    expect(result.well_id).toBeUndefined();
+    expect(result.location).toBeUndefined();
+    expect(result.well_type).toBeUndefined();
+    expect(result.name).toBeUndefined();
+    expect(result.well_driller).toBeUndefined();
+    expect(result.construction_date).toBeUndefined();
+    expect(result.obs).toBeUndefined();
+    expect(result.lat).toBeUndefined();
+    expect(result.lng).toBeUndefined();
+    expect(result.elevation).toBeUndefined();
+    // Untouched sections keep their data
+    expect(result.bore_hole).toHaveLength(1);
+    expect(result.lithology).toHaveLength(1);
+  });
+
+  it('empties constructive arrays and cement_pad when constructive is hidden', () => {
+    const result = redactWell(fullV2Well(), {
+      ...ALL_VISIBLE,
+      constructive: false,
+    });
+    expect(result.bore_hole).toEqual([]);
+    expect(result.well_case).toEqual([]);
+    expect(result.reduction).toEqual([]);
+    expect(result.well_screen).toEqual([]);
+    expect(result.surface_case).toEqual([]);
+    expect(result.hole_fill).toEqual([]);
+    expect(result.cement_pad).toBeUndefined();
+    // Untouched sections keep their data
+    expect(result.name).toBe('Well-01');
+    expect(result.lithology).toHaveLength(1);
+  });
+
+  it('empties geologic arrays when geology is hidden', () => {
+    const result = redactWell(fullV2Well(), { ...ALL_VISIBLE, geology: false });
+    expect(result.lithology).toEqual([]);
+    expect(result.fractures).toEqual([]);
+    expect(result.caves).toEqual([]);
+    expect(result.bore_hole).toHaveLength(1);
+  });
+
+  it('empties hydrodynamic arrays when hydrodynamic is hidden', () => {
+    const result = redactWell(fullV2Well(), {
+      ...ALL_VISIBLE,
+      hydrodynamic: false,
+    });
+    expect(result.hydrodynamic_events).toEqual([]);
+    expect(result.aquifer_analysis).toEqual([]);
+    expect(result.history_logs).toHaveLength(1);
+  });
+
+  it('empties history_logs when history is hidden', () => {
+    const result = redactWell(fullV2Well(), { ...ALL_VISIBLE, history: false });
+    expect(result.history_logs).toEqual([]);
+    expect(result.hydrodynamic_events).toHaveLength(1);
+  });
+
+  it('empties everything when all sections are hidden, preserving version', () => {
+    const result = redactWell(fullV2Well(), {
+      general: false,
+      constructive: false,
+      geology: false,
+      hydrodynamic: false,
+      history: false,
+    });
+    expect(result.version).toBe(2);
+    expect(result.name).toBeUndefined();
+    expect(result.bore_hole).toEqual([]);
+    expect(result.lithology).toEqual([]);
+    expect(result.hydrodynamic_events).toEqual([]);
+    expect(result.history_logs).toEqual([]);
   });
 });
