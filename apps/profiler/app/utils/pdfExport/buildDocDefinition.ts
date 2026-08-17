@@ -102,6 +102,7 @@ export function buildDocDefinition(
     baseUrl: options.baseUrl,
     shareUrl: options.shareUrl,
     shareExpiresAt: options.shareExpiresAt,
+    omit: options.omitShareBlock,
   };
 
   if (!breakPages) {
