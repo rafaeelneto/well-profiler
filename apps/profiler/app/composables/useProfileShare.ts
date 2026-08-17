@@ -2,6 +2,7 @@ import type { SectionVisibility } from '@welldot/core';
 import { isWellEmpty, redactWell, serializeWell } from '@welldot/core';
 import { ref } from 'vue';
 import { useProfileStore } from '~/stores/profile.store';
+import { useShareVisibilityStore } from '~/stores/shareVisibility.store';
 import { copyToClipboard } from '~/utils/clipboard';
 
 export interface ShareResult {

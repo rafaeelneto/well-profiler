@@ -11,6 +11,18 @@ vi.mock('~/stores/profile.store', () => ({
   useProfileStore: () => ({ getExportableWell }),
 }));
 
+vi.mock('~/stores/shareVisibility.store', () => ({
+  useShareVisibilityStore: () => ({
+    visibility: {
+      general: true,
+      constructive: true,
+      geology: true,
+      hydrodynamic: true,
+      history: true,
+    },
+  }),
+}));
+
 const nonEmptyWell = {
   version: 2,
   bore_hole: [{ top: 0, bottom: 1, diameter: 100 }],
