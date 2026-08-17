@@ -29,6 +29,8 @@ export interface PdfExportOptions {
   shareUrl?: string;
   /** ISO timestamp the share expires at; shown as "valid until" next to the footer QR when `shareUrl` is set. */
   shareExpiresAt?: string;
+  /** True when the PDF is redacting sections — tells the footer to drop the QR/tagline entirely instead of falling back to `baseUrl`. */
+  omitShareBlock?: boolean;
 }
 
 export interface RenderedSvg {
