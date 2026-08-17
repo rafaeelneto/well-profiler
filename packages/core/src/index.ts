@@ -22,6 +22,8 @@ export type {
   RecoveryOnlyEvent,
   RecoveryPhase,
   Reduction,
+  SectionKey,
+  SectionVisibility,
   SpotMeasurementEvent,
   StepDrawdownEvent,
   SurfaceCase,
@@ -79,6 +81,8 @@ export {
   deserializeWell,
   isWellEmpty,
   profileToWell,
+  redactWell,
+  SECTION_KEYS,
   serializeWell,
 } from './utils/well.utils';
 

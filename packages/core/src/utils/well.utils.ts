@@ -3,6 +3,8 @@ import {
   Geologic,
   Lithology,
   Location,
+  SectionKey,
+  SectionVisibility,
   Well,
 } from '../types/well.types';
 import { mergeWell } from '../validators/well.validators';
@@ -15,6 +17,15 @@ type RawJSON = Record<string, unknown>;
 
 const WELL_FORMAT_VERSION = 2;
 const INCHES_TO_MM = 25.4;
+
+/** Fixed display order for the 5 redactable sections of a well. */
+export const SECTION_KEYS: readonly SectionKey[] = [
+  'general',
+  'constructive',
+  'geology',
+  'hydrodynamic',
+  'history',
+];
 
 const EMPTY_WELL: Well = {
   version: 2,
@@ -282,6 +293,60 @@ export function isWellEmpty(well: Well | null | undefined): boolean {
     well.well_case?.length === 0 &&
     well.well_screen?.length === 0
   );
+}
+
+/**
+ * Returns a copy of `well` with hidden sections cleared: array fields become
+ * `[]` and optional fields become `undefined`, so the result stays a
+ * schema-valid {@link Well}. Sections marked visible in `visibility` are
+ * carried over unchanged. Never mutates `well`.
+ *
+ * @param well - The well profile to redact.
+ * @param visibility - Which of the 5 sections ({@link SECTION_KEYS}) to keep.
+ * @returns A new {@link Well} with hidden sections emptied.
+ */
+export function redactWell(well: Well, visibility: SectionVisibility): Well {
+  const redacted: Well = { ...well };
+
+  if (!visibility.general) {
+    delete redacted.well_id;
+    delete redacted.location;
+    delete redacted.well_type;
+    delete redacted.name;
+    delete redacted.well_driller;
+    delete redacted.construction_date;
+    delete redacted.obs;
+    delete redacted.lat;
+    delete redacted.lng;
+    delete redacted.elevation;
+  }
+
+  if (!visibility.constructive) {
+    redacted.bore_hole = [];
+    redacted.well_case = [];
+    redacted.reduction = [];
+    redacted.well_screen = [];
+    redacted.surface_case = [];
+    redacted.hole_fill = [];
+    delete redacted.cement_pad;
+  }
+
+  if (!visibility.geology) {
+    redacted.lithology = [];
+    redacted.fractures = [];
+    redacted.caves = [];
+  }
+
+  if (!visibility.hydrodynamic) {
+    redacted.hydrodynamic_events = [];
+    redacted.aquifer_analysis = [];
+  }
+
+  if (!visibility.history) {
+    redacted.history_logs = [];
+  }
+
+  return redacted;
 }
 
 /**
