@@ -1,5 +1,10 @@
 import type { Well } from '@welldot/core';
-import { deserializeWell, isWellEmpty, serializeWell } from '@welldot/core';
+import {
+  deserializeWell,
+  isWellEmpty,
+  redactWell,
+  serializeWell,
+} from '@welldot/core';
 import { format } from 'date-fns';
 import type { Ref } from 'vue';
 import type { PdfInfoItem } from '~/stores/pdfExport.store';
@@ -28,6 +33,7 @@ export function usePdfExport(draftContainer: Ref<HTMLElement | null>) {
   const { t, locale } = useI18n();
   const profileStore = useProfileStore();
   const pdfExportStore = usePdfExportStore();
+  const shareVisibilityStore = useShareVisibilityStore();
   const uiStore = useUiStore();
   const { resolveMetadataValue } = useWellMetadataFields();
 
@@ -73,11 +79,22 @@ export function usePdfExport(draftContainer: Ref<HTMLElement | null>) {
     isGenerating.value = true;
 
     try {
-      const well = normalizeWell(exportableWell);
+      const applyRedaction =
+        pdfExportStore.useCustomVisibility && shareVisibilityStore.hasHidden;
+
+      const well = normalizeWell(
+        applyRedaction
+          ? redactWell(exportableWell, shareVisibilityStore.visibility)
+          : exportableWell,
+      );
       const baseUrl = useRequestURL().origin;
-      const share = await useProfileShare()
-        .getShare()
-        .catch(() => null);
+      // A redacted PDF never fetches or displays a share link — it would
+      // point to the full, non-redacted profile via the footer QR.
+      const share = applyRedaction
+        ? null
+        : await useProfileShare()
+            .getShare()
+            .catch(() => null);
       const options: PdfExportOptions = {
         header: pdfExportStore.header,
         breakPages: pdfExportStore.breakPages,
@@ -92,6 +109,7 @@ export function usePdfExport(draftContainer: Ref<HTMLElement | null>) {
         baseUrl,
         shareUrl: share ? `${baseUrl}/editor?share=${share.id}` : undefined,
         shareExpiresAt: share?.expiresAt,
+        omitShareBlock: applyRedaction,
       };
 
       const firstPageAvailableHeight = computeFirstPageAvailableHeight({
@@ -168,6 +186,8 @@ export function usePdfExport(draftContainer: Ref<HTMLElement | null>) {
         metadataPosition: pdfExportStore.metadataPosition,
         headingInfo: pdfExportStore.headingInfo,
         endInfo: pdfExportStore.endInfo,
+        useCustomVisibility: pdfExportStore.useCustomVisibility,
+        visibility: shareVisibilityStore.visibility,
         lengthUnit: uiStore.lengthUnit,
         diameterUnit: uiStore.diameterUnit,
         coordinateFormat: uiStore.coordinateFormat,
