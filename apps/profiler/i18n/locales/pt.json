@@ -300,7 +300,8 @@
         "hide": "Não exibir"
       },
       "visibilitySection": {
-        "title": "Decidir o que compartilhar"
+        "title": "Decidir o que compartilhar",
+        "toggle": "Usar minha seleção de compartilhamento"
       },
       "scale": {
         "title": "Escala"

@@ -150,6 +150,20 @@ const endInfoCount = computed(() =>
             />
           </section>
 
+          <!-- What to share -->
+          <section class="flex flex-col gap-3">
+            <span :class="kickerClass">{{
+              t('editor.exportPdfDialog.visibilitySection.title')
+            }}</span>
+            <label
+              class="flex items-center gap-2.5 text-sm text-content-0 cursor-pointer"
+            >
+              <Checkbox v-model="pdfExportStore.useCustomVisibility" binary />
+              {{ t('editor.exportPdfDialog.visibilitySection.toggle') }}
+            </label>
+            <ShareVisibilityChecklist v-if="pdfExportStore.useCustomVisibility" />
+          </section>
+
           <!-- Scale -->
           <section class="flex flex-col gap-3">
             <span :class="kickerClass">{{

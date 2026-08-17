@@ -300,7 +300,8 @@
         "hide": "Hide"
       },
       "visibilitySection": {
-        "title": "Decide what to share"
+        "title": "Decide what to share",
+        "toggle": "Use my share selection"
       },
       "scale": {
         "title": "Scale"
