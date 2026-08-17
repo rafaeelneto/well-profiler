@@ -269,6 +269,16 @@
       "linkValidUntil": "Válido até {date}",
       "comingSoon": "Em breve"
     },
+    "shareVisibility": {
+      "title": "Escolha o que compartilhar",
+      "sections": {
+        "general": "Informações gerais",
+        "constructive": "Construção",
+        "geology": "Geologia",
+        "hydrodynamic": "Testes de bombeamento",
+        "history": "Histórico"
+      }
+    },
     "exportPdfDialog": {
       "title": "Exportar PDF",
       "close": "Fechar",
@@ -288,6 +298,9 @@
         "before": "Antes",
         "after": "Depois",
         "hide": "Não exibir"
+      },
+      "visibilitySection": {
+        "title": "Decidir o que compartilhar"
       },
       "scale": {
         "title": "Escala"
