@@ -10,6 +10,7 @@ const emit = defineEmits<{
 }>();
 
 const { t } = useI18n();
+const localePath = useLocalePath();
 const store = useProfileStore();
 const { save, saveAs } = useProfileExport();
 const persistence = useFilePersistence();
@@ -214,7 +215,7 @@ const viewOptions = computed(() => [
   >
     <!-- Brand -->
     <NuxtLink
-      to="/"
+      :to="localePath('/')"
       class="flex items-center gap-2.5 font-bold text-base tracking-tight text-content-0 no-underline shrink-0"
     >
       <Icon name="welldot:logo" class="size-6.5 shrink-0" />
@@ -338,7 +339,7 @@ const viewOptions = computed(() => [
     <!-- Row 1: top bar -->
     <div class="flex items-center gap-3 px-4 py-3">
       <NuxtLink
-        to="/"
+        :to="localePath('/')"
         class="size-8 rounded-full border border-surface-200 flex items-center justify-center text-content-400 hover:text-content-0 hover:border-surface-300 transition-colors shrink-0"
         :aria-label="t('editor.back')"
       >

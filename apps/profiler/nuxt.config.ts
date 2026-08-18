@@ -53,7 +53,8 @@ export default defineNuxtConfig({
   ],
 
   i18n: {
-    strategy: 'no_prefix',
+    strategy: 'prefix_except_default',
+    baseUrl: isDev ? 'http://localhost:3000' : 'https://welldot.org',
     langDir: 'locales',
     locales: [
       { code: 'en', language: 'en-US', name: 'English', file: 'en.json' },
@@ -153,6 +154,11 @@ export default defineNuxtConfig({
   },
 
   ogImage: {
+    // Dynamic generation (Takumi/WASM renderer) pushes the Cloudflare Worker
+    // bundle over the free-tier size limit. Disabled for deploy; the
+    // OgImage/Default.takumi.vue component + defineOgImage() wiring in
+    // index.vue are kept so this can be re-enabled later. A static export
+    // (public/og-image.png) is served instead via 01.canonical.ts.
     enabled: false,
   },
 
@@ -185,11 +191,6 @@ export default defineNuxtConfig({
         { name: 'apple-mobile-web-app-title', content: 'Welldot' },
       ],
     },
-  },
-
-  routeRules: {
-    '/': { swr: 60 },
-    '/editor': { swr: 60 },
   },
 
   nitro: {

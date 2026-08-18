@@ -1,7 +1,16 @@
 {
   "meta": {
-    "title": "Welldot — Open well profile format",
-    "description": "Free editor to create, visualize, and export geological and construction profiles. A simple JSON, versioned, readable by any language."
+    "title": "Well Profiler App for the Open .well Format",
+    "description": "Welldot (formerly Well Profiler) is a free well profiler app for well profiles — visualize, edit, and export in the open, versioned .well format.",
+    "featureList": [
+      "Create, visualize, and export geological and construction well profiles",
+      "Open, versioned .well JSON file format",
+      "Free and open source"
+    ]
+  },
+  "editorMeta": {
+    "title": "Well Profile Editor",
+    "description": "Free browser-based well profiler app to create, visualize, and export geological and construction well profiles as open, versioned .well files."
   },
   "nav": {
     "editor": "Editor",
@@ -25,11 +34,13 @@
     "headlineEm": "open format",
     "headline2": ".",
     "body": "Free editor to create, visualize, and export geological and construction profiles. A simple JSON, versioned, readable by any language.",
-    "ctaPrimary": "Open editor →",
+    "ctaPrimary": "Open well editor →",
     "ctaSecondary": "View specification",
     "badgeSpec": "spec",
     "badgeLicense": "license",
-    "badgeSite": "welldot.org"
+    "badgeSite": "welldot.org",
+    "badgeFormerlyBold": "Formerly",
+    "badgeFormerly": "Well Profiler"
   },
   "format": {
     "kicker": "I · The format",
@@ -65,6 +76,8 @@
     "kicker": "II · Intention",
     "body": "Today, a water well's data exists in many places: in the driller's notebook, in the consultant's spreadsheet, in the PDF report submitted to the licensing authority. Each in its own format, each {unreadable}. {welldot} and the {well} format were created to solve this.",
     "unreadable": "unreadable to the other",
+    "originNote": "This project began as {wellProfiler}, a tool to draw well diagrams. It's growing into something broader: an open platform for the entire lifecycle of well data — not just the drawing.",
+    "wellProfiler": "Well Profiler",
     "pillars": [
       {
         "title": "Live editor",
@@ -152,12 +165,42 @@
       }
     ]
   },
+  "tools": {
+    "kicker": "V · The ecosystem",
+    "headline1": "Free, open",
+    "headlineEm": "tools",
+    "headline2": ", not just an app.",
+    "intro": "welldot is a set of small, independent packages. Use the editor, or pull just the piece you need into your own stack.",
+    "viewSource": "View source →",
+    "cards": [
+      {
+        "title": "\\@welldot/core",
+        "body": "Types, Zod validators, and serialization utilities for the .well format — the foundation everything else builds on.",
+        "path": "packages/core"
+      },
+      {
+        "title": "\\@welldot/utils",
+        "body": "Profile analysis utilities: depth calculations, cylindrical volumes, and gravel pack volume estimates.",
+        "path": "packages/utils"
+      },
+      {
+        "title": "\\@welldot/render",
+        "body": "The D3-based SVG renderer that draws every profile on this site — embeddable in any web app.",
+        "path": "packages/render"
+      },
+      {
+        "title": "Profiler app",
+        "body": "This editor, source and all. Nuxt 4 + Vue 3, deployed at welldot.org — fork it or read how it's built.",
+        "path": "apps/profiler"
+      }
+    ]
+  },
   "cta": {
     "headline1": "Everything about a well,",
     "headlineEm": "recorded at once",
     "headline2": ".",
     "subtitle": "Free to use. Free to implement. Open forever.",
-    "primary": "Open editor",
+    "primary": "Open well editor",
     "secondary": "github.com/rafaeelneto/welldot"
   },
   "heroVisual": {

@@ -3,6 +3,7 @@ import { useDark } from '@vueuse/core';
 import { NuxtLink } from '#components';
 
 const { t, locale, locales, setLocale } = useI18n();
+const localePath = useLocalePath();
 
 function changeLocale(code: string) {
   setLocale(code as 'en' | 'pt');
@@ -37,7 +38,7 @@ const togglePt = {
       <div class="container-landing flex items-center gap-4 lg:gap-6 py-3">
         <!-- Brand -->
         <NuxtLink
-          to="/"
+          :to="localePath('/')"
           class="flex items-center gap-2.5 font-bold text-base tracking-tight text-content-0 no-underline"
         >
           <Icon name="welldot:logo" class="size-6.5 shrink-0" />
@@ -47,7 +48,7 @@ const togglePt = {
         <!-- Desktop text links -->
         <div class="hidden lg:flex items-center gap-6">
           <NuxtLink
-            to="/editor"
+            :to="localePath('/editor')"
             class="text-content-400 hover:text-content-0 font-medium transition-colors no-underline"
           >
             {{ t('nav.editor') }}
@@ -93,7 +94,7 @@ const togglePt = {
           :label="t('nav.openEditor')"
           size="small"
           :as="NuxtLink"
-          to="/editor"
+          :to="localePath('/editor')"
           class="hidden lg:inline-flex"
         />
 
@@ -102,7 +103,7 @@ const togglePt = {
           :label="t('nav.openEditorMobile')"
           size="small"
           :as="NuxtLink"
-          to="/editor"
+          :to="localePath('/editor')"
           class="lg:hidden"
         />
 
@@ -141,7 +142,7 @@ const togglePt = {
 
       <nav class="flex flex-col gap-1 mt-2">
         <NuxtLink
-          to="/editor"
+          :to="localePath('/editor')"
           class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-content-200 hover:text-content-0 hover:bg-surface-100 transition-colors no-underline"
           @click="drawerOpen = false"
         >
@@ -198,7 +199,7 @@ const togglePt = {
           :label="t('nav.openEditor')"
           class="w-full"
           :as="NuxtLink"
-          to="/editor"
+          :to="localePath('/editor')"
           @click="drawerOpen = false"
         />
       </template>
