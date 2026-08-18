@@ -11,6 +11,18 @@ vi.mock('~/stores/profile.store', () => ({
   useProfileStore: () => ({ getExportableWell }),
 }));
 
+vi.mock('~/stores/shareVisibility.store', () => ({
+  useShareVisibilityStore: () => ({
+    visibility: {
+      general: true,
+      constructive: true,
+      geology: true,
+      hydrodynamic: true,
+      history: true,
+    },
+  }),
+}));
+
 const nonEmptyWell = {
   version: 2,
   bore_hole: [{ top: 0, bottom: 1, diameter: 100 }],
@@ -53,7 +65,10 @@ describe('useProfileShare', () => {
     const first = await getShare();
     const second = await getShare();
 
-    expect(first).toEqual({ id: 'abc123', expiresAt: '2026-09-14T00:00:00.000Z' });
+    expect(first).toEqual({
+      id: 'abc123',
+      expiresAt: '2026-09-14T00:00:00.000Z',
+    });
     expect(second).toEqual(first);
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });

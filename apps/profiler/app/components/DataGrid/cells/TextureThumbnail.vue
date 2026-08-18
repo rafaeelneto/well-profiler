@@ -26,7 +26,7 @@ function parseDotCoords(pathData: string): Array<[number, number]> {
     cmd = '';
   let i = 0;
   while (i < tokens.length) {
-    const t = tokens[i];
+    const t = tokens[i] || '';
     if (/[MmHhVvLlCcZz]/.test(t)) {
       cmd = t;
       i++;
@@ -65,26 +65,66 @@ const FALLBACK_685_LINES = [20, 50, 80, 110, 140];
 const FALLBACK_685_CURVES = [35, 65, 95, 125].map((y, i) => ({ y, i }));
 
 const FALLBACK_718_LINES: Array<[number, number, number, number]> = [
-  [10, 15, 22, 12], [35, 8, 45, 18], [65, 5, 72, 20], [90, 12, 100, 8],
-  [120, 6, 130, 18], [145, 15, 148, 28], [5, 40, 18, 35], [40, 32, 52, 45],
-  [70, 38, 80, 28], [100, 30, 112, 42], [135, 35, 145, 25], [15, 60, 25, 50],
-  [50, 55, 60, 68], [80, 58, 90, 48], [110, 52, 122, 65], [140, 58, 148, 48],
-  [8, 80, 20, 72], [42, 76, 55, 88], [72, 78, 85, 68], [105, 74, 115, 86],
-  [138, 80, 148, 70], [18, 100, 30, 92], [48, 96, 58, 108], [80, 100, 92, 90],
-  [112, 97, 122, 108], [140, 102, 150, 94], [10, 118, 22, 110], [44, 116, 56, 128],
-  [76, 120, 88, 112], [108, 118, 120, 128], [138, 122, 148, 112], [14, 138, 26, 130],
-  [48, 136, 60, 148], [80, 140, 90, 130], [110, 138, 122, 148], [138, 140, 148, 132],
+  [10, 15, 22, 12],
+  [35, 8, 45, 18],
+  [65, 5, 72, 20],
+  [90, 12, 100, 8],
+  [120, 6, 130, 18],
+  [145, 15, 148, 28],
+  [5, 40, 18, 35],
+  [40, 32, 52, 45],
+  [70, 38, 80, 28],
+  [100, 30, 112, 42],
+  [135, 35, 145, 25],
+  [15, 60, 25, 50],
+  [50, 55, 60, 68],
+  [80, 58, 90, 48],
+  [110, 52, 122, 65],
+  [140, 58, 148, 48],
+  [8, 80, 20, 72],
+  [42, 76, 55, 88],
+  [72, 78, 85, 68],
+  [105, 74, 115, 86],
+  [138, 80, 148, 70],
+  [18, 100, 30, 92],
+  [48, 96, 58, 108],
+  [80, 100, 92, 90],
+  [112, 97, 122, 108],
+  [140, 102, 150, 94],
+  [10, 118, 22, 110],
+  [44, 116, 56, 128],
+  [76, 120, 88, 112],
+  [108, 118, 120, 128],
+  [138, 122, 148, 112],
+  [14, 138, 26, 130],
+  [48, 136, 60, 148],
+  [80, 140, 90, 130],
+  [110, 138, 122, 148],
+  [138, 140, 148, 132],
 ];
 
 const FALLBACK_718_DOTS: Array<[number, number]> = [
-  [16, 13], [42, 12], [68, 12], [95, 10], [125, 12], [148, 12],
-  [10, 48], [52, 40], [75, 33], [106, 36], [140, 30],
-  [22, 78], [58, 78], [87, 73], [115, 78], [144, 75],
+  [16, 13],
+  [42, 12],
+  [68, 12],
+  [95, 10],
+  [125, 12],
+  [148, 12],
+  [10, 48],
+  [52, 40],
+  [75, 33],
+  [106, 36],
+  [140, 30],
+  [22, 78],
+  [58, 78],
+  [87, 73],
+  [115, 78],
+  [144, 75],
 ];
 
 const props = withDefaults(
   defineProps<{
-    code: number | string;
+    code: number | string | undefined;
     size?: number;
   }>(),
   { size: 48 },
@@ -93,11 +133,19 @@ const props = withDefaults(
 const pathData = ref<string | undefined>(undefined);
 const numericCode = computed(() => Number(props.code));
 
-onMounted(() => {
-  loadFgdcPaths().then(paths => {
-    pathData.value = paths[props.code] ?? paths[String(props.code)];
-  });
-});
+watch(
+  () => props.code,
+  () => {
+    pathData.value = undefined;
+    loadFgdcPaths().then(paths => {
+      const code = String(props.code);
+      pathData.value = paths[code];
+    });
+  },
+  {
+    immediate: true,
+  },
+);
 
 type RenderMode = 'fallback685' | 'fallback718' | 'spacer' | 'dots' | 'path';
 
@@ -119,7 +167,6 @@ const dotCoords = computed<Array<[number, number]>>(() => {
 </script>
 
 <template>
-  <!-- Fallback 685: dashed horizontal loess strata with wavy curves -->
   <svg
     v-if="renderMode === 'fallback685'"
     :width="size"

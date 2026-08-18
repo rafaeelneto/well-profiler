@@ -30,6 +30,7 @@ const baseOptions: PdfExportOptions = {
   lengthUnit: 'm',
   diameterUnit: 'mm',
   coordinateFormat: 'DD',
+  locale: 'en',
   baseUrl: 'https://example.test',
 };
 
@@ -82,10 +83,9 @@ describe('buildSectionTables', () => {
       JSON.stringify(s).includes('Gravel'),
     );
     expect(holeFillSection).toBeDefined();
-    const body = (holeFillSection as { stack: unknown[] }).stack;
-    const table = body[body.length - 1] as { table: { body: unknown[][] } };
-    // header row + 2 items + 2 subtotal rows (type changes every row here)
-    expect(table.table.body).toHaveLength(5);
+    const table = (holeFillSection as { table: { body: unknown[][] } }).table;
+    // title + header row + 2 items + 2 subtotal rows (type changes every row here)
+    expect(table.body).toHaveLength(6);
   });
 
   it('groups well_case subtotal rows by type + diameter', () => {
@@ -97,11 +97,9 @@ describe('buildSectionTables', () => {
       ],
     });
     const sections = buildSectionTables(well, baseOptions, t);
-    const table = (
-      sections[0] as { stack: { table: { body: unknown[][] } }[] }
-    ).stack.at(-1)!.table;
-    // header + 3 rows + 2 subtotal rows (group changes twice)
-    expect(table.body).toHaveLength(6);
+    const table = (sections[0] as { table: { body: unknown[][] } }).table;
+    // title + header + 3 rows + 2 subtotal rows (group changes twice)
+    expect(table.body).toHaveLength(7);
   });
 
   it('formats diameters and lengths using the given units', () => {
@@ -113,6 +111,6 @@ describe('buildSectionTables', () => {
     );
     const serialized = JSON.stringify(sections);
     expect(serialized).toContain('ft');
-    expect(serialized).toContain('inches');
+    expect(serialized).toContain('in.');
   });
 });

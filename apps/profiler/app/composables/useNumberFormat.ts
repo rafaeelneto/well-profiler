@@ -1,4 +1,4 @@
-import { formatNumber, type FormatNumberOptions } from '~/utils/formatNumber';
+import { formatNumber, type FormatNumberOptions } from '@welldot/utils';
 
 export const LOCALE_MAP: Record<string, string> = { en: 'en-US', pt: 'pt-BR' };
 

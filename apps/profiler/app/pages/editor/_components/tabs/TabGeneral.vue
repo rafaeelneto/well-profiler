@@ -66,15 +66,12 @@ function setPrimary(index: number) {
 
 // ─── Well type Select ─────────────────────────────────────────────────────────
 
-const wellTypeOptions = computed(() => [
-  { label: t('editor.general.wellTypes.deepTubular'), value: 'tubular_deep' },
-  {
-    label: t('editor.general.wellTypes.shallowTubular'),
-    value: 'tubular_shallow',
-  },
-  { label: t('editor.general.wellTypes.artesian'), value: 'artesian' },
-  { label: t('editor.general.wellTypes.handDug'), value: 'hand_dug' },
-]);
+const wellTypeOptions = computed(() =>
+  WELL_TYPE_VALUES.map(value => ({
+    label: resolveWellTypeLabel(value, t),
+    value,
+  })),
+);
 </script>
 
 <template>

@@ -55,6 +55,8 @@ export interface ContentStack {
   stack: Content[];
   margin?: Margins;
   width?: ColumnWidth;
+  /** If true, the whole element (and its children) is kept together on one page. */
+  unbreakable?: boolean;
 }
 
 export type TableCell = Content | Record<string, never>;
@@ -80,7 +82,8 @@ export interface ContentTable {
     widths?: ColumnWidth[];
     heights?: number | number[];
     dontBreakRows?: boolean;
-    keepWithHeaderRows?: boolean;
+    /** Number of rows after the header to bind to it — pdfmake requires a positive integer; `true` is silently ignored. */
+    keepWithHeaderRows?: number;
     body: TableCell[][];
   };
   layout?: string | TableLayout;

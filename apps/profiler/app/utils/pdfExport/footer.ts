@@ -7,6 +7,8 @@ export interface FooterShareInfo {
   baseUrl: string;
   shareUrl?: string;
   shareExpiresAt?: string;
+  /** When true, drop the QR/tagline column entirely instead of falling back to a `baseUrl` QR — used when the PDF is redacting sections and the full public link would defeat that. */
+  omit?: boolean;
 }
 
 function hostLabel(url: string): string {
@@ -44,14 +46,28 @@ function buildTagline(
   };
 }
 
-/** Builds the page footer: version/date, host label, and a QR code linking to the shared profile (or `share.baseUrl` as a fallback). */
+/** Builds the page footer: version/date, host label, and — unless `share.omit` — a QR code linking to the shared profile (or `share.baseUrl` as a fallback). */
 export function buildFooterContent(
   breakPages: boolean,
   t: PdfTranslate,
   share: FooterShareInfo,
 ): Content {
-  const { baseUrl, shareUrl, shareExpiresAt } = share;
-  const qrSvg = renderSVG(shareUrl ?? baseUrl, { pixelSize: 4 });
+  const { baseUrl, shareUrl, shareExpiresAt, omit } = share;
+
+  const shareColumn: Content | null = omit
+    ? null
+    : {
+        columns: [
+          buildTagline(t, Boolean(shareUrl), shareExpiresAt),
+          {
+            svg: renderSVG(shareUrl ?? baseUrl, { pixelSize: 4 }),
+            width: 34,
+            height: 34,
+          },
+        ],
+        columnGap: 4,
+        width: 84,
+      };
 
   return {
     stack: [
@@ -84,17 +100,10 @@ export function buildFooterContent(
             font: 'spaceGrotesk',
             fontSize: 7,
             color: '#494949',
-            alignment: 'center',
+            alignment: omit ? 'right' : 'center',
             width: '*',
           },
-          {
-            columns: [
-              buildTagline(t, Boolean(shareUrl), shareExpiresAt),
-              { svg: qrSvg, width: 34, height: 34 },
-            ],
-            columnGap: 4,
-            width: 84,
-          },
+          ...(shareColumn ? [shareColumn] : []),
         ],
       },
     ],

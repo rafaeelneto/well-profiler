@@ -269,6 +269,16 @@
       "linkValidUntil": "Valid until {date}",
       "comingSoon": "Soon"
     },
+    "shareVisibility": {
+      "title": "Choose what to share",
+      "sections": {
+        "general": "General info",
+        "constructive": "Construction",
+        "geology": "Geology",
+        "hydrodynamic": "Pumping tests",
+        "history": "History"
+      }
+    },
     "exportPdfDialog": {
       "title": "Export PDF",
       "close": "Close",
@@ -288,6 +298,10 @@
         "before": "Before",
         "after": "After",
         "hide": "Hide"
+      },
+      "visibilitySection": {
+        "title": "Decide what to share",
+        "toggle": "Use my share selection"
       },
       "scale": {
         "title": "Scale"
@@ -478,10 +492,11 @@
       "freeNotes": "Free notes",
       "metadata": "Metadata",
       "wellTypes": {
-        "deepTubular": "Deep tubular",
-        "shallowTubular": "Shallow tubular",
+        "tubular": "Tubular",
         "artesian": "Artesian",
-        "handDug": "Hand dug"
+        "handDug": "Hand dug",
+        "horizontal": "Horizontal",
+        "infiltrationGallery": "Infiltration gallery"
       },
       "wellIds": {
         "title": "Well Identifiers",
@@ -532,6 +547,15 @@
         "kindCase": "Casing",
         "kindScreen": "Screen",
         "total": "Total cased length"
+      },
+      "reduction": {
+        "title": "Reduction",
+        "tag": "REDUCER",
+        "type": "Type",
+        "diamFrom": "Diam. From",
+        "diamTo": "Diam. To",
+        "from": "From",
+        "to": "To"
       },
       "holeFill": {
         "title": "Annular Space",

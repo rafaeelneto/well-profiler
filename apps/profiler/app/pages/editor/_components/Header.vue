@@ -108,6 +108,7 @@ onBeforeUnmount(() => document.removeEventListener('keydown', _onKeyDown));
 
 // ── Share dialog ────────────────────────────────────────────────────
 const shareVisible = ref(false);
+const shareVisibilityStore = useShareVisibilityStore();
 
 // ── Settings dialog ─────────────────────────────────────────────────
 const settingsVisible = ref(false);
@@ -285,7 +286,13 @@ const viewOptions = computed(() => [
         @click="shareVisible = true"
       >
         <template #icon>
-          <Icon name="ph:share-network-duotone" class="size-4 shrink-0" />
+          <span class="relative inline-flex shrink-0">
+            <Icon name="ph:share-network-duotone" class="size-4 shrink-0" />
+            <span
+              v-if="shareVisibilityStore.hasHidden"
+              class="absolute -top-0.5 -right-0.5 size-1.5 rounded-full bg-primary-500"
+            />
+          </span>
         </template>
       </Button>
       <Button

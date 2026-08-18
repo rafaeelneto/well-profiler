@@ -1,10 +1,14 @@
 import type { DiameterUnits, LengthUnits } from '@welldot/core';
 import type {
   DeepPartial,
-  RenderConfig,
   RenderableWell,
+  RenderConfig,
 } from '@welldot/render';
-import { STATIC_RENDER_CONFIG, WellRenderer } from '@welldot/render';
+import {
+  applyRenderLocale,
+  STATIC_RENDER_CONFIG,
+  WellRenderer,
+} from '@welldot/render';
 import { getProfileLastItemsDepths } from '@welldot/utils';
 import type { RenderedSvg } from './types';
 
@@ -59,6 +63,8 @@ export interface BuildSvgProfilesOptions {
   /** Height budget already used by heading info / "before" metadata on the first page. */
   firstPageAvailableHeight?: number;
   units: { length: LengthUnits; diameter: DiameterUnits };
+  /** Active app locale — resolves renderer-drawn text and the diameter unit symbol. Anything other than `'en'` is treated as `'pt'`. */
+  locale: string;
 }
 
 export interface BuildSvgProfilesResult {
@@ -107,7 +113,9 @@ export async function buildSvgProfiles(
   container: HTMLElement,
   options: BuildSvgProfilesOptions,
 ): Promise<BuildSvgProfilesResult> {
-  const { breakPages, scale, firstPageAvailableHeight, units } = options;
+  const { breakPages, scale, firstPageAvailableHeight, units, locale } =
+    options;
+  const renderLocale: 'en' | 'pt' = locale === 'en' ? 'en' : 'pt';
 
   const maxYValues = Math.max(0, ...getProfileLastItemsDepths(well));
   const totalHeight = computeTotalSvgHeight(maxYValues, scale);
@@ -131,13 +139,17 @@ export async function buildSvgProfiles(
     container.appendChild(svg);
   }
 
+  const localizedStaticConfig = applyRenderLocale(
+    STATIC_RENDER_CONFIG,
+    renderLocale,
+  );
   const renderConfig: DeepPartial<RenderConfig> = {
-    ...STATIC_RENDER_CONFIG,
+    ...localizedStaticConfig,
     zoom: false,
     pan: false,
     animation: { duration: 0 },
     legend: {
-      ...STATIC_RENDER_CONFIG.legend,
+      ...localizedStaticConfig.legend,
       maxWidth: LEGEND_MAX_WIDTH,
     },
   };
@@ -152,6 +164,7 @@ export async function buildSvgProfiles(
     {
       renderConfig,
       units,
+      locale: renderLocale,
       theme: {
         labels: {
           headerFont: 'jetBrainsMono',

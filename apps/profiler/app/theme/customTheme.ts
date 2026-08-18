@@ -231,7 +231,7 @@ const MyPreset = definePreset(Aura, {
       colorScheme: {
         light: {
           root: {
-            background: 'color-mix(in srgb, {surface.50} 88%, transparent)',
+            background: '{surface.0}',
             borderColor: 'color-mix(in srgb, {content.700} 50%, transparent)',
             color: '{content.0}',
             shadow:
@@ -901,9 +901,9 @@ const MyPreset = definePreset(Aura, {
       colorScheme: {
         light: {
           root: {
-            filledBackground: '{surface.100}',
-            filledHoverBackground: '{surface.200}',
-            filledFocusBackground: '{surface.100}',
+            filledBackground: '{surface.0}',
+            filledHoverBackground: '{surface.100}',
+            filledFocusBackground: '{surface.50}',
           },
         },
         dark: {
@@ -911,6 +911,92 @@ const MyPreset = definePreset(Aura, {
             filledBackground: '{surface.200}',
             filledHoverBackground: '{surface.300}',
             filledFocusBackground: '{surface.200}',
+          },
+        },
+      },
+    },
+    listbox: {
+      root: {
+        borderRadius: '0.75rem',
+      },
+      colorScheme: {
+        light: {
+          root: {
+            background: '{surface.0}',
+            borderColor: '{surface.200}',
+            invalidBorderColor: '{error.500}',
+            color: '{content.0}',
+            shadow:
+              '0 8px 32px -4px rgba(14,30,51,0.14), 0 1px 6px -1px rgba(14,30,51,0.07)',
+          },
+          option: {
+            color: '{content.0}',
+            focusBackground: '{surface.100}',
+            focusColor: '{content.0}',
+            selectedBackground: '{primary.50}',
+            selectedColor: '{primary.700}',
+            selectedFocusBackground: '{primary.100}',
+            selectedFocusColor: '{primary.700}',
+            stripedBackground: '{surface.50}',
+          },
+          optionGroup: {
+            background: 'transparent',
+            color: '{content.400}',
+          },
+          checkmark: {
+            color: '{primary.600}',
+          },
+        },
+        dark: {
+          root: {
+            background: '{surface.100}',
+            borderColor: '{surface.200}',
+            invalidBorderColor: '{error.500}',
+            color: '{content.0}',
+            shadow:
+              '0 8px 32px -4px rgba(0,0,0,0.45), 0 1px 6px -1px rgba(0,0,0,0.28)',
+          },
+          option: {
+            color: '{content.0}',
+            focusBackground: '{surface.200}',
+            focusColor: '{content.0}',
+            selectedBackground: '{surface.200}',
+            selectedColor: '{content.0}',
+            selectedFocusBackground: '{surface.300}',
+            selectedFocusColor: '{content.0}',
+            stripedBackground: '{surface.200}',
+          },
+          optionGroup: {
+            background: 'transparent',
+            color: '{content.400}',
+          },
+          checkmark: {
+            color: '{primary.400}',
+          },
+        },
+      },
+    },
+    popover: {
+      root: {
+        borderRadius: '0.75rem',
+      },
+      colorScheme: {
+        light: {
+          root: {
+            background: '{surface.0}',
+            borderColor: '{surface.200}',
+            color: '{content.0}',
+            shadow:
+              '0 8px 32px -4px rgba(14,30,51,0.14), 0 1px 6px -1px rgba(14,30,51,0.07)',
+          },
+        },
+        dark: {
+          root: {
+            background: '{surface.100}',
+            borderColor: '{surface.200}',
+            color: '{content.0}',
+            shadow:
+              '0 8px 32px -4px rgba(0,0,0,0.45), 0 1px 6px -1px rgba(0,0,0,0.28)',
           },
         },
       },

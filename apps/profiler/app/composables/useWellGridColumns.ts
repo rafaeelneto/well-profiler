@@ -113,6 +113,7 @@ export function useWellGridColumns(options: UseWellGridColumnsOptions) {
   );
 
   const uiStore = useUiStore();
+  const { locale } = useI18n();
 
   const gridEditors = computed(() => {
     const editors: Editors = {
@@ -173,7 +174,8 @@ export function useWellGridColumns(options: UseWellGridColumnsOptions) {
 
   const unitLabels: Record<'length' | 'diameter', () => string> = {
     length: () => uiStore.lengthUnit,
-    diameter: () => uiStore.diameterUnit,
+    diameter: () =>
+      resolveDiameterUnitLabel(uiStore.diameterUnit, locale.value),
   };
 
   const columnKinds: Record<ColumnKind, ColumnKindDef> = {

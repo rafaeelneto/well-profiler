@@ -20,6 +20,7 @@ import {
   type Well,
 } from '@welldot/core';
 import {
+  formatNumber,
   getProfileDiamValues,
   getProfileLastItemsDepths,
 } from '@welldot/utils';
@@ -90,11 +91,13 @@ export class WellRenderer {
     length: 'm',
     diameter: 'mm',
   };
+  private locale: 'en' | 'pt' = 'pt';
 
   /**
    * @param svgs - One entry per SVG panel; multi-entry for split-panel layouts.
    * @param options.classNames - Override default BEM CSS class names.
    * @param options.units - Active measurement units (`length` and `diameter`).
+   * @param options.locale - Locale for renderer-drawn text (diameter symbol, and any `RenderConfig` fields resolved via `applyRenderLocale`). Defaults to `'pt'`, matching the package's historical output.
    * @param options.renderConfig - Rendering behaviour (zoom, pan, animation, layout). Defaults to `INTERACTIVE_RENDER_CONFIG`.
    * @param options.theme - Visual theme overrides. Merged on top of `DEFAULT_WELL_THEME`.
    * @param options.onError - Called when a draw error occurs (e.g., a renderer throws). Falls back to `console.error` if omitted.
@@ -105,6 +108,7 @@ export class WellRenderer {
     options: {
       classNames?: DeepPartial<ComponentsClassNames>;
       units?: Units;
+      locale?: 'en' | 'pt';
       renderConfig?: DeepPartial<RenderConfig>;
       theme?: DeepPartial<WellTheme>;
       onError?: (err: Error) => void;
@@ -130,6 +134,10 @@ export class WellRenderer {
 
     if (options.units) {
       this.units = { ...this.units, ...options.units };
+    }
+
+    if (options.locale) {
+      this.locale = options.locale;
     }
 
     if (options.renderConfig) {
@@ -282,11 +290,16 @@ export class WellRenderer {
    * Renders the well profile into all configured SVG panels.
    * @param profile - The well data to render.
    * @param options.units - Override the instance-level measurement units for this render.
+   * @param options.locale - Override the instance-level locale for this render.
    * @param options.highlights - Highlight overlays to display on top of the profile.
    */
   draw(
     profile: RenderableWell,
-    options: { units?: Units; highlights?: Highlights } = {},
+    options: {
+      units?: Units;
+      locale?: 'en' | 'pt';
+      highlights?: Highlights;
+    } = {},
   ) {
     if (isWellEmpty(profile)) return;
 
@@ -298,6 +311,9 @@ export class WellRenderer {
     }
 
     this.units = { ...this.units, ...options.units };
+    if (options.locale) {
+      this.locale = options.locale;
+    }
     const highlights = options.highlights ?? {};
 
     const maxValues = getProfileLastItemsDepths(profile);
@@ -390,6 +406,8 @@ export class WellRenderer {
       this.classes,
       this.units,
       this.renderConfig.tooltips,
+      this.renderConfig.tooltipLabels,
+      this.locale,
     );
 
     const { xLeft: geoXLeft, xRightInset: geoXRightInset } =
@@ -426,11 +444,13 @@ export class WellRenderer {
       .domain([depthFrom * depthFactor, depthTo * depthFactor])
       .range([0, contentHeight]);
 
-    const yAxis = d3
-      .axisLeft(yScaleAxis)
-      .tickFormat(
-        (d: d3module.NumberValue) => `${d}${getLengthUnit(this.units.length)}`,
-      );
+    const yAxis = d3.axisLeft(yScaleAxis).tickFormat(
+      (d: d3module.NumberValue) =>
+        `${formatNumber(Number(d), {
+          maximumFractionDigits: this.units.length === 'ft' ? 1 : 2,
+          locale: this.locale,
+        })}${getLengthUnit(this.units.length)}`,
+    );
 
     const gY = svg.select<SVGGElement>(`.${this.classes.yAxis}`).call(yAxis);
 
@@ -509,6 +529,7 @@ export class WellRenderer {
       classes: this.classes,
       textures: this.textures,
       units: this.units,
+      locale: this.locale,
       constructionData,
       groups,
     };

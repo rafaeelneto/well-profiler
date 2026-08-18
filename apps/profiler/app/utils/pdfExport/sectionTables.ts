@@ -1,32 +1,82 @@
 import type { Well } from '@welldot/core';
 import { calculateHoleFillVolume } from '@welldot/utils';
+import { resolveDiameterUnitLabel } from '~/utils/unitLabel';
 import { createPdfFormatters } from './formatters';
-import type { Content, TableCell, TableLayout } from './pdfmake.types';
+import type {
+  Content,
+  ContentTable,
+  TableCell,
+  TableLayout,
+} from './pdfmake.types';
 import type { PdfExportOptions, PdfTranslate } from './types';
 
-const LIGHT_LINES_LAYOUT: TableLayout = {
+/** Shared `pdfmake` table styling/layout helpers, reused by other `pdfExport/*` section builders. */
+export const LIGHT_LINES_LAYOUT: TableLayout = {
   hLineWidth: (i, node) => (i === node.table.body.length || i === 0 ? 1 : 0),
   vLineWidth: () => 0,
   hLineColor: () => '#3d3d3d',
 };
 
-function headerCell(text: string, alignRight = false): TableCell {
+/**
+ * Short horizontal rule separating entries in a flowing (non-table) block
+ * listing. A factory, not a shared constant — `pdfmake` mutates canvas
+ * nodes in place during layout, so reusing one object instance at multiple
+ * positions in the content tree corrupts it after the first occurrence.
+ */
+export function buildEntryDivider(): Content {
+  return {
+    canvas: [
+      {
+        type: 'line',
+        x1: 0,
+        y1: 0,
+        x2: 535,
+        y2: 0,
+        lineWidth: 0.5,
+        lineColor: '#e5e5e5',
+      },
+    ],
+    margin: [0, 4, 0, 4],
+  };
+}
+
+export function headerCell(text: string, alignRight = false): TableCell {
   return {
     text,
     style: alignRight ? ['tableHeader', 'columnRight'] : 'tableHeader',
   };
 }
 
-function rightCell(text: string): TableCell {
+export function rightCell(text: string): TableCell {
   return { text, style: 'columnRight' };
 }
 
-function sectionTitle(text: string): Content {
-  return { text, style: 'title' };
-}
-
-function sectionWrapper(title: string, table: Content): Content {
-  return { stack: [{ text: ' ' }, sectionTitle(title), table] };
+/**
+ * Prepends a colSpan title row to a table's body and folds it into
+ * `headerRows`/`keepWithHeaderRows`, so the title repeats (with the rest of
+ * the header) on every page the table spans and stays bound to the first
+ * data row — the section heading can never render alone at a page bottom.
+ */
+export function withTableTitle(
+  title: string,
+  content: ContentTable,
+  keepWithFirstRows = 1,
+): ContentTable {
+  const columns = content.table.widths?.length ?? 1;
+  const titleRow: TableCell[] = [
+    { text: title, style: 'title', colSpan: columns },
+    ...Array(Math.max(0, columns - 1)).fill({}),
+  ];
+  return {
+    ...content,
+    table: {
+      ...content.table,
+      body: [titleRow, ...content.table.body],
+      headerRows: (content.table.headerRows ?? 0) + 1,
+      keepWithHeaderRows: keepWithFirstRows,
+    },
+    margin: [0, 16, 0, 0],
+  };
 }
 
 function buildCementPadSection(
@@ -57,7 +107,7 @@ function buildCementPadSection(
     ],
   ];
 
-  return sectionWrapper(t('editor.construction.wellhead.cementPad'), {
+  return withTableTitle(t('editor.construction.wellhead.cementPad'), {
     layout: LIGHT_LINES_LAYOUT,
     table: { widths: ['*', '*'], dontBreakRows: true, body },
   });
@@ -76,7 +126,7 @@ function buildIntervalSection(
   const body: TableCell[][] = [
     [
       headerCell(
-        `${t('editor.construction.boreHole.diameter')} (${diameterUnit})`,
+        `${t('editor.construction.boreHole.diameter')} (${resolveDiameterUnitLabel(diameterUnit, options.locale)})`,
       ),
       headerCell(
         `${t('editor.construction.boreHole.from')} (${lengthUnit})`,
@@ -96,13 +146,12 @@ function buildIntervalSection(
     ]);
   }
 
-  return sectionWrapper(title, {
+  return withTableTitle(title, {
     layout: 'lightHorizontalLines',
     table: {
       widths: ['auto', 'auto', 'auto'],
       headerRows: 1,
       dontBreakRows: true,
-      keepWithHeaderRows: true,
       body,
     },
   });
@@ -127,7 +176,7 @@ function buildHoleFillSection(
     [
       headerCell(t('editor.construction.holeFill.description')),
       headerCell(
-        `${t('editor.construction.holeFill.diameter')} (${diameterUnit})`,
+        `${t('editor.construction.holeFill.diameter')} (${resolveDiameterUnitLabel(diameterUnit, options.locale)})`,
         true,
       ),
       headerCell(
@@ -165,13 +214,12 @@ function buildHoleFillSection(
     }
   });
 
-  return sectionWrapper(t('editor.construction.holeFill.title'), {
+  return withTableTitle(t('editor.construction.holeFill.title'), {
     layout: 'lightHorizontalLines',
     table: {
       widths: ['*', 'auto', 'auto', 'auto'],
       headerRows: 1,
       dontBreakRows: true,
-      keepWithHeaderRows: true,
       body,
     },
   });
@@ -191,7 +239,7 @@ function buildWellCaseSection(
     [
       headerCell(t('editor.construction.wellCase.type')),
       headerCell(
-        `${t('editor.construction.wellCase.diameter')} (${diameterUnit})`,
+        `${t('editor.construction.wellCase.diameter')} (${resolveDiameterUnitLabel(diameterUnit, options.locale)})`,
         true,
       ),
       headerCell(
@@ -235,13 +283,65 @@ function buildWellCaseSection(
     }
   });
 
-  return sectionWrapper(t('editor.construction.wellCase.title'), {
+  return withTableTitle(t('editor.construction.wellCase.title'), {
     layout: 'lightHorizontalLines',
     table: {
       widths: ['*', 'auto', 'auto', 'auto'],
       headerRows: 1,
       dontBreakRows: true,
-      keepWithHeaderRows: true,
+      body,
+    },
+  });
+}
+
+function buildReductionSection(
+  well: Well,
+  options: PdfExportOptions,
+  t: PdfTranslate,
+): Content | null {
+  const items = well.reduction;
+  if (items.length === 0) return null;
+
+  const { formatLength, formatDiameter, diameterUnit, lengthUnit } =
+    createPdfFormatters(options);
+  const body: TableCell[][] = [
+    [
+      headerCell(t('editor.construction.reduction.type')),
+      headerCell(
+        `${t('editor.construction.reduction.diamFrom')} (${resolveDiameterUnitLabel(diameterUnit, options.locale)})`,
+        true,
+      ),
+      headerCell(
+        `${t('editor.construction.reduction.diamTo')} (${resolveDiameterUnitLabel(diameterUnit, options.locale)})`,
+        true,
+      ),
+      headerCell(
+        `${t('editor.construction.reduction.from')} (${lengthUnit})`,
+        true,
+      ),
+      headerCell(
+        `${t('editor.construction.reduction.to')} (${lengthUnit})`,
+        true,
+      ),
+    ],
+  ];
+
+  for (const item of items) {
+    body.push([
+      item.type,
+      rightCell(formatDiameter(item.diam_from)),
+      rightCell(formatDiameter(item.diam_to)),
+      rightCell(formatLength(item.from)),
+      rightCell(formatLength(item.to)),
+    ]);
+  }
+
+  return withTableTitle(t('editor.construction.reduction.title'), {
+    layout: 'lightHorizontalLines',
+    table: {
+      widths: ['*', 'auto', 'auto', 'auto', 'auto'],
+      headerRows: 1,
+      dontBreakRows: true,
       body,
     },
   });
@@ -261,11 +361,11 @@ function buildWellScreenSection(
     [
       headerCell(t('editor.construction.wellScreen.type')),
       headerCell(
-        `${t('editor.construction.wellScreen.diameter')} (${diameterUnit})`,
+        `${t('editor.construction.wellScreen.diameter')} (${resolveDiameterUnitLabel(diameterUnit, options.locale)})`,
         true,
       ),
       headerCell(
-        `${t('editor.exportPdfDialog.content.slot')} (${diameterUnit})`,
+        `${t('editor.exportPdfDialog.content.slot')} (${resolveDiameterUnitLabel(diameterUnit, options.locale)})`,
         true,
       ),
       headerCell(
@@ -311,13 +411,12 @@ function buildWellScreenSection(
     }
   });
 
-  return sectionWrapper(t('editor.construction.wellScreen.title'), {
+  return withTableTitle(t('editor.construction.wellScreen.title'), {
     layout: 'lightHorizontalLines',
     table: {
       widths: ['*', 'auto', 'auto', 'auto', 'auto'],
       headerRows: 1,
       dontBreakRows: true,
-      keepWithHeaderRows: true,
       body,
     },
   });
@@ -325,8 +424,8 @@ function buildWellScreenSection(
 
 /**
  * Builds the per-feature summary tables (cement pad, bore hole, surface
- * casing, hole fill w/ gravel-pack volume, casing, screen), each omitted
- * when its corresponding `well.*` array/field is empty.
+ * casing, hole fill w/ gravel-pack volume, casing, reduction, screen), each
+ * omitted when its corresponding `well.*` array/field is empty.
  */
 export function buildSectionTables(
   well: Well,
@@ -349,6 +448,7 @@ export function buildSectionTables(
     ),
     buildHoleFillSection(well, options, t),
     buildWellCaseSection(well, options, t),
+    buildReductionSection(well, options, t),
     buildWellScreenSection(well, options, t),
   ];
 

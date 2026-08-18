@@ -1,5 +1,6 @@
 import { metersToFeet, mmToInches } from '@welldot/core';
-import { formatNumber } from '~/utils/formatNumber';
+import { formatNumber } from '@welldot/utils';
+import { resolveDiameterUnitLabel } from '~/utils/unitLabel';
 import type { PdfExportOptions } from './types';
 
 export interface PdfFormatters {
@@ -24,9 +25,9 @@ export interface PdfFormatters {
  * `pdfExport` builder functions, which must not depend on Vue/Pinia context.
  */
 export function createPdfFormatters(
-  options: Pick<PdfExportOptions, 'lengthUnit' | 'diameterUnit'>,
+  options: Pick<PdfExportOptions, 'lengthUnit' | 'diameterUnit' | 'locale'>,
 ): PdfFormatters {
-  const { lengthUnit, diameterUnit } = options;
+  const { lengthUnit, diameterUnit, locale } = options;
 
   function formatLength(
     value: number | null | undefined,
@@ -43,7 +44,10 @@ export function createPdfFormatters(
   ): string {
     if (value == null) return '—';
     const displayValue = diameterUnit === 'inches' ? mmToInches(value) : value;
-    return formatNumber(displayValue, { fractionDigits, suffix: diameterUnit });
+    return formatNumber(displayValue, {
+      fractionDigits,
+      suffix: resolveDiameterUnitLabel(diameterUnit, locale),
+    });
   }
 
   function formatVolume(

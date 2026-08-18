@@ -388,3 +388,14 @@ export type Constructive = {
   hole_fill: HoleFill[];
   cement_pad?: CementPad;
 };
+
+/** Top-level grouping of a well's fields, used to selectively redact sections when sharing/exporting. */
+export type SectionKey =
+  | 'general'
+  | 'constructive'
+  | 'geology'
+  | 'hydrodynamic'
+  | 'history';
+
+/** Per-section visibility, keyed by `SectionKey`. `true` = included. */
+export type SectionVisibility = Record<SectionKey, boolean>;

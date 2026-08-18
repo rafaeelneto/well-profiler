@@ -21,12 +21,16 @@ export interface PdfExportOptions {
   lengthUnit: LengthUnits;
   diameterUnit: DiameterUnits;
   coordinateFormat: CoordinateFormat;
+  /** Active app locale (`useI18n().locale.value`) — drives the diameter unit symbol (`in.`/`"`) and the embedded profile SVG's language. */
+  locale: string;
   /** Origin the PDF is being generated from (e.g. `useRequestURL().origin`). Footer QR/branding fall back to this when there's no `shareUrl`. */
   baseUrl: string;
   /** Share link for the exported profile. Falls back to the `baseUrl` QR when absent. */
   shareUrl?: string;
   /** ISO timestamp the share expires at; shown as "valid until" next to the footer QR when `shareUrl` is set. */
   shareExpiresAt?: string;
+  /** True when the PDF is redacting sections — tells the footer to drop the QR/tagline entirely instead of falling back to `baseUrl`. */
+  omitShareBlock?: boolean;
 }
 
 export interface RenderedSvg {

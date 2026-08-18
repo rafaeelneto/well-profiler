@@ -1,5 +1,153 @@
 import { easeCubic } from 'd3';
-import { RenderConfig, WellTheme } from '~/types/render.types';
+import {
+  RenderConfig,
+  RenderLabelPack,
+  RenderLocalizedText,
+  TooltipLabels,
+  WellTheme,
+} from '~/types/render.types';
+import { resolveRenderLabel } from '~/utils/format.utils';
+
+/**
+ * Canonical, paired-locale source for every string `@welldot/render` draws
+ * (construction-label prefixes, legend entries, tooltip titles/fields,
+ * fracture/cave type words). `pt` values must match the literals historically
+ * hardcoded in `tooltips.utils.ts`/`annotation-labels.renderer.ts` exactly —
+ * this is the single source of truth `applyRenderLocale()` resolves from.
+ */
+export const RENDER_LABELS: RenderLabelPack = {
+  constructionLabels: {
+    wellCasePrefix: { pt: 'Revest.', en: 'Casing' },
+    wellScreenPrefix: { pt: 'Filtro', en: 'Screen' },
+    wellScreenSlotPrefix: { pt: 'Ranhura:', en: 'Slot:' },
+  },
+  legend: {
+    title: { pt: 'LEGENDA', en: 'LEGEND' },
+    labels: {
+      fractureSingle: { pt: 'Fratura simples', en: 'Single fracture' },
+      fractureSwarm: { pt: 'Enxame de fraturas', en: 'Fracture swarm' },
+      fractureWater: { pt: "Entrada d'água", en: 'Water intake' },
+      caveDry: { pt: 'Caverna seca', en: 'Dry cave' },
+      caveWet: { pt: 'Caverna c/ água', en: 'Wet cave' },
+      boreHole: { pt: 'Perfuração', en: 'Borehole' },
+      surfaceCase: { pt: 'Tubo guia', en: 'Surface casing' },
+      holeFillGravel: { pt: 'Pré-filtro', en: 'Gravel pack' },
+      holeFillSeal: { pt: 'Vedação', en: 'Seal' },
+      wellCase: { pt: 'Revestimento', en: 'Casing' },
+      wellScreen: { pt: 'Filtro', en: 'Screen' },
+      reduction: { pt: 'Redução', en: 'Reduction' },
+      cementPad: { pt: 'Laje de cimento', en: 'Cement pad' },
+      conflict: { pt: 'Conflito', en: 'Conflict' },
+    },
+  },
+  tooltipLabels: {
+    common: {
+      from: { pt: 'De', en: 'From' },
+      to: { pt: 'até', en: 'to' },
+      description: { pt: 'Descrição:', en: 'Description:' },
+      diameter: { pt: 'Diâmetro:', en: 'Diameter:' },
+      type: { pt: 'Tipo:', en: 'Type:' },
+    },
+    geology: {
+      title: { pt: 'Litologia', en: 'Lithology' },
+      geologicUnit: { pt: 'Unidade geológica:', en: 'Geologic unit:' },
+      aquiferUnit: { pt: 'Unidade aquífera:', en: 'Aquifer unit:' },
+    },
+    hole: { title: { pt: 'FURO', en: 'BOREHOLE' } },
+    surfaceCase: { title: { pt: 'TUBO DE BOCA', en: 'SURFACE CASING' } },
+    holeFill: { title: { pt: 'ESP. ANULAR', en: 'ANNULAR SPACE' } },
+    wellCase: { title: { pt: 'REVESTIMENTO', en: 'CASING' } },
+    wellScreen: {
+      title: { pt: 'FILTROS', en: 'SCREENS' },
+      slot: { pt: 'Ranhura:', en: 'Slot:' },
+    },
+    reduction: { title: { pt: 'REDUÇÃO', en: 'REDUCTION' } },
+    conflict: { title: { pt: 'CONFLITO', en: 'CONFLICT' } },
+    fracture: {
+      title: { pt: 'FRATURA', en: 'FRACTURE' },
+      titleSwarm: { pt: 'ENXAME DE FRATURAS', en: 'FRACTURE SWARM' },
+      depth: { pt: 'Profundidade:', en: 'Depth:' },
+      waterIntake: { pt: "Entrada d'água:", en: 'Water intake:' },
+      dip: { pt: 'Mergulho:', en: 'Dip:' },
+      azimuth: { pt: 'Azimute:', en: 'Azimuth:' },
+    },
+    cementPad: {
+      title: { pt: 'LAJE DE PROTEÇÃO', en: 'PROTECTION SLAB' },
+      thickness: { pt: 'Espessura:', en: 'Thickness:' },
+      width: { pt: 'Largura:', en: 'Width:' },
+      length: { pt: 'Comprimento:', en: 'Length:' },
+    },
+    cave: {
+      title: { pt: 'CAVERNA', en: 'CAVE' },
+      waterIntake: { pt: "Entrada d'água", en: 'Water intake' },
+    },
+  },
+  typeLabels: {
+    fracture: { pt: 'fratura', en: 'fracture' },
+    fractureWater: { pt: 'fratura aberta', en: 'open fracture' },
+    cave: { pt: 'caverna', en: 'cave' },
+    caveWater: { pt: 'caverna úmida', en: 'wet cave' },
+  },
+};
+
+/** Resolves every `RenderLocalizedText` leaf of a flat group to a plain string for `locale`. */
+function resolveGroup<G extends Record<string, RenderLocalizedText>>(
+  group: G,
+  locale: 'en' | 'pt',
+): { [K in keyof G]: string } {
+  const result = {} as { [K in keyof G]: string };
+  for (const key in group) {
+    result[key] = resolveRenderLabel(group[key], locale);
+  }
+  return result;
+}
+
+/** Resolves `RENDER_LABELS.tooltipLabels` to the plain-string shape `RenderConfig.tooltipLabels` expects. */
+function resolveTooltipLabels(locale: 'en' | 'pt'): TooltipLabels {
+  const t = RENDER_LABELS.tooltipLabels;
+  return {
+    common: resolveGroup(t.common, locale),
+    geology: resolveGroup(t.geology, locale),
+    hole: resolveGroup(t.hole, locale),
+    surfaceCase: resolveGroup(t.surfaceCase, locale),
+    holeFill: resolveGroup(t.holeFill, locale),
+    wellCase: resolveGroup(t.wellCase, locale),
+    wellScreen: resolveGroup(t.wellScreen, locale),
+    reduction: resolveGroup(t.reduction, locale),
+    conflict: resolveGroup(t.conflict, locale),
+    fracture: resolveGroup(t.fracture, locale),
+    cementPad: resolveGroup(t.cementPad, locale),
+    cave: resolveGroup(t.cave, locale),
+  };
+}
+
+/**
+ * Returns a copy of `config` with `constructionLabels.labels`, `legend.labels`,
+ * `tooltipLabels`, and `labels.typeLabels` resolved from `RENDER_LABELS` for
+ * `locale`. Every other field of `config` is preserved unchanged.
+ */
+export function applyRenderLocale(
+  config: RenderConfig,
+  locale: 'en' | 'pt',
+): RenderConfig {
+  return {
+    ...config,
+    constructionLabels: {
+      ...config.constructionLabels,
+      labels: resolveGroup(RENDER_LABELS.constructionLabels, locale),
+    },
+    legend: {
+      ...config.legend,
+      title: resolveRenderLabel(RENDER_LABELS.legend.title, locale),
+      labels: resolveGroup(RENDER_LABELS.legend.labels, locale),
+    },
+    tooltipLabels: resolveTooltipLabels(locale),
+    labels: {
+      ...config.labels,
+      typeLabels: resolveGroup(RENDER_LABELS.typeLabels, locale),
+    },
+  };
+}
 
 export const DEFAULT_WELL_THEME: WellTheme = {
   lithology: { stroke: '#101010', strokeWidth: 1 },
@@ -130,9 +278,10 @@ export const STATIC_RENDER_CONFIG: RenderConfig = {
     cementPad: { widthMultiplier: 0.9, thicknessMultiplier: 1.3 },
     surfaceCase: { diameterPaddingRatio: 0.1 },
   },
+  tooltipLabels: resolveTooltipLabels('pt'),
   labels: {
     active: true,
-    typeLabels: { fracture: 'fratura', cave: 'caverna' },
+    typeLabels: resolveGroup(RENDER_LABELS.typeLabels, 'pt'),
     depthTipHeight: 11,
     depthTipPadX: 2,
     descriptionXOffset: 20,
@@ -238,9 +387,10 @@ export const INTERACTIVE_RENDER_CONFIG: RenderConfig = {
     cementPad: { widthMultiplier: 0.9, thicknessMultiplier: 1.3 },
     surfaceCase: { diameterPaddingRatio: 0.1 },
   },
+  tooltipLabels: resolveTooltipLabels('pt'),
   labels: {
     active: false,
-    typeLabels: { fracture: 'fratura', cave: 'caverna' },
+    typeLabels: resolveGroup(RENDER_LABELS.typeLabels, 'pt'),
     depthTipHeight: 11,
     depthTipPadX: 2,
     descriptionXOffset: 78,

@@ -34,6 +34,7 @@ const baseOptions: PdfExportOptions = {
   lengthUnit: 'm',
   diameterUnit: 'mm',
   coordinateFormat: 'DD',
+  locale: 'pt',
   baseUrl: BASE_URL,
 };
 

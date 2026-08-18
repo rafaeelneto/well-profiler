@@ -57,6 +57,8 @@ export function useWellMetadataFields() {
         return well.location?.elevation != null
           ? String(well.location.elevation)
           : '';
+      case 'well_type':
+        return well.well_type ? resolveWellTypeLabel(well.well_type, t) : '';
       default:
         return String(well[key] ?? '');
     }

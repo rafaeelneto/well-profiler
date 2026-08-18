@@ -269,6 +269,16 @@
       "linkValidUntil": "Válido até {date}",
       "comingSoon": "Em breve"
     },
+    "shareVisibility": {
+      "title": "Escolha o que compartilhar",
+      "sections": {
+        "general": "Informações gerais",
+        "constructive": "Construção",
+        "geology": "Geologia",
+        "hydrodynamic": "Testes de bombeamento",
+        "history": "Histórico"
+      }
+    },
     "exportPdfDialog": {
       "title": "Exportar PDF",
       "close": "Fechar",
@@ -288,6 +298,10 @@
         "before": "Antes",
         "after": "Depois",
         "hide": "Não exibir"
+      },
+      "visibilitySection": {
+        "title": "Decidir o que compartilhar",
+        "toggle": "Usar minha seleção de compartilhamento"
       },
       "scale": {
         "title": "Escala"
@@ -478,10 +492,11 @@
       "freeNotes": "Notas livres",
       "metadata": "Metadados",
       "wellTypes": {
-        "deepTubular": "Tubular profundo",
-        "shallowTubular": "Tubular raso",
+        "tubular": "Tubular",
         "artesian": "Artesiano",
-        "handDug": "Escavado"
+        "handDug": "Cacimba / poço escavado",
+        "horizontal": "Horizontal",
+        "infiltrationGallery": "Galeria de infiltração"
       },
       "wellIds": {
         "title": "Identificadores do Poço",
@@ -533,6 +548,15 @@
         "kindScreen": "Filtro",
         "total": "Total revestido"
       },
+      "reduction": {
+        "title": "Redução",
+        "tag": "REDUÇÃO",
+        "type": "Tipo",
+        "diamFrom": "Diâm. De",
+        "diamTo": "Diâm. Até",
+        "from": "De",
+        "to": "Até"
+      },
       "holeFill": {
         "title": "Espaço Anular",
         "tag": "CIMENTAÇÃO · PRÉ-FILTRO",
@@ -558,7 +582,7 @@
     "historico": {
       "tag": "Histórico · Poço",
       "logs": {
-        "title": "History Logs",
+        "title": "Registro de Histórico",
         "tag": "REGISTRO",
         "empty": "Nenhum evento registrado",
         "noResults": "Nenhum registro corresponde à pesquisa",
