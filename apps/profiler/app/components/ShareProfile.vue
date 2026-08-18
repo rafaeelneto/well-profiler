@@ -87,21 +87,25 @@ async function recopyLink() {
     :style="{ width: '24rem' }"
   >
     <div class="flex flex-col gap-2 pt-1">
-      <button
-        type="button"
-        class="flex items-center gap-1.5 self-start text-xs font-medium text-content-400 hover:text-content-0 transition-colors cursor-pointer"
+      <Button
+        severity="secondary"
+        text
+        size="small"
+        class="self-start"
+        :label="t('editor.shareVisibility.title')"
         @click="showVisibilityChecklist = !showVisibilityChecklist"
       >
-        <Icon
-          :name="
-            showVisibilityChecklist
-              ? 'ph:caret-down-bold'
-              : 'ph:caret-right-bold'
-          "
-          class="size-3 shrink-0"
-        />
-        {{ t('editor.shareVisibility.title') }}
-      </button>
+        <template #icon>
+          <Icon
+            :name="
+              showVisibilityChecklist
+                ? 'ph:caret-down-bold'
+                : 'ph:caret-right-bold'
+            "
+            class="size-3 shrink-0"
+          />
+        </template>
+      </Button>
 
       <div
         v-if="showVisibilityChecklist"
