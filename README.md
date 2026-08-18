@@ -2,7 +2,7 @@
 
 Most software for documenting and visualizing water well profiles is proprietary, expensive, and not interoperable. Well Profiler exists to change that.
 
-This repository is an open-source software ecosystem for geological well log visualization and profiling, designed for hydrogeologists, engineers, and researchers. It consists of a web application and a set of reusable TypeScript libraries built around the **`.well` open file format**.
+This repository started as **Well Profiler**, a tool focused on drawing well diagrams. It has since grown into **welldot**, a broader open-source ecosystem for geological well log visualization and profiling, designed for hydrogeologists, engineers, and researchers — spanning not just drawing, but also structured data recording and research. It consists of a web application and a set of reusable TypeScript libraries built around the **`.well` open file format**.
 
 The core tools — the Well Profiler app, the `.well` format, and the libraries — are free and open source under the Apache 2.0 license.
 

@@ -11,6 +11,12 @@ import TabHidrodynamica from './_components/tabs/TabHidrodynamica.vue';
 definePageMeta({ layout: 'editor' });
 
 const { t } = useI18n();
+
+useSeoMeta({
+  title: () => t('editorMeta.title'),
+  description: () => t('editorMeta.description'),
+});
+
 const viewport = useViewport();
 
 useSharedProfileLoader();

@@ -1,7 +1,16 @@
 {
   "meta": {
-    "title": "Welldot — Formato aberto para perfis de poços",
-    "description": "Editor livre para criar, visualizar e exportar perfis geológicos e construtivos. Um JSON simples, versionado, legível por qualquer linguagem."
+    "title": "Editor de Perfil de Poço em Formato Aberto (.well)",
+    "description": "Antigo Well Profiler, agora editor gratuito de perfil de poço online: crie, visualize e exporte perfis construtivos e geológicos no formato aberto .well.",
+    "featureList": [
+      "Crie, visualize e exporte perfis geológicos e construtivos de poços",
+      "Formato de arquivo .well aberto e versionado",
+      "Gratuito e de código aberto"
+    ]
+  },
+  "editorMeta": {
+    "title": "Editor de Perfil de Poço",
+    "description": "Editor gratuito de perfil de poço construtivo online. Crie, visualize e exporte perfis geológicos e construtivos de poços no formato aberto e versionado .well."
   },
   "nav": {
     "editor": "Editor",
@@ -25,11 +34,13 @@
     "headlineEm": "arquivo aberto",
     "headline2": ".",
     "body": "Editor livre para criar, visualizar e exportar perfis geológicos e construtivos. Um JSON simples, versionado, legível por qualquer linguagem.",
-    "ctaPrimary": "Abrir editor →",
+    "ctaPrimary": "Abrir editor de poços →",
     "ctaSecondary": "Ver especificação",
     "badgeSpec": "spec",
     "badgeLicense": "licença",
-    "badgeSite": "welldot.org"
+    "badgeSite": "welldot.org",
+    "badgeFormerlyBold": "Antigo",
+    "badgeFormerly": "Well Profiler"
   },
   "format": {
     "kicker": "I · O formato",
@@ -65,6 +76,8 @@
     "kicker": "II · Intenção",
     "body": "Hoje, o dado de um poço d'água existe em muitos lugares: no caderno do perfurador, na planilha do consultor, no PDF do relatório entregue ao órgão licenciador. Cada um em seu formato, cada um {unreadable}. O {welldot} e o formato {well} foram criados para resolver isso.",
     "unreadable": "ilegível para o outro",
+    "originNote": "Este projeto começou como o {wellProfiler}, uma ferramenta para desenhar perfis de poços. Está se tornando algo mais amplo: uma plataforma aberta para todo o ciclo de vida do dado do poço — não só o desenho.",
+    "wellProfiler": "Well Profiler",
     "pillars": [
       {
         "title": "Editor ao vivo",
@@ -152,12 +165,42 @@
       }
     ]
   },
+  "tools": {
+    "kicker": "V · O ecossistema",
+    "headline1": "Ferramentas livres",
+    "headlineEm": "e abertas",
+    "headline2": ", não só um app.",
+    "intro": "O welldot é um conjunto de pacotes pequenos e independentes. Use o editor, ou aproveite só a peça que você precisa na sua própria stack.",
+    "viewSource": "Ver código-fonte →",
+    "cards": [
+      {
+        "title": "\\@welldot/core",
+        "body": "Tipos, validadores Zod e utilitários de serialização para o formato .well — a base sobre a qual tudo o mais é construído.",
+        "path": "packages/core"
+      },
+      {
+        "title": "\\@welldot/utils",
+        "body": "Utilitários de análise de perfil: cálculos de profundidade, volumes cilíndricos e estimativas de volume de pré-filtro.",
+        "path": "packages/utils"
+      },
+      {
+        "title": "\\@welldot/render",
+        "body": "O renderizador SVG em D3 que desenha todo perfil deste site — incorporável em qualquer aplicação web.",
+        "path": "packages/render"
+      },
+      {
+        "title": "App do profiler",
+        "body": "Este editor, código-fonte incluso. Nuxt 4 + Vue 3, publicado em welldot.org — faça um fork ou veja como é construído.",
+        "path": "apps/profiler"
+      }
+    ]
+  },
   "cta": {
     "headline1": "Tudo sobre um poço,",
     "headlineEm": "registrado de uma vez",
     "headline2": ".",
     "subtitle": "Livre para usar. Livre para implementar. Aberto para sempre.",
-    "primary": "Abrir editor",
+    "primary": "Abrir editor de poços",
     "secondary": "github.com/rafaeelneto/welldot"
   },
   "heroVisual": {
