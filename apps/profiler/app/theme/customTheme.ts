@@ -231,7 +231,7 @@ const MyPreset = definePreset(Aura, {
       colorScheme: {
         light: {
           root: {
-            background: 'color-mix(in srgb, {surface.50} 88%, transparent)',
+            background: '{surface.0}',
             borderColor: 'color-mix(in srgb, {content.700} 50%, transparent)',
             color: '{content.0}',
             shadow:

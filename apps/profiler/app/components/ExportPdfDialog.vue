@@ -155,12 +155,18 @@ const endInfoCount = computed(() =>
             <span :class="kickerClass">{{
               t('editor.exportPdfDialog.visibilitySection.title')
             }}</span>
-            <label
-              class="flex items-center gap-2.5 text-sm text-content-0 cursor-pointer"
-            >
-              <Checkbox v-model="pdfExportStore.useCustomVisibility" binary />
-              {{ t('editor.exportPdfDialog.visibilitySection.toggle') }}
-            </label>
+            <div class="flex items-center justify-between">
+              <label
+                for="pdf-use-custom-visibility"
+                class="text-sm text-content-0 cursor-pointer"
+              >
+                {{ t('editor.exportPdfDialog.visibilitySection.toggle') }}
+              </label>
+              <ToggleSwitch
+                v-model="pdfExportStore.useCustomVisibility"
+                input-id="pdf-use-custom-visibility"
+              />
+            </div>
             <ShareVisibilityChecklist v-if="pdfExportStore.useCustomVisibility" />
           </section>
 

@@ -114,8 +114,11 @@ async function recopyLink() {
         <ShareVisibilityChecklist />
       </div>
 
-      <button
-        class="flex items-center gap-4 p-3 rounded-lg border border-surface-200 hover:border-primary-300 hover:bg-surface-50 transition-colors text-left w-full cursor-pointer"
+      <Button
+        unstyled
+        :pt="{
+          root: 'flex items-center gap-4 p-3 rounded-lg border border-surface-200 hover:border-primary-300 hover:bg-surface-50 transition-colors text-left w-full cursor-pointer',
+        }"
         @click="copyJson"
       >
         <Icon
@@ -130,10 +133,13 @@ async function recopyLink() {
             {{ t('editor.shareDialog.copyJsonDesc') }}
           </div>
         </div>
-      </button>
+      </Button>
 
-      <button
-        class="flex items-center gap-4 p-3 rounded-lg border border-surface-200 hover:border-primary-300 hover:bg-surface-50 transition-colors text-left w-full cursor-pointer"
+      <Button
+        unstyled
+        :pt="{
+          root: 'flex items-center gap-4 p-3 rounded-lg border border-surface-200 hover:border-primary-300 hover:bg-surface-50 transition-colors text-left w-full cursor-pointer',
+        }"
         @click="downloadWell"
       >
         <Icon
@@ -148,11 +154,14 @@ async function recopyLink() {
             {{ t('editor.shareDialog.downloadWellDesc') }}
           </div>
         </div>
-      </button>
+      </Button>
 
-      <button
-        class="flex items-center gap-4 p-3 rounded-lg border border-surface-200 hover:border-primary-300 hover:bg-surface-50 transition-colors text-left w-full cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:border-surface-200 disabled:hover:bg-transparent"
+      <Button
+        unstyled
         :disabled="isEmpty"
+        :pt="{
+          root: 'flex items-center gap-4 p-3 rounded-lg border border-surface-200 hover:border-primary-300 hover:bg-surface-50 transition-colors text-left w-full cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:border-surface-200 disabled:hover:bg-transparent',
+        }"
         @click="copyLink"
       >
         <Icon
@@ -185,7 +194,7 @@ async function recopyLink() {
             {{ t('editor.shareDialog.copyLinkError') }}
           </div>
         </div>
-      </button>
+      </Button>
 
       <div
         v-if="shareUrl"
