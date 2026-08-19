@@ -23,7 +23,7 @@ useSharedProfileLoader();
 
 const isMobile = computed(() => viewport.isLessThan('lg'));
 const mobileView = ref<'perfil' | 'dados'>('dados');
-const activeTabKey = ref<string>('5');
+const activeTabKey = ref<string>('0');
 
 const tabs = computed<
   {

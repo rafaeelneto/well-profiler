@@ -422,6 +422,13 @@
         "to": "Até",
         "diameter": "Diâm.",
         "drillingMethod": "Método",
+        "drillingMethodOptions": {
+          "rotary": "Rotativo",
+          "percussion": "Percussão",
+          "cableTool": "Percussão a Cabo",
+          "auger": "Trado",
+          "airHammer": "Martelo Pneumático"
+        },
         "addRow": "Adicionar trecho",
         "empty": "Nenhum trecho cadastrado"
       },

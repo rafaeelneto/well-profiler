@@ -422,6 +422,13 @@
         "to": "To",
         "diameter": "Diam.",
         "drillingMethod": "Method",
+        "drillingMethodOptions": {
+          "rotary": "Rotary",
+          "percussion": "Percussion",
+          "cableTool": "Cable Tool",
+          "auger": "Auger",
+          "airHammer": "Air Hammer"
+        },
         "addRow": "Add bore hole",
         "empty": "No bore hole intervals yet"
       },

@@ -102,7 +102,7 @@ export type SurfaceCase = {
 
 /** Concrete pad installed at ground level (depth 0) around the wellhead. All dimensions in **meters**. */
 export type CementPad = {
-  /** Pad shape (e.g. `square`, `rectangular`, `circular`). */
+  /** Free text description of the pad, typically its material (e.g. `concrete`) but may also describe its shape (e.g. `circular`) or both. */
   type: string;
   /** Width in meters. */
   width: number;

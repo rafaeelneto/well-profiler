@@ -4,6 +4,32 @@ import type { WellGridColumn } from '~/components/DataGrid/types';
 const { t } = useI18n();
 const profileStore = useProfileStore();
 
+// Canonical values match the recommended `drilling_method` keys in the
+// .well v2 spec (docs/spec/v2/object-schemas.md) — not an enforced
+// enumeration, just suggestions. Any free text is stored as-is.
+const drillingMethodOptions = computed(() => [
+  {
+    label: t('editor.construction.boreHole.drillingMethodOptions.rotary'),
+    value: 'rotary',
+  },
+  {
+    label: t('editor.construction.boreHole.drillingMethodOptions.percussion'),
+    value: 'percussion',
+  },
+  {
+    label: t('editor.construction.boreHole.drillingMethodOptions.cableTool'),
+    value: 'cable_tool',
+  },
+  {
+    label: t('editor.construction.boreHole.drillingMethodOptions.auger'),
+    value: 'auger',
+  },
+  {
+    label: t('editor.construction.boreHole.drillingMethodOptions.airHammer'),
+    value: 'air_hammer',
+  },
+]);
+
 const boreHoleColumns = computed<WellGridColumn[]>(() => [
   {
     prop: 'from',
@@ -26,7 +52,8 @@ const boreHoleColumns = computed<WellGridColumn[]>(() => [
   {
     prop: 'drilling_method',
     label: t('editor.construction.boreHole.drillingMethod'),
-    type: 'text',
+    type: 'combo',
+    options: drillingMethodOptions.value,
     stretch: true,
     minSize: 200,
   },
