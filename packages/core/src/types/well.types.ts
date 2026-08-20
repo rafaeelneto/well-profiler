@@ -102,7 +102,7 @@ export type SurfaceCase = {
 
 /** Concrete pad installed at ground level (depth 0) around the wellhead. All dimensions in **meters**. */
 export type CementPad = {
-  /** Pad shape (e.g. `square`, `rectangular`, `circular`). */
+  /** Free text description of the pad, typically its material (e.g. `concrete`) but may also describe its shape (e.g. `circular`) or both. */
   type: string;
   /** Width in meters. */
   width: number;
@@ -352,6 +352,8 @@ export type Well = {
   elevation?: number;
 
   // Constructive
+  /** The well's current usable depth in meters from ground level, as measured or reported. May be less than the deepest constructive element (see `bore_hole`) due to siltation, debris, or partial backfill. */
+  well_depth?: number;
   bore_hole: BoreHole[];
   well_case: WellCase[];
   reduction: Reduction[];

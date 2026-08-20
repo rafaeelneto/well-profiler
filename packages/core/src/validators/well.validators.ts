@@ -291,6 +291,7 @@ export const WellSchema = z
     lat: z.number().optional(),
     lng: z.number().optional(),
     elevation: z.number().optional(),
+    well_depth: z.number().optional(),
     bore_hole: z.array(BoreHoleSchema),
     well_case: z.array(WellCaseSchema),
     reduction: z.array(ReductionSchema),

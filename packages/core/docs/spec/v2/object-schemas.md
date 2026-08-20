@@ -10,12 +10,12 @@
 
 A drilled interval of the borehole. Multiple entries describe a telescoping borehole.
 
-| Field             | Type   | Required | Description                                                                            |
-| ----------------- | ------ | -------- | -------------------------------------------------------------------------------------- |
-| `from`            | number | yes      | Start depth in meters.                                                                 |
-| `to`              | number | yes      | End depth in meters.                                                                   |
-| `diameter`        | number | yes      | Borehole diameter in millimeters.                                                      |
-| `drilling_method` | string | no       | Method used. Recommended: `rotary`, `percussion`, `cable_tool`, `auger`, `air_hammer`. |
+| Field             | Type   | Required | Description                                                                                                                                                                                               |
+| ----------------- | ------ | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `from`            | number | yes      | Start depth in meters.                                                                                                                                                                                    |
+| `to`              | number | yes      | End depth in meters.                                                                                                                                                                                      |
+| `diameter`        | number | yes      | Borehole diameter in millimeters.                                                                                                                                                                         |
+| `drilling_method` | string | no       | Free text description of the method used (e.g. `rotary`, `percussion`, `cable_tool`, `auger`, `air_hammer`). These example values are common terms, not an enforced enumeration — any free text is valid. |
 
 ```json
 { "from": 0, "to": 80, "diameter": 250, "drilling_method": "rotary" }
@@ -27,12 +27,12 @@ A drilled interval of the borehole. Multiple entries describe a telescoping bore
 
 Steel or plastic casing installed inside the borehole.
 
-| Field      | Type   | Required | Description                                                         |
-| ---------- | ------ | -------- | ------------------------------------------------------------------- |
-| `from`     | number | yes      | Start depth in meters.                                              |
-| `to`       | number | yes      | End depth in meters.                                                |
-| `type`     | string | yes      | Casing material. Free Text |
-| `diameter` | number | yes      | Casing outer diameter in millimeters.                               |
+| Field      | Type   | Required | Description                           |
+| ---------- | ------ | -------- | ------------------------------------- |
+| `from`     | number | yes      | Start depth in meters.                |
+| `to`       | number | yes      | End depth in meters.                  |
+| `type`     | string | yes      | Casing material. Free Text            |
+| `diameter` | number | yes      | Casing outer diameter in millimeters. |
 
 ---
 
@@ -40,13 +40,13 @@ Steel or plastic casing installed inside the borehole.
 
 A transition piece connecting two casing or screen sections of different diameters.
 
-| Field       | Type   | Required | Description                                                |
-| ----------- | ------ | -------- | ---------------------------------------------------------- |
-| `from`      | number | yes      | Start depth in meters.                                     |
-| `to`        | number | yes      | End depth in meters.                                       |
-| `diam_from` | number | yes      | Diameter at top in millimeters.                            |
-| `diam_to`   | number | yes      | Diameter at bottom in millimeters.                         |
-| `type`      | string | yes      | Reducer type. Free Text |
+| Field       | Type   | Required | Description                                      |
+| ----------- | ------ | -------- | ------------------------------------------------ |
+| `from`      | number | yes      | Start depth in meters.                           |
+| `to`        | number | yes      | End depth in meters.                             |
+| `diam_from` | number | yes      | Diameter at top in millimeters.                  |
+| `diam_to`   | number | yes      | Diameter at bottom in millimeters.               |
+| `type`      | string | yes      | Reducer type material and description. Free Text |
 
 ---
 
@@ -54,13 +54,13 @@ A transition piece connecting two casing or screen sections of different diamete
 
 Slotted or wire-wound screen section.
 
-| Field         | Type   | Required | Description                                                                                          |
-| ------------- | ------ | -------- | ---------------------------------------------------------------------------------------------------- |
-| `from`        | number | yes      | Start depth in meters.                                                                               |
-| `to`          | number | yes      | End depth in meters.                                                                                 |
-| `type`        | string | yes      | Screen type. Free text |
-| `diameter`    | number | yes      | Screen outer diameter in millimeters.                                                                |
-| `screen_slot` | number | yes      | Slot opening size in millimeters.                                                                    |
+| Field         | Type   | Required | Description                                 |
+| ------------- | ------ | -------- | ------------------------------------------- |
+| `from`        | number | yes      | Start depth in meters.                      |
+| `to`          | number | yes      | End depth in meters.                        |
+| `type`        | string | yes      | Screen type/material description. Free text |
+| `diameter`    | number | yes      | Screen outer diameter in millimeters.       |
+| `screen_slot` | number | yes      | Slot opening size in millimeters.           |
 
 > **v1 migration:** v1's `screen_slot_mm` field is renamed to `screen_slot` in v2. The value is in millimeters before and after — no conversion needed. See § Units for the rule that screen slot is always in millimeters regardless of any application's display preference.
 
@@ -96,12 +96,12 @@ Material placed in the annular space between casing and borehole wall.
 
 Concrete wellhead pad. **All dimensions are in meters**.
 
-| Field       | Type   | Required | Description                                                  |
-| ----------- | ------ | -------- | ------------------------------------------------------------ |
-| `type`      | string | yes      | Pad shape. Recommended: `square`, `rectangular`, `circular`. |
-| `width`     | number | yes      | Width in meters.                                             |
-| `thickness` | number | yes      | Thickness in meters.                                         |
-| `length`    | number | yes      | Length in meters.                                            |
+| Field       | Type   | Required | Description                                                                                                                                                        |
+| ----------- | ------ | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `type`      | string | yes      | Free text description of the pad, typically its material (e.g. `concrete`) but may also describe its shape (e.g. `circular`) or both. Not an enforced enumeration. |
+| `width`     | number | yes      | Width in meters.                                                                                                                                                   |
+| `thickness` | number | yes      | Thickness in meters.                                                                                                                                               |
+| `length`    | number | yes      | Length in meters.                                                                                                                                                  |
 
 > Note: A typical residential cement pad has dimensions on the order of `1.0` meter. Applications presenting these values in non-metric units (e.g. feet for US users) must convert `cement_pad` dimensions along with all other length fields.
 
@@ -111,15 +111,15 @@ Concrete wellhead pad. **All dimensions are in meters**.
 
 Geological description of a depth interval.
 
-| Field           | Type      | Required | Description                                                         |
-| --------------- | --------- | -------- | ------------------------------------------------------------------- |
-| `from`          | number    | yes      | Start depth in meters.                                              |
-| `to`            | number    | yes      | End depth in meters.                                                |
-| `description`   | string    | yes      | Free-text geological description.                                   |
-| `color`         | string    | yes      | Representative color as a CSS hex value.                            |
-| `texture`       | `Texture` | yes      | Lithology pattern reference. See below.                             |
-| `geologic_unit` | string    | yes      | Stratigraphic or geologic unit name.                                |
-| `aquifer_unit`  | string    | yes      | Aquifer unit name like "Aquifero Pirabas" or "Massachusetts Aquifer"|
+| Field           | Type      | Required | Description                                                          |
+| --------------- | --------- | -------- | -------------------------------------------------------------------- |
+| `from`          | number    | yes      | Start depth in meters.                                               |
+| `to`            | number    | yes      | End depth in meters.                                                 |
+| `description`   | string    | yes      | Free-text geological description.                                    |
+| `color`         | string    | yes      | Representative color as a CSS hex value.                             |
+| `texture`       | `Texture` | yes      | Lithology pattern reference. See below.                              |
+| `geologic_unit` | string    | yes      | Stratigraphic or geologic unit name.                                 |
+| `aquifer_unit`  | string    | yes      | Aquifer unit name like "Aquifero Pirabas" or "Massachusetts Aquifer" |
 
 ### `Texture`
 
@@ -171,15 +171,15 @@ Profiles SHOULD constrain the `vocabulary` field to a specific URI or short toke
 
 A discrete fracture or fracture zone.
 
-| Field             | Type    | Required | Description                                       |
-| ----------------- | ------- | -------- | ------------------------------------------------- |
-| `depth`           | number  | yes      | Depth of fracture in meters.                      |
-| `water_intake`    | boolean | yes      | Whether the fracture produces water.              |
-| `description`     | string  | yes      | Free-text description.                            |
-| `swarm`           | boolean | yes      | Whether this fracture belongs to a swarm.         |
-| `azimuth`         | number  | yes      | Azimuth in degrees from geographic north (0–360). |
-| `dip`             | number  | yes      | Dip angle in degrees from horizontal (0–90).      |
-| `depth_precision` | number  | no       | One-sigma precision of `depth` in meters. Default handled by editors       |
+| Field             | Type    | Required | Description                                                          |
+| ----------------- | ------- | -------- | -------------------------------------------------------------------- |
+| `depth`           | number  | yes      | Depth of fracture in meters.                                         |
+| `water_intake`    | boolean | yes      | Whether the fracture produces water.                                 |
+| `description`     | string  | yes      | Free-text description.                                               |
+| `swarm`           | boolean | yes      | Whether this fracture belongs to a swarm.                            |
+| `azimuth`         | number  | yes      | Azimuth in degrees from geographic north (0–360).                    |
+| `dip`             | number  | yes      | Dip angle in degrees from horizontal (0–90).                         |
+| `depth_precision` | number  | no       | One-sigma precision of `depth` in meters. Default handled by editors |
 
 ---
 
@@ -200,17 +200,17 @@ A cavity or void zone.
 
 A chronological, append-only ledger of all hydrodynamic observations. Events are ordered by `datetime` ascending (UTC-normalized instants); parsers MUST NOT assume order and SHOULD sort by `datetime` when querying. When two events share the same instant, an optional `sequence` integer breaks the tie.
 
-> **Note — interpretive contracts, not pumping methods.** Each `type` value identifies a *category of field record* with a distinct semantic contract, not a pumping technique or equipment class. Equipment belongs in the `equipment` field; test-analysis method belongs in `method` on `aquifer_analysis`. The contract for each type specifies what data it reliably supplies, how many steps it may carry, whether recovery is permitted, and whether its event ID is valid input to `source_event_ids` on an `aquifer_analysis` entry.
+> **Note — interpretive contracts, not pumping methods.** Each `type` value identifies a _category of field record_ with a distinct semantic contract, not a pumping technique or equipment class. Equipment belongs in the `equipment` field; test-analysis method belongs in `method` on `aquifer_analysis`. The contract for each type specifies what data it reliably supplies, how many steps it may carry, whether recovery is permitted, and whether its event ID is valid input to `source_event_ids` on an `aquifer_analysis` entry.
 
 ### Event types
 
-| `type` | Português (BR) | What it records | `steps` constraint | `recovery` | Valid in `source_event_ids` |
-| ------------------ | ------------------------- | --------------------------------------------------------------------------------------------------------------------------------- | ------------------- | ---------- | ----------------------------------------- |
-| `spot_measurement` | Medição pontual           | Static water level during a routine visit; optionally an informal brief pump observation. Not a controlled test. | 0 or 1 | Optional | As `static_level_source_id` only |
-| `constant_rate`    | Teste de vazão constante  | Controlled pump test at exactly one fixed rate. | Exactly 1 | Optional | Yes |
-| `step_drawdown`    | Teste de vazão escalonada | Controlled pump test at two or more successive rates in ascending order. | ≥ 2, ascending | Optional | Yes |
-| `airlift`          | Air-lift                  | Historical fact that air-lift development was performed and produced an estimated yield. | ≥ 1 | Optional | No — see § airlift |
-| `recovery_only`    | Apenas recuperação        | Recovery after a pumping event whose drawdown data was not recorded. | None | Required | Yes |
+| `type`             | Português (BR)            | What it records                                                                                                  | `steps` constraint | `recovery` | Valid in `source_event_ids`      |
+| ------------------ | ------------------------- | ---------------------------------------------------------------------------------------------------------------- | ------------------ | ---------- | -------------------------------- |
+| `spot_measurement` | Medição pontual           | Static water level during a routine visit; optionally an informal brief pump observation. Not a controlled test. | 0 or 1             | Optional   | As `static_level_source_id` only |
+| `constant_rate`    | Teste de vazão constante  | Controlled pump test at exactly one fixed rate.                                                                  | Exactly 1          | Optional   | Yes                              |
+| `step_drawdown`    | Teste de vazão escalonada | Controlled pump test at two or more successive rates in ascending order.                                         | ≥ 2, ascending     | Optional   | Yes                              |
+| `airlift`          | Air-lift                  | Historical fact that air-lift development was performed and produced an estimated yield.                         | ≥ 1                | Optional   | No — see § airlift               |
+| `recovery_only`    | Apenas recuperação        | Recovery after a pumping event whose drawdown data was not recorded.                                             | None               | Required   | Yes                              |
 
 The `type` field accepts any string. Non-canonical values SHOULD use the `x-` prefix.
 
@@ -232,24 +232,24 @@ Only `id`, `type`, and `datetime` are required. All others are optional for all 
 
 ### `spot_measurement`
 
-| Field                    | Type            | Required | Description                                                                                                                              |
-| ------------------------ | --------------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| `static_level`           | number          | yes      | Depth to water surface from ground level, in meters.                                                                                     |
-| `static_level_precision` | number          | no       | One-sigma precision of `static_level`.                                                                                                   |
-| `measurement_method`     | string          | no       | Recommended: `electric_probe`, `pressure_transducer`, `air_line`, `tape`.                                                                |
+| Field                    | Type            | Required | Description                                                                                                                               |
+| ------------------------ | --------------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| `static_level`           | number          | yes      | Depth to water surface from ground level, in meters.                                                                                      |
+| `static_level_precision` | number          | no       | One-sigma precision of `static_level`.                                                                                                    |
+| `measurement_method`     | string          | no       | Recommended: `electric_probe`, `pressure_transducer`, `air_line`, `tape`.                                                                 |
 | `steps`                  | `PumpingStep[]` | no       | At most one step. For an informal brief pump observation during the visit — not a controlled test. Use `constant_rate` for a formal test. |
-| `recovery`               | `RecoveryPhase` | no       | Recovery after the optional pumping step.                                                                                                |
+| `recovery`               | `RecoveryPhase` | no       | Recovery after the optional pumping step.                                                                                                 |
 
 ---
 
 ### `constant_rate`
 
-| Field                    | Type            | Required | Description                                                               |
-| ------------------------ | --------------- | -------- | ------------------------------------------------------------------------- |
-| `static_level`           | number          | no       | Pre-test static level in meters. Omit if not measured.                    |
-| `static_level_precision` | number          | no       | One-sigma precision of `static_level`.                                    |
+| Field                    | Type            | Required | Description                                                                                                  |
+| ------------------------ | --------------- | -------- | ------------------------------------------------------------------------------------------------------------ |
+| `static_level`           | number          | no       | Pre-test static level in meters. Omit if not measured.                                                       |
+| `static_level_precision` | number          | no       | One-sigma precision of `static_level`.                                                                       |
 | `steps`                  | `PumpingStep[]` | no       | Exactly one entry. A second step would make this a `step_drawdown`. Omit if only recovery data is available. |
-| `recovery`               | `RecoveryPhase` | no       | Recovery measurements after pump shutdown.                                |
+| `recovery`               | `RecoveryPhase` | no       | Recovery measurements after pump shutdown.                                                                   |
 
 ---
 
@@ -321,32 +321,32 @@ Static level is not reliably measurable during air-lift and SHOULD be omitted.
 
 An array of interpreted aquifer parameter sets. Multiple entries may coexist, representing different methods or analysts.
 
-| Field                     | Type     | Required | Description                                                                                          |
-| ------------------------- | -------- | -------- | ---------------------------------------------------------------------------------------------------- |
-| `id`                      | string   | yes      | Unique within `aquifer_analysis`.                                                                    |
-| `datetime`                | string   | yes      | RFC 3339 datetime with mandatory UTC offset.                                                         |
-| `analyst`                 | string   | no       | Name of the hydrogeologist.                                                                          |
-| `source_event_ids`        | string[] | yes      | IDs of source `hydrodynamic_events` from this same file. See § Cross-reference and Uniqueness Rules. |
-| `method`                  | string   | no       | See vocabulary below.                                                                                |
-| `static_level`            | number   | no       | Static level used as reference, in meters.                                                           |
-| `static_level_precision`  | number   | no       | One-sigma precision of `static_level`.                                                               |
-| `static_level_source_id`  | string   | no       | ID of the event from which `static_level` was taken.                                                 |
-| `dynamic_level`           | number   | no       | Stabilized dynamic level in meters.                                                                  |
-| `dynamic_level_precision` | number   | no       | One-sigma precision of `dynamic_level`.                                                              |
-| `flow_rate`               | number   | no       | Flow rate associated with `dynamic_level`, in m³/h.                                                  |
-| `flow_rate_precision`     | number   | no       | One-sigma precision of `flow_rate`.                                                                  |
+| Field                     | Type     | Required | Description                                                                                                                                                                                                                                                                     |
+| ------------------------- | -------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `id`                      | string   | yes      | Unique within `aquifer_analysis`.                                                                                                                                                                                                                                               |
+| `datetime`                | string   | yes      | RFC 3339 datetime with mandatory UTC offset.                                                                                                                                                                                                                                    |
+| `analyst`                 | string   | no       | Name of the hydrogeologist.                                                                                                                                                                                                                                                     |
+| `source_event_ids`        | string[] | yes      | IDs of source `hydrodynamic_events` from this same file. See § Cross-reference and Uniqueness Rules.                                                                                                                                                                            |
+| `method`                  | string   | no       | See vocabulary below.                                                                                                                                                                                                                                                           |
+| `static_level`            | number   | no       | Static level used as reference, in meters.                                                                                                                                                                                                                                      |
+| `static_level_precision`  | number   | no       | One-sigma precision of `static_level`.                                                                                                                                                                                                                                          |
+| `static_level_source_id`  | string   | no       | ID of the event from which `static_level` was taken.                                                                                                                                                                                                                            |
+| `dynamic_level`           | number   | no       | Stabilized dynamic level in meters.                                                                                                                                                                                                                                             |
+| `dynamic_level_precision` | number   | no       | One-sigma precision of `dynamic_level`.                                                                                                                                                                                                                                         |
+| `flow_rate`               | number   | no       | Flow rate associated with `dynamic_level`, in m³/h.                                                                                                                                                                                                                             |
+| `flow_rate_precision`     | number   | no       | One-sigma precision of `flow_rate`.                                                                                                                                                                                                                                             |
 | `max_flow_rate`           | number   | no       | Maximum recommended sustained extraction rate in m³/h, as judged by the analyst from the source events. This is an interpretive recommendation, not the test rate. Distinct from `flow_rate`, which is the rate actually applied during the test that produced `dynamic_level`. |
-| `max_flow_rate_precision` | number   | no       | One-sigma precision of `max_flow_rate` in m³/h.                                                      |
-| `max_flow_rate_basis`     | string   | no       | Free-text justification: safety factor applied, regulatory framework referenced (e.g. `"80% of test rate per ANA practice"`, `"limited by available drawdown to top of screen"`), or assumptions about long-term recharge. |
-| `specific_capacity`       | number   | no       | `Q/s` in m³/h per m (i.e. m²/h).                                                                     |
-| `transmissivity`          | number   | no       | Aquifer transmissivity `T` in m²/s.                                                                  |
-| `storativity`             | number   | no       | Dimensionless storativity `S`.                                                                       |
-| `hydraulic_conductivity`  | number   | no       | Hydraulic conductivity `K` in m/s. Requires `aquifer_thickness`.                                     |
-| `aquifer_thickness`       | number   | no       | Saturated aquifer thickness in meters.                                                               |
-| `jacob_b`                 | number   | no       | Formation loss coefficient from Jacob's equation.                                                    |
-| `jacob_c`                 | number   | no       | Well loss coefficient from Jacob's equation.                                                         |
-| `well_efficiency_pct`     | number   | no       | Well efficiency as a percentage.                                                                     |
-| `notes`                   | string   | no       | Methodology notes, assumptions, data quality remarks.                                                |
+| `max_flow_rate_precision` | number   | no       | One-sigma precision of `max_flow_rate` in m³/h.                                                                                                                                                                                                                                 |
+| `max_flow_rate_basis`     | string   | no       | Free-text justification: safety factor applied, regulatory framework referenced (e.g. `"80% of test rate per ANA practice"`, `"limited by available drawdown to top of screen"`), or assumptions about long-term recharge.                                                      |
+| `specific_capacity`       | number   | no       | `Q/s` in m³/h per m (i.e. m²/h).                                                                                                                                                                                                                                                |
+| `transmissivity`          | number   | no       | Aquifer transmissivity `T` in m²/s.                                                                                                                                                                                                                                             |
+| `storativity`             | number   | no       | Dimensionless storativity `S`.                                                                                                                                                                                                                                                  |
+| `hydraulic_conductivity`  | number   | no       | Hydraulic conductivity `K` in m/s. Requires `aquifer_thickness`.                                                                                                                                                                                                                |
+| `aquifer_thickness`       | number   | no       | Saturated aquifer thickness in meters.                                                                                                                                                                                                                                          |
+| `jacob_b`                 | number   | no       | Formation loss coefficient from Jacob's equation.                                                                                                                                                                                                                               |
+| `jacob_c`                 | number   | no       | Well loss coefficient from Jacob's equation.                                                                                                                                                                                                                                    |
+| `well_efficiency_pct`     | number   | no       | Well efficiency as a percentage.                                                                                                                                                                                                                                                |
+| `notes`                   | string   | no       | Methodology notes, assumptions, data quality remarks.                                                                                                                                                                                                                           |
 
 ### `method` — Recommended values
 

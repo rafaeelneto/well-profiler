@@ -357,6 +357,7 @@
         "latitude": "Latitude",
         "longitude": "Longitude",
         "elevation": "Elevation",
+        "wellDepth": "Well depth",
         "observations": "Observations"
       },
       "initialInfo": {
@@ -422,8 +423,18 @@
         "to": "To",
         "diameter": "Diam.",
         "drillingMethod": "Method",
+        "drillingMethodOptions": {
+          "rotary": "Rotary",
+          "percussion": "Percussion",
+          "cableTool": "Cable Tool",
+          "auger": "Auger",
+          "airHammer": "Air Hammer"
+        },
         "addRow": "Add bore hole",
-        "empty": "No bore hole intervals yet"
+        "empty": "No bore hole intervals yet",
+        "wellDepth": "Well depth",
+        "wellDepthCalculated": "Calculated depth",
+        "syncDepth": "Resync depth"
       },
       "surfaceCase": {
         "title": "Surface Casing",
@@ -526,6 +537,7 @@
       "latitude": "Latitude",
       "longitude": "Longitude",
       "elevation": "Elevation",
+      "wellDepth": "Well depth",
       "clickOrDragPin": "Click the map or drag the pin",
       "latPlaceholderDd": "-23.512533",
       "latPlaceholderDms": "23°30'45.12\"S",

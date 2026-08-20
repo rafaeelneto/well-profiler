@@ -124,6 +124,7 @@ Each minor revision of this spec MUST include a "Deprecations" subsection in its
 | `well_driller`      | string  | no       | Name of the drilling company or individual.                                                                                                                                                                                                     |
 | `construction_date` | string  | no       | ISO 8601 calendar date of well completion (`YYYY-MM-DD`). Date-only by design — time of day for construction completion is not meaningful at the precision the well registry cares about. Interpreted as the local civil date at the well site. |
 | `obs`               | string  | no       | Free-text observations about the well.                                                                                                                                                                                                          |
+| `well_depth`        | number  | no       | The well's current usable depth in meters from ground level, as measured or reported. May be less than the deepest constructive element (see `bore_hole`) due to siltation, debris, or partial backfill.                                        |
 
 ### v2 additions
 
@@ -290,6 +291,7 @@ UCUM is the **Unified Code for Units of Measure**, the international machine-par
 
 **Meter (`m`)** — all depths, lengths, and elevations:
 
+- `well_depth`
 - `bore_hole[].from`, `bore_hole[].to`
 - `well_case[].from`, `well_case[].to`
 - `reduction[].from`, `reduction[].to`

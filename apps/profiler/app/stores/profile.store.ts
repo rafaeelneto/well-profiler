@@ -12,6 +12,7 @@ import type { Draft } from 'immer';
 import { defineStore } from 'pinia';
 import { computed, markRaw, ref } from 'vue';
 import { makeDeepProxy } from '~/utils/state';
+import { calculatedWellDepth } from '~/utils/wellDepth';
 
 // ─── Chained-depth types ─────────────────────────────────────────────────────
 
@@ -240,11 +241,30 @@ export const useProfileStore = defineStore(
       }
     }
 
-    /** Apply an Immer recipe to the current well. Tracked in undo/redo history. */
+    /**
+     * Apply an Immer recipe to the current well. Tracked in undo/redo history.
+     *
+     * Also keeps `well_depth` tracking the calculated constructive depth
+     * (`calculatedWellDepth` — deliberately narrower than `maxDepth`, which
+     * includes geology for the render scale), in the same transaction as the
+     * triggering edit (same pattern as `rechainDepths` below): only while
+     * it's unset or still equal to the pre-edit calculated depth. Once the
+     * user manually diverges it, further edits to the constructive data no
+     * longer touch it — they'd need to click "sync" to re-link it.
+     */
     function updateWell(recipe: (draft: Draft<Well>) => void): void {
       if (!_well.value) return;
+      const previousDepth = calculatedWellDepth(_well.value);
       _update(draft => {
-        if (draft) recipe(draft as Draft<Well>);
+        if (!draft) return;
+        recipe(draft as Draft<Well>);
+        const nextDepth = calculatedWellDepth(draft as Well);
+        if (
+          nextDepth !== previousDepth &&
+          (draft.well_depth == null || draft.well_depth === previousDepth)
+        ) {
+          draft.well_depth = nextDepth;
+        }
       });
       isDirty.value = true;
     }

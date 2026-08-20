@@ -1,6 +1,7 @@
 import type { Well } from '@welldot/core';
 import { format, parseISO } from 'date-fns';
 import { formatCoord } from '~/utils/coords';
+import { calculatedWellDepth } from '~/utils/wellDepth';
 import { resolveWellTypeLabel } from '~/utils/wellType';
 import { createPdfFormatters } from './formatters';
 import type { ContentTable, TableCell } from './pdfmake.types';
@@ -87,6 +88,13 @@ export function buildMetadataTable(
     fields.push({
       label: t('editor.general.elevation'),
       value: formatLength(well.location.elevation),
+    });
+  }
+  const calculatedDepth = calculatedWellDepth(well);
+  if (well.well_depth != null || calculatedDepth > 0) {
+    fields.push({
+      label: t('editor.general.wellDepth'),
+      value: formatLength(well.well_depth ?? calculatedDepth),
     });
   }
   for (const entry of well.well_id ?? []) {

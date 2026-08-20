@@ -33,4 +33,9 @@ export type WellGridColumn =
       type: 'select-button';
       options: Array<{ label: string; value: string }>;
     })
+  | (WellGridColumnBase & {
+      /** Suggested values with translated labels, but any free text is accepted and stored as-is. */
+      type: 'combo';
+      options: Array<{ label: string; value: string }>;
+    })
   | (WellGridColumnBase & { type: 'texture' });

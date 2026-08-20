@@ -1,7 +1,7 @@
 ---
 name: welldot-converter
 metadata:
-  version: 1.0.0
+  version: 2.0.0
 description: >
   Converts water well reports (PDF, DOCX, image, text) into a valid `.well` JSON file
   for welldot.org and @welldot/core. Works with reports in any language (PT, EN, ES, etc.).
@@ -31,14 +31,16 @@ or use with `@welldot/core`.
 **Always fetch the latest docs before extracting or validating data.** The `.well` format
 may evolve; anything in this SKILL.md is secondary to the live spec.
 
-Required sources (web_fetch each session):
+This skill targets **spec version 2** — welldot.org / `@welldot/core` do not accept `version: 1` files
+for new conversions. Required sources (web_fetch each session):
 
-| Doc           | URL                                                                                   |
-| ------------- | ------------------------------------------------------------------------------------- |
-| Main repo     | https://github.com/rafaeelneto/welldot                                                |
-| Core README   | https://github.com/rafaeelneto/welldot/blob/main/packages/core/README.md              |
-| Format spec   | https://github.com/rafaeelneto/welldot/blob/main/packages/core/well-specifications.md |
-| FGDC textures | https://github.com/rafaeelneto/welldot/blob/main/packages/core/fgdc-textures.md       |
+| Doc              | URL                                                                                             |
+| ---------------- | ----------------------------------------------------------------------------------------------- |
+| Overview         | https://github.com/rafaeelneto/welldot/blob/main/packages/core/docs/spec/v2/overview.md         |
+| Format reference | https://github.com/rafaeelneto/welldot/blob/main/packages/core/docs/spec/v2/format-reference.md |
+| Object schemas   | https://github.com/rafaeelneto/welldot/blob/main/packages/core/docs/spec/v2/object-schemas.md   |
+| Interoperability | https://github.com/rafaeelneto/welldot/blob/main/packages/core/docs/spec/v2/interoperability.md |
+| FGDC textures    | https://github.com/rafaeelneto/welldot/blob/main/packages/core/docs/reference/fgdc-textures.md  |
 
 If this SKILL.md conflicts with the GitHub spec, **the GitHub spec wins**.
 
@@ -51,11 +53,19 @@ match what you read. Re-fetch if the session is long or you suspect spec changes
 
 ---
 
-## Language
+## Language and free-text preservation
 
-**Preserve the source document's language** in all free-text fields (`description`, `obs`,
-`geologic_unit`, `aquifer_unit`, names, etc.). Portuguese report → Portuguese output.
-English report → English output. Only translate if the user explicitly asks.
+**Preserve the source document's language** in all free-text fields (`description`, `obs`, `notes`,
+`geologic_unit`, `aquifer_unit`, names, `history_logs[].description`, and the freetext "type" fields
+below, etc.). Portuguese report → Portuguese output. English report → English output. Only translate if
+the user explicitly asks.
+
+**Stay near-verbatim.** Light trimming of filler words is fine. Summarizing or paraphrasing a free-text
+field is only acceptable when it drops **zero** detail or data — no lost measurements, materials,
+brand/equipment names, or qualifiers. When in doubt, transcribe closer to the original rather than
+condense it. This applies with extra weight to `hole_fill[].description`, and to `well_case.type`,
+`well_screen.type`, `reduction.type`, and `cement_pad.type` — see § Vocabulary tiers below for why those
+four are treated as description-like text rather than enums.
 
 ---
 
@@ -66,8 +76,10 @@ English report → English output. Only translate if the user explicitly asks.
 - Value present → transcribe precisely, converting units if needed
 - Value absent → **omit the field entirely** — never estimate, infer, or approximate
 
-Applies to: `lat`, `lng`, `elevation`, `from`, `to`, `diameter`, `screen_slot_mm`, `dip`,
-`azimuth`, and all other numeric fields.
+Applies to: `location.lat`, `location.lng`, `location.elevation`, `from`, `to`, `diameter`,
+`screen_slot`, `dip`, `azimuth`, all `hydrodynamic_events`/`aquifer_analysis` numerics, and all other
+numeric fields. If a pump-test report only gives a final drawdown value and not a time series, record a
+single `LevelReading` — never fabricate intermediate readings to fill out a curve.
 
 Accepted conversions (only when original unit is explicit in the document):
 
@@ -92,10 +104,14 @@ Check `/mnt/user-data/uploads/` for uploaded files.
 
 ## Step 1 — Fetch the latest docs
 
-web_fetch the four URLs above. Pay attention to:
+web_fetch the five URLs above. Pay attention to:
 
 - Required fields per object type
-- Allowed vocabularies (well_type, drilling_method, aquifer_unit, etc.)
+- Which "type"-like fields are recommended-but-free-text vs. pure free text vs. a real closed enum —
+  see § Vocabulary tiers below; this distinction changed since this SKILL.md's v1 days and is easy to
+  get wrong by assuming everything is an enum.
+- `hydrodynamic_events` / `aquifer_analysis` / `history_logs` — v2-only, absent from v1 reports' target
+  format but still the correct place for pump-test and maintenance data found in a report.
 - Any new fields or types added since this SKILL.md was written
 - Available FGDC codes (Series 600 and 700 cover most well lithologies)
 
@@ -123,46 +139,115 @@ conforming to the `.well` spec fetched in Step 1.
 You are a technical assistant specialized in water well data extraction.
 
 Extract all available well data from the provided document and return ONLY a valid JSON object
-conforming to the .well format specification v1:
-https://github.com/rafaeelneto/welldot/blob/main/packages/core/well-specifications.md
+conforming to the .well format specification v2:
+https://github.com/rafaeelneto/welldot/blob/main/packages/core/docs/spec/v2/object-schemas.md
+(also see format-reference.md in the same directory for top-level structure, units, and datetime rules)
 
 No explanation, no markdown fences, no preamble — raw JSON only.
 
-LANGUAGE: Preserve the source document's language in all free-text fields (description, obs,
-geologic_unit, aquifer_unit, names). Do not translate unless explicitly requested.
+LANGUAGE AND FREE-TEXT PRESERVATION:
+- Preserve the source document's language in every free-text field (description, obs, notes,
+  geologic_unit, aquifer_unit, names, history_logs[].description, and the freetext "type" fields below).
+  Do not translate unless explicitly requested.
+- Stay near-verbatim. Light trimming of filler words is fine. Summarizing is only acceptable when it
+  drops ZERO detail or data (measurements, materials, brand/equipment names, qualifiers). When in doubt,
+  transcribe closer to the original rather than condense.
 
 METRIC FIDELITY (critical):
 - Transcribe ONLY values explicitly in the document. If absent, OMIT the field. Never infer.
-- Applies to: lat, lng, elevation, from, to, diameter, screen_slot_mm, dip, azimuth, all numerics.
+- Applies to: location.lat, location.lng, location.elevation, from, to, diameter, screen_slot, dip,
+  azimuth, all numerics in hydrodynamic_events/aquifer_analysis, and every other numeric field.
 - Unit conversions (only when source unit is explicit): ft→m ×0.3048, in→mm ×25.4, cm→mm ×10,
-  DMS→decimal degrees (precise), SIRGAS UTM→WGS84 decimal (precise).
-- Empty arrays for missing array fields: []. Omit cement_pad entirely if not in document.
+  DMS→decimal degrees (precise), projected CRS (e.g. SIRGAS UTM)→WGS84 decimal (precise).
+- Empty arrays for missing array fields: []. Omit cement_pad, location, well_id, hydrodynamic_events,
+  aquifer_analysis, history_logs entirely (not empty placeholders) if the document has nothing for them.
+- If a pump-test report gives only a final drawdown value and not a time series, record a single
+  LevelReading — never fabricate intermediate readings to fill out a curve.
 
-FGDC TEXTURE — numeric codes only (integer, not string):
-- Match geological description to best code from:
-  https://github.com/rafaeelneto/welldot/blob/main/packages/core/fgdc-textures.md
-- Prefer Series 600 (sedimentary) and 700 (metamorphic/igneous) — fully implemented.
-  Avoid Series 100–500 (pending) unless only match.
-- Common mappings (verify against full list):
+VOCABULARY TIERS — read carefully, these fields are NOT uniformly enums:
+
+Tier 1 — recommended example values, not enforced. Use the example term ONLY when the report's own
+wording maps to it losslessly (no dropped nuance/brand/equipment/shape detail); otherwise transcribe the
+report's own phrase verbatim, in its own language:
+  - bore_hole[].drilling_method: rotary, percussion, cable_tool, auger, air_hammer
+  - cement_pad.type: material and/or shape, e.g. "concrete", "circular" (may combine both)
+  - well_type: tubular, artesian, hand_dug, horizontal, infiltration_gallery (use x- prefix if none fit)
+
+Tier 2 — pure free text, NO recommended vocabulary exists for these at all. Never invent or apply an
+enum. Always transcribe the report's own wording verbatim, in its own language:
+  - well_case[].type (casing material — do NOT use steel/pvc/hdpe/fiberglass as an enum)
+  - reduction[].type
+  - well_screen[].type (do NOT use wire_wound/bridge_slot/louvered/pvc_slotted as an enum)
+
+Tier 3 — real closed enum, must classify into exactly one value:
+  - hole_fill[].type: "gravel_pack" or "seal" only. (hole_fill[].description carries the near-verbatim
+    material detail instead — see LANGUAGE AND FREE-TEXT PRESERVATION.)
+
+TEXTURE (lithology[].texture) — an object, not a bare string or code:
+  { "code": 607, "vocabulary": "fgdc" }
+- vocabulary defaults to "fgdc" (integer codes). Only use a different vocabulary (cgi/custom/an HTTPS
+  URI) when the source document itself explicitly cites that alternative standard.
+- texture is REQUIRED on every lithology entry — never omit it.
+- Match description to the best FGDC code. Prefer Series 600 (sedimentary) and 700 (metamorphic/
+  igneous) — the only series with rendered patterns today. Between two comparably good candidates,
+  prefer the non-pending one; but geological accuracy comes first — never force-fit a poorly-matching
+  Series 600/700 code just to avoid a pending Series 100-500 code.
+- Common mappings (verify against the full fgdc-textures.md list):
   Sand/Areia=607, Gravel/Cascalho=601, Clay/Argila=620, Silt/Silte=616,
   Limestone/Calcário=627, Granite/Granito=718, Gneiss=708, Schist/Xisto=705,
-  Quartzite/Quartzito=702, Basalt/Basalto=717, Sandstone/Arenito=607-608,
+  Quartzite/Quartzito=702, Basaltic flows/Basalto=717, Sandstone/Arenito=607-608,
   Shale/Folhelho=619-620, Chalk=626, Coal/Carvão=658, Gypsum/Gesso=667
+- Codes 120, 123, 132 are non-pending but have meaningless placeholder labels — never use them.
 
 LITHOLOGY COLOR: geologically plausible CSS hex. Examples:
   clay=#8B7355, sand=#F5DEB3, granite=#A9A9A9, basalt=#696969,
   limestone=#FFFACD, gneiss=#B8860B, schist=#9E8B6E
 
-VOCABULARY:
-- well_type: tubular, artesian, hand_dug, horizontal, infiltration_gallery
-- drilling_method: rotary, percussion, cable_tool, auger, diamond, air_rotary
-- well_case type: steel, pvc, hdpe, fiberglass
-- well_screen type: wire_wound, bridge_slot, louvered, pvc_slotted
-- hole_fill type: gravel_pack | seal
-- fracture required: depth, water_intake (bool), description, swarm (bool), azimuth, dip
-- cave required: from, to, water_intake (bool), description
+fracture required: depth, water_intake (bool), description, swarm (bool), azimuth, dip
+cave required: from, to, water_intake (bool), description
 
-version: 1 (integer)
+HYDRODYNAMIC_EVENTS (pumping tests, static/dynamic level measurements) — array, each entry:
+  Common: id (uuid), type, datetime (RFC 3339 WITH UTC offset — never a naked timestamp), sequence,
+  operator, equipment, notes.
+  type is one of:
+  - spot_measurement: static_level (required), static_level_precision, measurement_method
+    (electric_probe/pressure_transducer/air_line/tape), steps (0 or 1), recovery (optional)
+  - constant_rate: static_level (optional), steps (exactly 1), recovery (optional)
+  - step_drawdown: static_level (optional), steps (>=2, ascending rate order), recovery (optional)
+  - airlift: steps (>=1) required, recovery optional. NEVER let an airlift event's id appear in any
+    aquifer_analysis[].source_event_ids — refuse and flag to the user if the report implies otherwise.
+  - recovery_only: pumping_rate (optional), pumping_duration (optional), recovery REQUIRED
+  PumpingStep: { rate (m3/h, required), rate_precision, duration (min), readings: LevelReading[] }
+  LevelReading: { elapsed (min, required), depth (m, required), depth_precision, pressure (kPa) }
+  RecoveryPhase: { readings: LevelReading[] (required) }
+
+AQUIFER_ANALYSIS — only populate when the report states an actual interpreted result (transmissivity,
+specific capacity, etc.); never compute these yourself from raw readings. Fields: id, datetime (RFC 3339
+with offset), analyst, source_event_ids (required, references hydrodynamic_events ids, never airlift),
+method (cooper_jacob/theis/neuman/hantush/birsoy_summers/eden_hazel/visual_inspection), static_level(+
+_precision, _source_id), dynamic_level(+_precision), flow_rate(+_precision), max_flow_rate(+_precision,
+_basis), specific_capacity, transmissivity, storativity, hydraulic_conductivity, aquifer_thickness,
+jacob_b, jacob_c, well_efficiency_pct, notes.
+
+HISTORY_LOGS — interventions/inspections/incidents distinct from hydrodynamic_events. Each entry: id,
+datetime (RFC 3339 with offset, when it happened), updated_at (RFC 3339 with offset, when the record was
+made/edited — NEVER synthesize this if the report doesn't distinguish it from datetime, omit instead),
+category (maintenance/inspection/incident/event, open vocab), description (near-verbatim), author,
+severity (low/medium/high/critical), attachments (only if the report references an actual retrievable
+URL — Attachment: id, uri (https, required), media_type (required), filename, description, sha256).
+
+TOP-LEVEL v2 STRUCTURE: well_id[] ({authority, id, primary?}), location ({lat, lng, elevation?,
+properties?}) replacing v1's flat lat/lng/elevation, profiles[] (only if the report explicitly declares
+conformance to a named profile schema — usually omit).
+
+well_depth (number, meters, optional): the well's CURRENT/USABLE depth, distinct from the as-drilled
+depth (which goes in bore_hole[].to). Most reports state only ONE depth figure — the drilled/total
+depth — which belongs in bore_hole, NOT well_depth. Only populate well_depth when the report explicitly
+distinguishes a current/usable/measured depth from the original drilled depth (e.g. a re-survey noting
+siltation, debris, or partial backfill reduced the depth; SIAGAS-style records with a separate
+"profundidade útil"). Never copy the same total-depth figure into both bore_hole[].to and well_depth.
+
+version: 2 (integer)
 ```
 
 ### API call
@@ -198,12 +283,25 @@ const wellData = JSON.parse(raw.replace(/```json|```/g, '').trim());
 
 ## Step 4 — Validate
 
-1. `"version": 1` present
+1. `"version": 2` present
 2. All required fields present per object type (per spec from Step 1)
 3. Depth consistency: `from < to` for all interval objects
 4. Diameter sanity: boreholes 100–600 mm typical; casings smaller than borehole
-5. `fgdc_texture` is a numeric integer, not a string
-6. No numeric field was estimated — if in doubt, remove and flag to user
+5. `lithology[].texture` is an object `{code, vocabulary}` — never a bare string or the old
+   `fgdc_texture` field name; `code` is numeric when `vocabulary` is `fgdc`
+6. `hole_fill[].type` is exactly `gravel_pack` or `seal` — but `well_case.type`, `reduction.type`,
+   `well_screen.type`, `cement_pad.type`, and `drilling_method` are **not** checked against any enum;
+   flag it as a bug in the extraction (not a data problem) if one of those was force-fit to a value the
+   report didn't actually say
+7. `well_screen[].screen_slot` used, not the v1 `screen_slot_mm`
+8. Every `hydrodynamic_events[]`, `aquifer_analysis[]`, `history_logs[]` `datetime` (and `updated_at`) is
+   RFC 3339 **with a UTC offset** — reject and fix any naked `YYYY-MM-DDTHH:MM:SS` or bare date used
+   where an instant is required (only `construction_date` is a bare calendar date)
+9. `hydrodynamic_events[].steps` cardinality matches its `type`: `spot_measurement` 0–1,
+   `constant_rate` exactly 1, `step_drawdown` ≥2 ascending, `airlift` ≥1, `recovery_only` none
+   (recovery required instead)
+10. No `aquifer_analysis[].source_event_ids` entry points to an `airlift`-type event
+11. No numeric field was estimated — if in doubt, remove and flag to user
 
 ---
 
@@ -213,8 +311,12 @@ Save to `/mnt/user-data/outputs/<well_name>.well` (sanitized from well name; def
 
 Present the file with a brief summary:
 
-- Sections found: constructive (bore_hole, casing, screen, etc.) / geologic (lithology, fractures)
-- Total depth
+- Sections found: constructive (bore_hole, casing, screen, etc.) / geologic (lithology, fractures) /
+  hydrodynamic (pumping tests, aquifer analysis) / history (maintenance, inspections, incidents)
+- Total depth (from `bore_hole`), and `well_depth` separately if the report gave a distinct current/
+  usable depth
+- Any freetext "type" field (drilling_method, well_case/reduction/well_screen.type, cement_pad.type)
+  that was kept as the report's original wording rather than mapped to a recommended value
 - Fields absent in the report (intentionally omitted) that may need manual completion
 
 ---
@@ -225,27 +327,49 @@ Ask targeted questions for missing critical data. Common gaps:
 
 - **Borehole diameter** not stated (do not infer — ask)
 - **Total depth** sometimes only in feet — confirm conversion
-- **Screen slot** (`screen_slot_mm`) often missing in older reports
+- **Two different depth figures** (e.g. original drilled depth vs. a more recent measured/usable depth,
+  often from a re-survey) — confirm which is `bore_hole[].to` (as-drilled) and which is `well_depth`
+  (current/usable); do not guess
+- **Screen slot** (`screen_slot`) often missing in older reports
 - **Coordinates** sometimes in UTM — ask for decimal degrees or convert
 - **Driller name** often in header/stamp missed by text extraction
+- **Pump-test data** often gives only a final drawdown reading, not a full time series — ask before
+  fabricating intermediate `LevelReading`s to fill a curve
+- **Static vs. dynamic level dates** sometimes ambiguous between a single test event and a routine
+  monitoring visit — ask whether to record as `constant_rate`/`step_drawdown` (a formal test) or
+  `spot_measurement` (a routine check)
+- **History-log dates** — maintenance or incidents mentioned in narrative prose without a clear date;
+  ask rather than guessing a `datetime`, and never synthesize `updated_at` if the report doesn't
+  distinguish it from when the event happened
+- **`aquifer_analysis` results without visible source data** — if the report states a transmissivity or
+  specific-capacity figure but no underlying test readings, ask whether to still record the analysis
+  (with `source_event_ids` pointing at whatever event context exists) or omit it
 
 ---
 
 ## Common report term lookup
 
-| Section     | PT terms                                                   | EN terms                                       |
-| ----------- | ---------------------------------------------------------- | ---------------------------------------------- |
-| Metadata    | Nome do poço, empresa perfuradora, data de conclusão, cota | Well name, driller, completion date, elevation |
-| Borehole    | Perfuração, diâmetro de perfuração, profundidade total     | Drilling, borehole diameter, total depth       |
-| Casing      | Revestimento, tubo de aço/PVC                              | Casing, steel/PVC pipe                         |
-| Reduction   | Redutor, adaptador                                         | Reducer, adapter                               |
-| Screen      | Filtro, seção filtrante, ranhura, wire-wound               | Screen, slotted section, slot opening          |
-| Gravel pack | Pré-filtro, enrocamento, seixo                             | Gravel pack, filter gravel                     |
-| Seal        | Cimentação anular, bentonita, vedação                      | Annular seal, bentonite, cement                |
-| Cement pad  | Laje de proteção, laje de concreto                         | Wellhead pad, concrete pad                     |
-| Lithology   | Perfil litológico, coluna geológica, camadas               | Lithological profile, geologic column, layers  |
-| Fractures   | Fraturas, zonas fraturadas                                 | Fractures, fracture zones                      |
-| Caves       | Cavernas, zonas cavernosas                                 | Caves, voids, cavities                         |
+| Section      | PT terms                                                   | EN terms                                               |
+| ------------ | ---------------------------------------------------------- | ------------------------------------------------------ |
+| Metadata     | Nome do poço, empresa perfuradora, data de conclusão, cota | Well name, driller, completion date, elevation         |
+| Borehole     | Perfuração, diâmetro de perfuração, profundidade total     | Drilling, borehole diameter, total depth               |
+| Usable depth | Profundidade útil, profundidade atual, profundidade medida | Usable depth, current depth, measured depth            |
+| Casing       | Revestimento, tubo de aço/PVC                              | Casing, steel/PVC pipe                                 |
+| Reduction    | Redutor, adaptador                                         | Reducer, adapter                                       |
+| Screen       | Filtro, seção filtrante, ranhura, wire-wound               | Screen, slotted section, slot opening                  |
+| Gravel pack  | Pré-filtro, enrocamento, seixo                             | Gravel pack, filter gravel                             |
+| Seal         | Cimentação anular, bentonita, vedação                      | Annular seal, bentonite, cement                        |
+| Cement pad   | Laje de proteção, laje de concreto                         | Wellhead pad, concrete pad                             |
+| Lithology    | Perfil litológico, coluna geológica, camadas               | Lithological profile, geologic column, layers          |
+| Fractures    | Fraturas, zonas fraturadas                                 | Fractures, fracture zones                              |
+| Caves        | Cavernas, zonas cavernosas                                 | Caves, voids, cavities                                 |
+| Pumping test | Teste de vazão, teste de bombeamento, teste de aquífero    | Pumping test, aquifer test                             |
+| Levels       | Nível estático, nível dinâmico, rebaixamento               | Static level, dynamic level, drawdown                  |
+| Recovery     | Recuperação, teste de recuperação                          | Recovery, recovery test                                |
+| Air-lift     | Air-lift, teste de produção por ar comprimido              | Air-lift, air-lift test                                |
+| Maintenance  | Manutenção, troca de bomba, limpeza, recondicionamento     | Maintenance, pump replacement, cleaning, redevelopment |
+| Inspection   | Inspeção, vistoria, filmagem                               | Inspection, survey, camera log                         |
+| Incident     | Incidente, colapso, contaminação, vandalismo               | Incident, collapse, contamination, vandalism           |
 
 ---
 

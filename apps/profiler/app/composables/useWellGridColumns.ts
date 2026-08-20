@@ -15,6 +15,7 @@ import { computed, defineComponent, h, type ComputedRef } from 'vue';
 import GridCheckboxCell from '~/components/DataGrid/cells/GridCheckboxCell.vue';
 import GridColorCell from '~/components/DataGrid/cells/GridColorCell.vue';
 import GridColorPickerEditor from '~/components/DataGrid/cells/GridColorPickerEditor.vue';
+import GridComboEditor from '~/components/DataGrid/cells/GridComboEditor.vue';
 import GridDeleteCell from '~/components/DataGrid/cells/GridDeleteCell.vue';
 import GridFormattedCell from '~/components/DataGrid/cells/GridFormattedCell.vue';
 import GridNumberEditor from '~/components/DataGrid/cells/GridNumberEditor.vue';
@@ -41,6 +42,7 @@ type ColumnKind =
   | 'color'
   | 'select'
   | 'select-button'
+  | 'combo'
   | 'formatted'
   | 'checkbox'
   | 'texture';
@@ -57,6 +59,7 @@ function resolveColumnKind(col: WellGridColumn): ColumnKind {
   if (col.type === 'texture') return 'texture';
   if (col.type === 'select') return 'select';
   if (col.type === 'select-button') return 'select-button';
+  if (col.type === 'combo') return 'combo';
   if (col.type === 'color') return 'color';
   if (col.type === 'checkbox') return 'checkbox';
   if (col.unitType) return col.unitType;
@@ -75,6 +78,13 @@ function selectEditorFactory(options: Array<{ label: string; value: string }>) {
   return defineComponent({
     props: ['val', 'save', 'close'],
     setup: (p: any) => () => h(GridSelectEditor, { ...p, options }),
+  });
+}
+
+function comboEditorFactory(options: Array<{ label: string; value: string }>) {
+  return defineComponent({
+    props: ['val', 'save', 'close'],
+    setup: (p: any) => () => h(GridComboEditor, { ...p, options }),
   });
 }
 
@@ -137,6 +147,11 @@ export function useWellGridColumns(options: UseWellGridColumnsOptions) {
       if (col.type === 'select') {
         editors[`select_${col.prop}`] = VGridVueEditor(
           selectEditorFactory(col.options),
+        );
+      }
+      if (col.type === 'combo') {
+        editors[`combo_${col.prop}`] = VGridVueEditor(
+          comboEditorFactory(col.options),
         );
       }
     }
@@ -202,6 +217,15 @@ export function useWellGridColumns(options: UseWellGridColumnsOptions) {
       cellTemplate: col =>
         VGridVueTemplate(GridSelectCell, {
           options: (col as Extract<WellGridColumn, { type: 'select' }>).options,
+        }),
+    },
+    combo: {
+      editor: col => `combo_${col.prop}`,
+      // GridSelectCell already falls back to the raw value when it isn't
+      // one of the suggested options, which is exactly what free text needs.
+      cellTemplate: col =>
+        VGridVueTemplate(GridSelectCell, {
+          options: (col as Extract<WellGridColumn, { type: 'combo' }>).options,
         }),
     },
     formatted: {
