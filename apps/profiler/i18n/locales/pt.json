@@ -357,6 +357,7 @@
         "latitude": "Latitude",
         "longitude": "Longitude",
         "elevation": "Elevação",
+        "wellDepth": "Profundidade útil",
         "observations": "Observações"
       },
       "initialInfo": {
@@ -430,7 +431,10 @@
           "airHammer": "Martelo Pneumático"
         },
         "addRow": "Adicionar trecho",
-        "empty": "Nenhum trecho cadastrado"
+        "empty": "Nenhum trecho cadastrado",
+        "wellDepth": "Profundidade útil",
+        "wellDepthCalculated": "Profundidade calculada",
+        "syncDepth": "Ressincronizar profundidade"
       },
       "surfaceCase": {
         "title": "Tubo de Boca",
@@ -533,6 +537,7 @@
       "latitude": "Latitude",
       "longitude": "Longitude",
       "elevation": "Elevação",
+      "wellDepth": "Profundidade útil",
       "clickOrDragPin": "Clique no mapa ou arraste o pino",
       "latPlaceholderDd": "-23.512533",
       "latPlaceholderDms": "23°30'45.12\"S",

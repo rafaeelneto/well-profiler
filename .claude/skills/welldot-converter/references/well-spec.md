@@ -36,6 +36,7 @@ This is a condensed reference for extraction. The normative source is
   "well_driller": "...",
   "construction_date": "YYYY-MM-DD",
   "obs": "...",
+  "well_depth": 42.0,
 
   "well_id": [ { "authority": "...", "id": "...", "primary": true } ],
   "location": {
@@ -62,6 +63,16 @@ states one — never estimate it.
 `tubular` | `artesian` | `hand_dug` | `horizontal` | `infiltration_gallery`. Any string is accepted; use
 the recommended values above when they fit, otherwise write the term as an `x-`-prefixed value (e.g.
 `x-radial_collector`) rather than forcing a mismatch.
+
+### `well_depth` — current/usable depth, not the drilled depth
+
+Number, meters, optional. Distinct from the as-drilled depth, which is `bore_hole[].to` (the last/deepest
+bore hole interval) — not this field. A report that states a single depth figure ("profundidade total",
+"total depth") is describing the drilled depth: put it in `bore_hole`, leave `well_depth` unset. Only set
+`well_depth` when the report explicitly gives a _separate_ current/usable/measured depth distinct from
+the original drilled depth — e.g. a re-survey noting the well is now shallower due to siltation, debris,
+or partial backfill ("profundidade útil" in SIAGAS-style Brazilian records). Never duplicate the same
+number into both fields.
 
 ---
 

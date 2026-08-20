@@ -64,6 +64,25 @@ describe('buildMetadataTable', () => {
     expect(serialized).toContain('ft');
   });
 
+  it('includes well_depth formatted via lengthUnit when set', () => {
+    const well = baseWell({ well_depth: 187.3 });
+    const serialized = JSON.stringify(buildMetadataTable(well, baseOptions, t));
+    expect(serialized).toContain('187.3');
+  });
+
+  it('omits well_depth when unset and no constructive/geologic data exists', () => {
+    const well = baseWell({ name: 'Well A' });
+    const serialized = JSON.stringify(buildMetadataTable(well, baseOptions, t));
+    expect(serialized).not.toContain('editor.general.wellDepth');
+  });
+
+  it('falls back to the calculated depth when well_depth is unset but bore_hole has data', () => {
+    const well = baseWell({ bore_hole: [{ from: 0, to: 150, diameter: 200 }] });
+    const serialized = JSON.stringify(buildMetadataTable(well, baseOptions, t));
+    expect(serialized).toContain('editor.general.wellDepth');
+    expect(serialized).toContain('150');
+  });
+
   it('formats construction_date as dd/MM/yyyy', () => {
     const well = baseWell({ construction_date: '2024-03-05' });
     const table = buildMetadataTable(well, baseOptions, t);

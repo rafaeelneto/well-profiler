@@ -47,6 +47,36 @@ function createEmptyWell(): Well {
   return JSON.parse(JSON.stringify(EMPTY_WELL)) as Well;
 }
 
+/**
+ * Deepest recorded point across a well's constructive arrays only (not
+ * geologic — lithology/fractures/caves may extend past the actual
+ * constructed well and would overstate it). Same "last item's `to`" logic
+ * as `@welldot/utils`'s `getProfileLastItemsDepths`, duplicated here because
+ * `packages/core` may not depend on `@welldot/utils` (dependency chain runs
+ * the other way).
+ */
+function calculatedWellDepth(well: Well): number {
+  const lastTo = (items: { to: number }[]): number =>
+    items.length ? items[items.length - 1]!.to : 0;
+
+  return Math.max(
+    0,
+    lastTo(well.bore_hole),
+    lastTo(well.hole_fill),
+    lastTo(well.reduction),
+    lastTo(well.surface_case),
+    lastTo(well.well_case),
+    lastTo(well.well_screen),
+  );
+}
+
+/** Fills in `well_depth` from the constructive data when the source didn't provide one. */
+function withCalculatedWellDepth(well: Well): Well {
+  if (well.well_depth != null) return well;
+  const calculated = calculatedWellDepth(well);
+  return calculated > 0 ? { ...well, well_depth: calculated } : well;
+}
+
 function normalizeLithology(items: RawJSON[]): Lithology[] {
   return items.map(item => {
     const base = { aquifer_unit: '', ...item };
@@ -148,6 +178,9 @@ function decodeV2Well(raw: RawJSON): Well {
       construction_date: raw.construction_date as string,
     }),
     ...(raw.obs !== undefined && { obs: raw.obs as string }),
+    ...(raw.well_depth !== undefined && {
+      well_depth: raw.well_depth as number,
+    }),
     bore_hole: (raw.bore_hole as Well['bore_hole']) ?? [],
     well_case: (raw.well_case as Well['well_case']) ?? [],
     reduction: (raw.reduction as Well['reduction']) ?? [],
@@ -248,6 +281,7 @@ export function serializeWell(well: Well): string {
       construction_date: well.construction_date,
     }),
     ...(well.obs !== undefined && { obs: well.obs }),
+    ...(well.well_depth !== undefined && { well_depth: well.well_depth }),
     bore_hole: well.bore_hole,
     well_case: well.well_case,
     reduction: well.reduction,
@@ -329,6 +363,7 @@ export function redactWell(well: Well, visibility: SectionVisibility): Well {
     redacted.surface_case = [];
     redacted.hole_fill = [];
     delete redacted.cement_pad;
+    delete redacted.well_depth;
   }
 
   if (!visibility.geology) {
@@ -378,8 +413,8 @@ export function deserializeWell(jsonString: string): Well | null {
   }
 
   if (typeof raw.version === 'number') {
-    if (raw.version === 2) return decodeV2Well(raw);
-    if (raw.version === 1) return decodeV1Well(raw);
+    if (raw.version === 2) return withCalculatedWellDepth(decodeV2Well(raw));
+    if (raw.version === 1) return withCalculatedWellDepth(decodeV1Well(raw));
     throw new Error(`Unsupported .well format version: ${raw.version}`);
   }
 
@@ -402,12 +437,12 @@ export function deserializeWell(jsonString: string): Well | null {
     ...(raw.obs !== undefined && { obs: raw.obs as string }),
   };
 
-  return {
+  return withCalculatedWellDepth({
     ...createEmptyWell(),
     ...metadata,
     ...normalizeConstructive(constructiveSource),
     ...normalizeGeologic(raw),
-  };
+  });
 }
 
 // ─── Backward-compat aliases ─────────────────────────────────────────────────

@@ -240,6 +240,13 @@ TOP-LEVEL v2 STRUCTURE: well_id[] ({authority, id, primary?}), location ({lat, l
 properties?}) replacing v1's flat lat/lng/elevation, profiles[] (only if the report explicitly declares
 conformance to a named profile schema — usually omit).
 
+well_depth (number, meters, optional): the well's CURRENT/USABLE depth, distinct from the as-drilled
+depth (which goes in bore_hole[].to). Most reports state only ONE depth figure — the drilled/total
+depth — which belongs in bore_hole, NOT well_depth. Only populate well_depth when the report explicitly
+distinguishes a current/usable/measured depth from the original drilled depth (e.g. a re-survey noting
+siltation, debris, or partial backfill reduced the depth; SIAGAS-style records with a separate
+"profundidade útil"). Never copy the same total-depth figure into both bore_hole[].to and well_depth.
+
 version: 2 (integer)
 ```
 
@@ -306,7 +313,8 @@ Present the file with a brief summary:
 
 - Sections found: constructive (bore_hole, casing, screen, etc.) / geologic (lithology, fractures) /
   hydrodynamic (pumping tests, aquifer analysis) / history (maintenance, inspections, incidents)
-- Total depth
+- Total depth (from `bore_hole`), and `well_depth` separately if the report gave a distinct current/
+  usable depth
 - Any freetext "type" field (drilling_method, well_case/reduction/well_screen.type, cement_pad.type)
   that was kept as the report's original wording rather than mapped to a recommended value
 - Fields absent in the report (intentionally omitted) that may need manual completion
@@ -319,6 +327,9 @@ Ask targeted questions for missing critical data. Common gaps:
 
 - **Borehole diameter** not stated (do not infer — ask)
 - **Total depth** sometimes only in feet — confirm conversion
+- **Two different depth figures** (e.g. original drilled depth vs. a more recent measured/usable depth,
+  often from a re-survey) — confirm which is `bore_hole[].to` (as-drilled) and which is `well_depth`
+  (current/usable); do not guess
 - **Screen slot** (`screen_slot`) often missing in older reports
 - **Coordinates** sometimes in UTM — ask for decimal degrees or convert
 - **Driller name** often in header/stamp missed by text extraction
@@ -342,6 +353,7 @@ Ask targeted questions for missing critical data. Common gaps:
 | ------------ | ---------------------------------------------------------- | ------------------------------------------------------ |
 | Metadata     | Nome do poço, empresa perfuradora, data de conclusão, cota | Well name, driller, completion date, elevation         |
 | Borehole     | Perfuração, diâmetro de perfuração, profundidade total     | Drilling, borehole diameter, total depth               |
+| Usable depth | Profundidade útil, profundidade atual, profundidade medida | Usable depth, current depth, measured depth            |
 | Casing       | Revestimento, tubo de aço/PVC                              | Casing, steel/PVC pipe                                 |
 | Reduction    | Redutor, adaptador                                         | Reducer, adapter                                       |
 | Screen       | Filtro, seção filtrante, ranhura, wire-wound               | Screen, slotted section, slot opening                  |

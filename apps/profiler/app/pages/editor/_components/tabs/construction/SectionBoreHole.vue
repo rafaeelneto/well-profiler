@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import type { WellGridColumn } from '~/components/DataGrid/types';
+import { calculatedWellDepth } from '~/utils/wellDepth';
 
 const { t } = useI18n();
 const profileStore = useProfileStore();
+const { unit: lengthUnit, toDisplay } = useUnitDisplay('length');
+const { formatNumber } = useNumberFormat();
 
 // Canonical values match the recommended `drilling_method` keys in the
 // .well v2 spec (docs/spec/v2/object-schemas.md) — not an enforced
@@ -74,6 +77,22 @@ function updateBoreHole(index: number, prop: string, value: unknown) {
 function reorderBoreHole(from: number, to: number) {
   profileStore.reorderWellFeature('bore_hole', from, to);
 }
+
+const calculatedDepth = computed(() =>
+  calculatedWellDepth(profileStore.well),
+);
+const calculatedDepthText = computed(
+  () =>
+    `${formatNumber(toDisplay(calculatedDepth.value), { fractionDigits: 2 })} ${lengthUnit.value}`,
+);
+
+function updateWellDepth(value: number | null) {
+  profileStore.well.well_depth = value ?? undefined;
+}
+
+function syncWellDepth() {
+  profileStore.well.well_depth = calculatedDepth.value;
+}
 </script>
 
 <template>
@@ -100,5 +119,33 @@ function reorderBoreHole(from: number, to: number) {
       @change="updateBoreHole"
       @reorder="reorderBoreHole"
     />
+    <Field :label="t('editor.construction.boreHole.wellDepth')">
+      <UnitInput
+        unit-type="length"
+        :model-value="profileStore.well.well_depth ?? null"
+        :placeholder="calculatedDepthText"
+        :suffix="` ${lengthUnit}`"
+        :min="0"
+        class="w-full"
+        :pt="{ pcInput: { root: 'w-full font-mono text-sm' } }"
+        @update:model-value="updateWellDepth"
+      />
+      <div
+        v-if="profileStore.well.well_depth != profileStore.maxDepth"
+        class="flex items-center gap-2 text-xs text-content-400"
+      >
+        <span
+          >{{ t('editor.construction.boreHole.wellDepthCalculated') }}:
+          {{ calculatedDepthText }}</span
+        >
+        <Button
+          :label="t('editor.construction.boreHole.syncDepth')"
+          link
+          size="small"
+          class="p-0! text-xs!"
+          @click="syncWellDepth"
+        />
+      </div>
+    </Field>
   </section>
 </template>

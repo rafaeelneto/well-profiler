@@ -352,6 +352,8 @@ export type Well = {
   elevation?: number;
 
   // Constructive
+  /** The well's current usable depth in meters from ground level, as measured or reported. May be less than the deepest constructive element (see `bore_hole`) due to siltation, debris, or partial backfill. */
+  well_depth?: number;
   bore_hole: BoreHole[];
   well_case: WellCase[];
   reduction: Reduction[];

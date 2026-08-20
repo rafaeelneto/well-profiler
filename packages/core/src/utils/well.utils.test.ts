@@ -138,6 +138,7 @@ function fullWell(): Well {
     construction_date: '2023-06-15',
     location: { lat: -1.4558, lng: -48.5044, elevation: 12 },
     obs: 'Artesian zone at 40m',
+    well_depth: 145.5,
     bore_hole: [makeBoreHole()],
     well_case: [makeWellCase()],
     reduction: [makeReduction()],
@@ -306,6 +307,7 @@ describe('serializeWell', () => {
         'lat',
         'lng',
         'elevation',
+        'well_depth',
         'obs',
       ]) {
         expect(parsed).not.toHaveProperty(key);
@@ -342,6 +344,7 @@ describe('serializeWell', () => {
       expect(parsed.well_driller).toBe('Driller Co.');
       expect(parsed.construction_date).toBe('2023-06-15');
       expect(parsed.obs).toBe('Artesian zone at 40m');
+      expect(parsed.well_depth).toBe(145.5);
       expect(parsed.location).toEqual({
         lat: -1.4558,
         lng: -48.5044,
@@ -386,6 +389,7 @@ describe('serializeWell', () => {
       expect(restored).not.toBeNull();
       expect(restored!.well_type).toBe(original.well_type);
       expect(restored!.name).toBe(original.name);
+      expect(restored!.well_depth).toBe(original.well_depth);
       expect(restored!.bore_hole).toEqual(original.bore_hole);
       expect(restored!.well_case).toEqual(original.well_case);
       expect(restored!.reduction).toEqual(original.reduction);
@@ -865,6 +869,65 @@ describe('deserializeWell', () => {
         JSON.stringify({ bore_hole: [makeBoreHole()], surface_case: null }),
       );
       expect(result!.surface_case).toEqual([]);
+    });
+  });
+
+  describe('calculated well_depth', () => {
+    it('fills well_depth from the deepest constructive interval when absent (v2)', () => {
+      const result = deserializeWell(
+        JSON.stringify({
+          version: 2,
+          bore_hole: [makeBoreHole({ from: 0, to: 120 })],
+        }),
+      );
+      expect(result!.well_depth).toBe(120);
+    });
+
+    it('fills well_depth from the deepest constructive interval when absent (v1)', () => {
+      const result = deserializeWell(
+        JSON.stringify({
+          bore_hole: [makeBoreHole({ from: 0, to: 88 })],
+        }),
+      );
+      expect(result!.well_depth).toBe(88);
+    });
+
+    it('does not override an explicit well_depth with the calculated one', () => {
+      const result = deserializeWell(
+        JSON.stringify({
+          version: 2,
+          well_depth: 42,
+          bore_hole: [makeBoreHole({ from: 0, to: 120 })],
+        }),
+      );
+      expect(result!.well_depth).toBe(42);
+    });
+
+    it('leaves well_depth undefined when there is no constructive data to calculate from', () => {
+      const result = deserializeWell(JSON.stringify({ version: 2 }));
+      expect(result!.well_depth).toBeUndefined();
+    });
+
+    it('ignores lithology depth — only constructive arrays count', () => {
+      const result = deserializeWell(
+        JSON.stringify({
+          version: 2,
+          bore_hole: [makeBoreHole({ from: 0, to: 50 })],
+          lithology: [makeLithology({ from: 0, to: 500 })],
+        }),
+      );
+      expect(result!.well_depth).toBe(50);
+    });
+
+    it('picks the deepest across multiple constructive arrays', () => {
+      const result = deserializeWell(
+        JSON.stringify({
+          version: 2,
+          bore_hole: [makeBoreHole({ from: 0, to: 100 })],
+          well_screen: [makeWellScreen({ from: 90, to: 212 })],
+        }),
+      );
+      expect(result!.well_depth).toBe(212);
     });
   });
 });
@@ -1504,9 +1567,10 @@ describe('redactWell', () => {
     // Untouched sections keep their data
     expect(result.bore_hole).toHaveLength(1);
     expect(result.lithology).toHaveLength(1);
+    expect(result.well_depth).toBe(145.5);
   });
 
-  it('empties constructive arrays and cement_pad when constructive is hidden', () => {
+  it('empties constructive arrays, cement_pad, and well_depth when constructive is hidden', () => {
     const result = redactWell(fullV2Well(), {
       ...ALL_VISIBLE,
       constructive: false,
@@ -1518,6 +1582,7 @@ describe('redactWell', () => {
     expect(result.surface_case).toEqual([]);
     expect(result.hole_fill).toEqual([]);
     expect(result.cement_pad).toBeUndefined();
+    expect(result.well_depth).toBeUndefined();
     // Untouched sections keep their data
     expect(result.name).toBe('Well-01');
     expect(result.lithology).toHaveLength(1);

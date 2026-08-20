@@ -1,4 +1,5 @@
 import type { Well } from '@welldot/core';
+import { calculatedWellDepth } from '~/utils/wellDepth';
 
 export type WellMetadataFieldKey =
   | 'name'
@@ -8,6 +9,7 @@ export type WellMetadataFieldKey =
   | 'lat'
   | 'lng'
   | 'elevation'
+  | 'well_depth'
   | 'obs';
 
 export function useWellMetadataFields() {
@@ -42,6 +44,10 @@ export function useWellMetadataFields() {
       label: t('editor.exportPdfDialog.metadataFields.elevation'),
     },
     {
+      key: 'well_depth',
+      label: t('editor.exportPdfDialog.metadataFields.wellDepth'),
+    },
+    {
       key: 'obs',
       label: t('editor.exportPdfDialog.metadataFields.observations'),
     },
@@ -59,6 +65,8 @@ export function useWellMetadataFields() {
           : '';
       case 'well_type':
         return well.well_type ? resolveWellTypeLabel(well.well_type, t) : '';
+      case 'well_depth':
+        return String(well.well_depth ?? calculatedWellDepth(well));
       default:
         return String(well[key] ?? '');
     }
