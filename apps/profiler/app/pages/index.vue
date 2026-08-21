@@ -201,7 +201,7 @@ const toolCards = computed(() =>
             class="flex flex-wrap gap-5.5 pt-5 border-t border-surface-200 font-mono text-[11px] text-content-500 tracking-[0.04em]"
           >
             <span
-              ><b class="text-content-0 font-medium">v1.0</b>
+              ><b class="text-content-0 font-medium">v2.0</b>
               {{ t('hero.badgeSpec') }}</span
             >
             <span
@@ -256,7 +256,7 @@ const toolCards = computed(() =>
               >
             </i18n-t>
           </p>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             <LandingPropCard
               v-for="prop in formatProps"
               :key="prop.num"
@@ -431,7 +431,7 @@ const toolCards = computed(() =>
       >
         {{ t('horizon.intro') }}
       </p>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <LandingPropCard
           v-for="prop in horizonProps"
           :key="prop.num"

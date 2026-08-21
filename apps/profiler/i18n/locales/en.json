@@ -25,7 +25,7 @@
   },
   "footer": {
     "version": "welldot · v1.0.0",
-    "spec": ".well spec v1.0",
+    "spec": ".well spec v2.0",
     "license": "Open · Apache 2.0"
   },
   "hero": {
@@ -47,7 +47,7 @@
     "headline1": "One JSON.",
     "headlineEm": "Three",
     "headline2": "purposes.",
-    "intro": "Today, well data lives in PDFs that don't talk to each other. The {well} file is a simple, versioned format to change that — a single JSON that fully describes a well, designed as an {standard}.",
+    "intro": "Today, well data lives in PDFs that don't talk to each other. The {well} file is a simple, versioned format to change that — a single JSON that fully describes a well, from construction and geology to pump tests and maintenance history, designed as an {standard}.",
     "standard": "international standard",
     "props": [
       {
@@ -69,6 +69,16 @@
         "num": "§ 1.4",
         "title": "Open",
         "body": "Human-readable JSON, public specification, and permissive license — free to use, extend, and contribute."
+      },
+      {
+        "num": "§ 1.5",
+        "title": "Pump tests",
+        "body": "Hydrodynamic events and derived aquifer parameters — transmissivity, storativity, specific capacity — recorded as structured time series."
+      },
+      {
+        "num": "§ 1.6",
+        "title": "Operational history",
+        "body": "A dated log of maintenance, inspections, and incidents, with attachments, that follows the well through its working life."
       }
     ]
   },
@@ -131,7 +141,7 @@
     "headline1": "The",
     "headlineEm": "future",
     "headline2": ".",
-    "intro": "v1 covers geological and construction profiles. The specification evolves openly to embrace the full lifecycle of a well.",
+    "intro": "v2 covers geological, construction, and hydrodynamic profiles — pump tests, aquifer analysis, and operational history. The specification evolves openly to embrace what's still ahead.",
     "props": [
       {
         "num": "§ 4.1",
@@ -140,26 +150,16 @@
       },
       {
         "num": "§ 4.2",
-        "title": "Pump tests",
-        "body": "Pump tests, recovery, specific flow, and hydrodynamic parameters as time series."
-      },
-      {
-        "num": "§ 4.3",
-        "title": "Operational history",
-        "body": "Event log: maintenance, pump replacement, static level, shutdowns — dated and attributable."
-      },
-      {
-        "num": "§ 4.4",
         "title": "Water quality",
         "body": "Physical-chemical and bacteriological analyses linked to sampling, depth, and date."
       },
       {
-        "num": "§ 4.5",
+        "num": "§ 4.3",
         "title": "Extended metadata",
         "body": "Water rights, owner, usage regime, cadastral references, and links to regulatory databases."
       },
       {
-        "num": "§ 4.6",
+        "num": "§ 4.4",
         "title": "Community extensions",
         "body": "Namespaces for fields specific to agencies and regions, without breaking the standardized core."
       }

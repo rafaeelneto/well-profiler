@@ -25,7 +25,7 @@
   },
   "footer": {
     "version": "welldot · v1.0.0",
-    "spec": ".well spec v1.0",
+    "spec": ".well spec v2.0",
     "license": "Aberto · Apache 2.0"
   },
   "hero": {
@@ -47,7 +47,7 @@
     "headline1": "Um JSON.",
     "headlineEm": "Três",
     "headline2": "propósitos.",
-    "intro": "Hoje, dados de poços vivem em PDFs que não se conversam entre si. O arquivo {well} é um formato simples e versionado para mudar isso — um único JSON que descreve o poço por inteiro, pensado como {standard}.",
+    "intro": "Hoje, dados de poços vivem em PDFs que não se conversam entre si. O arquivo {well} é um formato simples e versionado para mudar isso — um único JSON que descreve o poço por inteiro, da construção e geologia aos testes de bombeamento e ao histórico de manutenção, pensado como {standard}.",
     "standard": "padrão internacional",
     "props": [
       {
@@ -69,6 +69,16 @@
         "num": "§ 1.4",
         "title": "Aberto",
         "body": "JSON legível por humanos, especificação pública e licença permissiva — livre para usar, estender e contribuir."
+      },
+      {
+        "num": "§ 1.5",
+        "title": "Testes de bombeamento",
+        "body": "Eventos hidrodinâmicos e parâmetros de aquífero derivados — transmissividade, armazenamento, capacidade específica — registrados como séries temporais estruturadas."
+      },
+      {
+        "num": "§ 1.6",
+        "title": "Histórico operacional",
+        "body": "Um log datado de manutenções, inspeções e incidentes, com anexos, que acompanha o poço ao longo de sua vida útil."
       }
     ]
   },
@@ -131,7 +141,7 @@
     "headline1": "O",
     "headlineEm": "futuro",
     "headline2": ".",
-    "intro": "A v1 cobre perfil geológico e construtivo. A especificação evolui de forma aberta para abraçar todo o ciclo de vida de um poço.",
+    "intro": "A v2 cobre perfis geológicos, construtivos e hidrodinâmicos — testes de bombeamento, análise de aquífero e histórico operacional. A especificação evolui de forma aberta para abraçar o que ainda vem pela frente.",
     "props": [
       {
         "num": "§ 4.1",
@@ -140,26 +150,16 @@
       },
       {
         "num": "§ 4.2",
-        "title": "Testes de bombeamento",
-        "body": "Pump tests, recuperação, vazão específica e parâmetros hidrodinâmicos como séries temporais."
-      },
-      {
-        "num": "§ 4.3",
-        "title": "Histórico operacional",
-        "body": "Log de eventos: manutenções, troca de bomba, nível estático, paradas — datados e atribuíveis."
-      },
-      {
-        "num": "§ 4.4",
         "title": "Qualidade da água",
         "body": "Análises físico-químicas e bacteriológicas vinculadas à amostragem, profundidade e data."
       },
       {
-        "num": "§ 4.5",
+        "num": "§ 4.3",
         "title": "Metadados estendidos",
         "body": "Outorga, proprietário, regime de uso, referências cadastrais e vínculos com bases regulatórias."
       },
       {
-        "num": "§ 4.6",
+        "num": "§ 4.4",
         "title": "Extensões da comunidade",
         "body": "Namespaces para campos específicos de órgãos e regiões, sem quebrar o núcleo padronizado."
       }
