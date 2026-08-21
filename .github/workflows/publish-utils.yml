@@ -46,7 +46,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Update npm for trusted publishing
-        run: npm install -g npm@latest
+        run: npm install -g npm@11
 
       - name: Set pre-release version (preview branch)
         if: github.event_name == 'push' && startsWith(github.ref, 'refs/heads/')
