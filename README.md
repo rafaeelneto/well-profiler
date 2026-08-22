@@ -274,10 +274,18 @@ Then attach or describe the well report you want to convert. Claude will extract
 
 ---
 
-## Licensing
+## Contributing
 
-This project is licensed under the [Apache 2.0](./LICENCE.md) license.
+Contributions are welcome — see [CONTRIBUTING.md](./CONTRIBUTING.md) for development setup, the
+repository layout, and the process for proposing a change to the `.well` format.
+
+If you are building a tool that reads or writes `.well` files, you don't need permission and you
+don't need to use these libraries — the format is open and the spec is complete enough to implement
+from scratch. Please open an issue to tell us about it; we want to keep a list of compatible
+implementations.
 
 ---
 
-Suggestions, issues, and contributions are welcome. If you are building a tool that reads or writes `.well` files, feel free to open an issue — we would like to know about compatible implementations.
+## Licensing
+
+This project is licensed under the [Apache 2.0](./LICENCE.md) license.
