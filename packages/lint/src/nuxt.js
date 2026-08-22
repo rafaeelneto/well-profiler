@@ -18,6 +18,15 @@ export const nuxtConfig = [
     files: ['*.vue', '**/*.vue'],
     languageOptions: {
       parser: vueParser,
+      parserOptions: {
+        // `vue-eslint-parser` handles the SFC, but delegates `<script lang="ts">`
+        // to this sub-parser. Without it the blocks are parsed as plain JS and
+        // any TS syntax (`import type`, annotations, `as`) is a parse error.
+        parser: tseslint.parser,
+        ecmaVersion: 'latest',
+        sourceType: 'module',
+        extraFileExtensions: ['.vue'],
+      },
     },
   },
   {
@@ -28,11 +37,19 @@ export const nuxtConfig = [
       '@typescript-eslint/no-explicit-any': 'off',
       'no-unused-vars': [
         'warn',
-        { argsIgnorePattern: '^_', varsIgnorePattern: '^_', ignoreRestSiblings: true },
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          ignoreRestSiblings: true,
+        },
       ],
       '@typescript-eslint/no-unused-vars': [
         'warn',
-        { argsIgnorePattern: '^_', varsIgnorePattern: '^_', ignoreRestSiblings: true },
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          ignoreRestSiblings: true,
+        },
       ],
     },
   },

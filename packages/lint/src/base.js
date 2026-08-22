@@ -15,7 +15,9 @@ export default [
     rules: {
       // style
       'linebreak-style': ['error', 'unix'],
-      camelcase: ['error'],
+      // The `.well` schema is snake_case on the wire, so code across the repo
+      // reads and writes fields like `media_type` and `static_level` verbatim.
+      camelcase: 'off',
       'prefer-template': ['error'],
       'no-plusplus': ['error', { allowForLoopAfterthoughts: true }],
       radix: ['error', 'as-needed'],
