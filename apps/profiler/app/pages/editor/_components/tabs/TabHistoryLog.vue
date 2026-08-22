@@ -1,10 +1,32 @@
 <script setup lang="ts">
 import type { Attachment, HistoryLogEntry } from '@welldot/core';
 import { useConfirm } from 'primevue/useconfirm';
+import AttachmentDialog from './historyLog/AttachmentDialog.vue';
+import LogEntryDialog from './historyLog/LogEntryDialog.vue';
 
 const { t } = useI18n();
 const profileStore = useProfileStore();
 const confirm = useConfirm();
+const {
+  categoryOptions,
+  categoryIcon,
+  categoryLabel,
+  categorySeverity,
+  severityLabel,
+  severityToChip,
+} = useHistoryLogCategories();
+const {
+  attachmentIcon,
+  attachmentLabel,
+  copiedAttachmentId,
+  copyAttachmentPath,
+} = useAttachmentDisplay();
+
+const logEntryDialogRef =
+  useTemplateRef<InstanceType<typeof LogEntryDialog>>('logEntryDialogRef');
+const attachmentDialogRef = useTemplateRef<
+  InstanceType<typeof AttachmentDialog>
+>('attachmentDialogRef');
 
 // ─── Filter / search ──────────────────────────────────────────────────────────
 
@@ -75,108 +97,16 @@ function visibleAttachments(entry: HistoryLogEntry): Attachment[] {
   return list.slice(0, VISIBLE_ATTACHMENTS);
 }
 
-// ─── Entry dialog ─────────────────────────────────────────────────────────────
+// ─── Entries ──────────────────────────────────────────────────────────────────
 
-const dialogVisible = ref(false);
-const editingId = ref<string | null>(null);
-
-const form = reactive({
-  category: '' as string,
-  datetime: null as Date | null,
-  description: '',
-  author: '',
-  severity: '' as string,
-});
-
-const categoryOptions = computed(() => [
-  {
-    label: t('editor.historyLog.logs.categories.maintenance'),
-    value: 'maintenance',
-    icon: 'ph:wrench-duotone',
-  },
-  {
-    label: t('editor.historyLog.logs.categories.inspection'),
-    value: 'inspection',
-    icon: 'ph:eye-duotone',
-  },
-  {
-    label: t('editor.historyLog.logs.categories.incident'),
-    value: 'incident',
-    icon: 'ph:warning-duotone',
-  },
-  {
-    label: t('editor.historyLog.logs.categories.event'),
-    value: 'event',
-    icon: 'ph:flag-duotone',
-  },
-]);
-
-const severityOptions = computed(() => [
-  { label: t('editor.historyLog.logs.severity.low'), value: 'low' },
-  { label: t('editor.historyLog.logs.severity.medium'), value: 'medium' },
-  { label: t('editor.historyLog.logs.severity.high'), value: 'high' },
-  { label: t('editor.historyLog.logs.severity.critical'), value: 'critical' },
-]);
-
-function openAddDialog() {
-  editingId.value = null;
-  form.category = 'event';
-  form.datetime = new Date();
-  form.description = '';
-  form.author = '';
-  form.severity = '';
-  dialogVisible.value = true;
-}
-
-function openEditDialog(entry: HistoryLogEntry) {
-  editingId.value = entry.id;
-  form.category = entry.category;
-  form.datetime = new Date(entry.datetime);
-  form.description = entry.description;
-  form.author = entry.author ?? '';
-  form.severity = entry.severity ?? '';
-  dialogVisible.value = true;
-}
-
-function saveEntry() {
-  if (!form.category || !form.datetime || !form.description.trim()) return;
-
-  const now = new Date().toISOString();
-  const datetimeStr = form.datetime.toISOString();
-
-  if (editingId.value) {
-    profileStore.updateWell(draft => {
-      const idx =
-        draft.history_logs?.findIndex(e => e.id === editingId.value) ?? -1;
-      if (idx !== -1 && draft.history_logs) {
-        draft.history_logs[idx] = {
-          ...draft.history_logs[idx],
-          category: form.category,
-          datetime: datetimeStr,
-          description: form.description.trim(),
-          author: form.author.trim() || undefined,
-          severity: form.severity || undefined,
-          updated_at: now,
-        };
-      }
-    });
-  } else {
-    const newEntry: HistoryLogEntry = {
-      id: crypto.randomUUID(),
-      category: form.category,
-      datetime: datetimeStr,
-      description: form.description.trim(),
-      author: form.author.trim() || undefined,
-      severity: form.severity || undefined,
-      updated_at: now,
-    };
-    profileStore.updateWell(draft => {
-      if (!draft.history_logs) draft.history_logs = [];
-      draft.history_logs.push(newEntry);
-    });
-  }
-
-  dialogVisible.value = false;
+/** Receives the edited entry back from the dialog and persists it. */
+function upsertEntry(entry: HistoryLogEntry) {
+  profileStore.updateWell(draft => {
+    if (!draft.history_logs) draft.history_logs = [];
+    const idx = draft.history_logs.findIndex(e => e.id === entry.id);
+    if (idx === -1) draft.history_logs.push(entry);
+    else draft.history_logs[idx] = entry;
+  });
 }
 
 function deleteEntry(id: string) {
@@ -197,80 +127,33 @@ function deleteEntry(id: string) {
   });
 }
 
-// ─── Attachment dialog ────────────────────────────────────────────────────────
+// ─── Attachments on saved entries ─────────────────────────────────────────────
 
-const mediaTypeOptions = [
-  { label: 'PDF', value: 'application/pdf' },
-  { label: 'JPEG', value: 'image/jpeg' },
-  { label: 'PNG', value: 'image/png' },
-  { label: 'Word', value: 'application/msword' },
-  { label: 'Other', value: 'application/octet-stream' },
-];
+/** Entry the attachment dialog is currently editing a file for. */
+const attachmentTargetEntryId = ref<string>('');
 
-const attachmentDialog = reactive({
-  visible: false,
-  entryId: '' as string,
-  editingAttachmentId: null as string | null,
-  form: {
-    url: '',
-    filename: '',
-    mediaType: 'application/pdf',
-  },
-});
-
-function openAddAttachment(entryId: string) {
-  attachmentDialog.entryId = entryId;
-  attachmentDialog.editingAttachmentId = null;
-  attachmentDialog.form.url = '';
-  attachmentDialog.form.filename = '';
-  attachmentDialog.form.mediaType = 'application/pdf';
-  attachmentDialog.visible = true;
+function addAttachment(entryId: string) {
+  attachmentTargetEntryId.value = entryId;
+  attachmentDialogRef.value?.openAdd();
 }
 
-function openEditAttachment(entryId: string, attachment: Attachment) {
-  attachmentDialog.entryId = entryId;
-  attachmentDialog.editingAttachmentId = attachment.id;
-  attachmentDialog.form.url = attachment.uri;
-  attachmentDialog.form.filename = attachment.filename ?? '';
-  attachmentDialog.form.mediaType = attachment.media_type;
-  attachmentDialog.visible = true;
+function editAttachment(entryId: string, attachment: Attachment) {
+  attachmentTargetEntryId.value = entryId;
+  attachmentDialogRef.value?.openEdit(attachment);
 }
 
-function saveAttachment() {
-  const { entryId, editingAttachmentId, form } = attachmentDialog;
-  if (!form.url.trim() && !editingAttachmentId) return;
-
+function upsertStoredAttachment(attachment: Attachment) {
   profileStore.updateWell(draft => {
-    const entry = draft.history_logs?.find(e => e.id === entryId);
+    const entry = draft.history_logs?.find(
+      e => e.id === attachmentTargetEntryId.value,
+    );
     if (!entry) return;
     if (!entry.attachments) entry.attachments = [];
 
-    if (editingAttachmentId) {
-      const idx = entry.attachments.findIndex(
-        a => a.id === editingAttachmentId,
-      );
-      if (idx !== -1) {
-        const existing = entry.attachments[idx]!;
-        entry.attachments[idx] = {
-          id: existing.id,
-          uri: existing.uri,
-          sha256: existing.sha256,
-          description: existing.description,
-          filename: form.filename.trim() || undefined,
-          media_type: form.mediaType,
-        };
-      }
-    } else {
-      entry.attachments.push({
-        id: crypto.randomUUID(),
-        uri: form.url.trim(),
-        media_type: form.mediaType,
-        filename: form.filename.trim() || undefined,
-      });
-    }
+    const idx = entry.attachments.findIndex(a => a.id === attachment.id);
+    if (idx === -1) entry.attachments.push(attachment);
+    else entry.attachments[idx] = attachment;
   });
-
-  attachmentDialog.visible = false;
 }
 
 function deleteAttachment(entryId: string, attachmentId: string) {
@@ -298,52 +181,12 @@ function deleteAttachment(entryId: string, attachmentId: string) {
 
 // ─── Display helpers ──────────────────────────────────────────────────────────
 
-function categoryIcon(category: string): string {
-  const opt = categoryOptions.value.find(o => o.value === category);
-  return opt?.icon ?? 'ph:dot-duotone';
-}
-
-function categorySeverity(category: string): string {
-  const map: Record<string, string> = {
-    maintenance: 'warn',
-    inspection: 'info',
-    incident: 'danger',
-    event: 'secondary',
-  };
-  return map[category] ?? 'secondary';
-}
-
-function severityToChip(severity: string): string {
-  if (severity === 'low') return 'success';
-  if (severity === 'medium') return 'warn';
-  if (severity === 'high' || severity === 'critical') return 'danger';
-  return 'secondary';
-}
-
-function categoryLabel(category: string): string {
-  const opt = categoryOptions.value.find(o => o.value === category);
-  return opt?.label ?? category;
-}
-
-function severityLabel(severity: string): string {
-  const opt = severityOptions.value.find(o => o.value === severity);
-  return opt?.label ?? severity;
-}
-
 function showEditedAt(entry: HistoryLogEntry): boolean {
   if (!entry.updated_at) return false;
   const diff = Math.abs(
     new Date(entry.updated_at).getTime() - new Date(entry.datetime).getTime(),
   );
   return diff > 60_000;
-}
-
-function attachmentIcon(mediaType: string): string {
-  if (mediaType.includes('pdf')) return 'ph:file-pdf-duotone';
-  if (mediaType.startsWith('image/')) return 'ph:image-duotone';
-  if (mediaType.includes('word') || mediaType.includes('document'))
-    return 'ph:file-doc-duotone';
-  return 'ph:file-duotone';
 }
 </script>
 
@@ -384,8 +227,8 @@ function attachmentIcon(mediaType: string): string {
         unstyled
         class="add-entry-btn"
         type="button"
-        @click="openAddDialog"
         :label="t('editor.historyLog.logs.addEvent')"
+        @click="logEntryDialogRef?.openAdd()"
       >
         <template #icon>
           <Icon name="ph:plus" />
@@ -511,7 +354,7 @@ function attachmentIcon(mediaType: string): string {
               <button
                 class="add-attachment-btn"
                 type="button"
-                @click="openAddAttachment(entry.id)"
+                @click="addAttachment(entry.id)"
               >
                 <Icon name="ph:plus" class="size-3" />
                 {{ t('editor.historyLog.logs.addAttachment') }}
@@ -534,15 +377,36 @@ function attachmentIcon(mediaType: string): string {
                 />
                 <span
                   class="font-mono text-[10px] text-content-300 truncate flex-1 min-w-0"
+                  :title="att.uri"
                 >
-                  {{ att.filename ?? att.uri.split('/').at(-1) ?? att.uri }}
+                  {{ attachmentLabel(att) }}
                 </span>
                 <div class="flex items-center gap-1 shrink-0">
                   <button
                     class="thumb-action"
                     type="button"
+                    :aria-label="t('editor.historyLog.logs.copyPath')"
+                    :title="
+                      copiedAttachmentId === att.id
+                        ? t('editor.historyLog.logs.copied')
+                        : t('editor.historyLog.logs.copyPath')
+                    "
+                    @click="copyAttachmentPath(att)"
+                  >
+                    <Icon
+                      :name="
+                        copiedAttachmentId === att.id
+                          ? 'ph:check-bold'
+                          : 'ph:copy-duotone'
+                      "
+                      class="size-3"
+                    />
+                  </button>
+                  <button
+                    class="thumb-action"
+                    type="button"
                     :aria-label="t('editor.historyLog.logs.editAttachment')"
-                    @click="openEditAttachment(entry.id, att)"
+                    @click="editAttachment(entry.id, att)"
                   >
                     <Icon name="ph:pencil-simple-duotone" class="size-3" />
                   </button>
@@ -598,7 +462,7 @@ function attachmentIcon(mediaType: string): string {
               size="small"
               :label="t('editor.edit')"
               :aria-label="t('editor.historyLog.logs.editEvent')"
-              @click="openEditDialog(entry)"
+              @click="logEntryDialogRef?.openEdit(entry)"
             >
               <template #icon>
                 <Icon name="ph:pencil-simple-duotone" />
@@ -621,160 +485,8 @@ function attachmentIcon(mediaType: string): string {
     </div>
   </div>
 
-  <!-- ── Add / Edit Entry Dialog ───────────────────────────────────────────── -->
-  <Dialog
-    v-model:visible="dialogVisible"
-    modal
-    :header="
-      editingId
-        ? t('editor.historyLog.logs.editEvent')
-        : t('editor.historyLog.logs.addEvent')
-    "
-    :style="{ width: '100vw', maxWidth: '36rem' }"
-  >
-    <div class="flex flex-col gap-4 pt-2">
-      <Field :label="t('editor.historyLog.logs.fields.category')">
-        <div class="flex flex-wrap gap-2">
-          <label
-            v-for="opt in categoryOptions"
-            :key="opt.value"
-            :for="`cat-${opt.value}`"
-            class="category-radio-option"
-            :class="{ active: form.category === opt.value }"
-          >
-            <RadioButton
-              v-model="form.category"
-              :inputId="`cat-${opt.value}`"
-              :value="opt.value"
-              class="sr-only"
-            />
-            <Icon :name="opt.icon" class="size-4 shrink-0" />
-            <span>{{ opt.label }}</span>
-          </label>
-        </div>
-      </Field>
-
-      <Field :label="t('editor.historyLog.logs.fields.datetime')">
-        <DatePicker
-          v-model="form.datetime"
-          show-time
-          hour-format="24"
-          show-button-bar
-          date-format="dd/mm/yy"
-          class="w-full"
-          :pt="{ pcInput: { root: 'font-mono text-sm w-full' } }"
-        />
-      </Field>
-
-      <Field :label="t('editor.historyLog.logs.fields.description')">
-        <Textarea
-          v-model="form.description"
-          :rows="5"
-          class="w-full font-mono text-sm"
-        />
-      </Field>
-
-      <Field :label="t('editor.historyLog.logs.fields.author')">
-        <InputText v-model="form.author" class="w-full" />
-      </Field>
-
-      <Field :label="t('editor.historyLog.logs.fields.severity')">
-        <div class="flex flex-wrap gap-2">
-          <label
-            v-for="opt in severityOptions"
-            :key="opt.value"
-            :for="`sev-${opt.value}`"
-            class="category-radio-option"
-            :class="{ active: form.severity === opt.value }"
-          >
-            <RadioButton
-              v-model="form.severity"
-              :inputId="`sev-${opt.value}`"
-              :value="opt.value"
-              class="sr-only"
-            />
-            <span>{{ opt.label }}</span>
-          </label>
-        </div>
-      </Field>
-    </div>
-
-    <template #footer>
-      <Button
-        :label="t('editor.confirmClear.reject')"
-        severity="secondary"
-        text
-        @click="dialogVisible = false"
-      />
-      <Button
-        :label="
-          editingId ? t('editor.save') : t('editor.historyLog.logs.addEvent')
-        "
-        :disabled="!form.category || !form.datetime || !form.description.trim()"
-        @click="saveEntry"
-      />
-    </template>
-  </Dialog>
-
-  <!-- ── Add / Edit Attachment Dialog ─────────────────────────────────────── -->
-  <Dialog
-    v-model:visible="attachmentDialog.visible"
-    modal
-    :header="
-      attachmentDialog.editingAttachmentId
-        ? t('editor.historyLog.logs.editAttachment')
-        : t('editor.historyLog.logs.addAttachment')
-    "
-    :style="{ width: '28rem' }"
-  >
-    <div class="flex flex-col gap-4 pt-2">
-      <Field
-        v-if="!attachmentDialog.editingAttachmentId"
-        :label="t('editor.historyLog.logs.fields.attachmentUrl')"
-      >
-        <InputText
-          v-model="attachmentDialog.form.url"
-          class="w-full font-mono text-sm"
-          placeholder="https://"
-        />
-      </Field>
-
-      <Field :label="t('editor.historyLog.logs.fields.attachmentFilename')">
-        <InputText v-model="attachmentDialog.form.filename" class="w-full" />
-      </Field>
-
-      <Field :label="t('editor.historyLog.logs.fields.attachmentMediaType')">
-        <Select
-          v-model="attachmentDialog.form.mediaType"
-          :options="mediaTypeOptions"
-          option-label="label"
-          option-value="value"
-          class="w-full"
-        />
-      </Field>
-    </div>
-
-    <template #footer>
-      <Button
-        :label="t('editor.confirmClear.reject')"
-        severity="secondary"
-        text
-        @click="attachmentDialog.visible = false"
-      />
-      <Button
-        :label="
-          attachmentDialog.editingAttachmentId
-            ? t('editor.save')
-            : t('editor.historyLog.logs.addAttachment')
-        "
-        :disabled="
-          !attachmentDialog.editingAttachmentId &&
-          !attachmentDialog.form.url.trim()
-        "
-        @click="saveAttachment"
-      />
-    </template>
-  </Dialog>
+  <LogEntryDialog ref="logEntryDialogRef" @save="upsertEntry" />
+  <AttachmentDialog ref="attachmentDialogRef" @save="upsertStoredAttachment" />
 </template>
 
 <style scoped>
@@ -949,38 +661,5 @@ function attachmentIcon(mediaType: string): string {
 .attachment-overflow-btn:hover {
   background: var(--color-surface-50);
   color: var(--color-primary-500);
-}
-
-.category-radio-option {
-  display: flex;
-  flex: 1 1 auto;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  border-radius: 8px;
-  border: 1px solid var(--color-surface-200);
-  background: var(--color-surface-50);
-  color: var(--color-content-300);
-  font-family: var(--font-display);
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  white-space: nowrap;
-  transition:
-    background 120ms ease,
-    color 120ms ease,
-    border-color 120ms ease;
-}
-
-.category-radio-option:hover {
-  background: var(--color-surface-100);
-  color: var(--color-content-100);
-  border-color: var(--color-surface-300);
-}
-
-.category-radio-option.active {
-  background: var(--color-primary-50);
-  color: var(--color-primary-600);
-  border-color: var(--color-primary-300);
 }
 </style>

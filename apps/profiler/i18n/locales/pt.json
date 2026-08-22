@@ -654,6 +654,9 @@
         "by": "por",
         "deleteAttachment": "Remover anexo?",
         "editAttachment": "Editar anexo",
+        "copyPath": "Copiar caminho",
+        "copied": "Copiado",
+        "noAttachments": "Nenhum arquivo anexado",
         "categories": {
           "maintenance": "Manutenção",
           "inspection": "Inspeção",
@@ -672,6 +675,7 @@
           "description": "Descrição",
           "author": "Autor",
           "severity": "Severidade",
+          "attachments": "Anexos",
           "attachmentUrl": "URL do arquivo",
           "attachmentFilename": "Nome exibido",
           "attachmentMediaType": "Tipo de arquivo"
