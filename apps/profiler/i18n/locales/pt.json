@@ -232,9 +232,9 @@
     "menu": "Menu",
     "importSiagas": "Importar do SIAGAS",
     "aiImporter": {
-      "title": "Importador com IA",
+      "title": "Importar com IA",
       "comingSoon": "Este recurso estará disponível em breve.",
-      "description": "O Importador com IA vai transformar um relatório de poço — PDF, imagem ou documento — em um perfil .well automaticamente. Ainda não está disponível.",
+      "description": "O Importar com IA vai transformar um relatório de poço — PDF, imagem ou documento — em um perfil .well automaticamente. Ainda não está disponível.",
       "close": "Fechar"
     },
     "toolsMenu": {
