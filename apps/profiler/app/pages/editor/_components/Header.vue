@@ -2,6 +2,7 @@
 import ShareProfile from '~/components/ShareProfile.vue';
 import SettingsModal from '~/components/SettingsModal.vue';
 import ExportPdfDialog from '~/components/ExportPdfDialog.vue';
+import AiImporterDialog from '~/components/AiImporterDialog.vue';
 import ToolsMenu, { type ToolItem } from './ToolsMenu.vue';
 
 const props = defineProps<{ mobileView: 'profile' | 'data' }>();
@@ -117,6 +118,9 @@ const settingsVisible = ref(false);
 // ── Export PDF dialog ────────────────────────────────────────────────
 const exportPdfVisible = ref(false);
 
+// ── AI importer dialog ───────────────────────────────────────────────
+const aiImporterVisible = ref(false);
+
 // ── Tools menu ──────────────────────────────────────────────────────
 const toolsMenuVisible = ref(false);
 
@@ -156,9 +160,16 @@ const toolItems = computed<ToolItem[]>(() => [
     onClick: () => (exportPdfVisible.value = true),
   },
   {
+    label: t('editor.aiImporter.title'),
+    icon: 'welldot:file-ai',
+    comingSoon: true,
+    onClick: () => (aiImporterVisible.value = true),
+  },
+  {
     label: t('editor.importSiagas'),
     icon: 'ph:download-simple-duotone',
     comingSoon: true,
+    alwaysInMenu: true,
     disabled: true,
   },
   {
@@ -173,7 +184,7 @@ const toolItems = computed<ToolItem[]>(() => [
 // Extra tools shown in the desktop menu, on top of the dedicated buttons
 // already present in the nav.
 const extraToolItems = computed<ToolItem[]>(() =>
-  toolItems.value.filter(item => item.comingSoon || item.alwaysInMenu),
+  toolItems.value.filter(item => item.alwaysInMenu),
 );
 
 // ── Pass-through ────────────────────────────────────────────────────
@@ -259,6 +270,17 @@ const viewOptions = computed(() => [
     <!-- Action buttons -->
     <div class="flex items-center gap-0.5">
       <Button
+        v-tooltip.bottom="t('editor.aiImporter.title')"
+        :aria-label="t('editor.aiImporter.title')"
+        unstyled
+        :pt="actionBtnPt"
+        @click="aiImporterVisible = true"
+      >
+        <template #icon>
+          <Icon name="welldot:file-ai" class="size-4 shrink-0" />
+        </template>
+      </Button>
+      <Button
         :label="t('editor.save')"
         :disabled="!hasWell"
         unstyled
@@ -323,8 +345,8 @@ const viewOptions = computed(() => [
 
     <Button
       :label="t('editor.exportPdf')"
-      @click="exportPdfVisible = true"
       size="small"
+      @click="exportPdfVisible = true"
     >
       <template #icon>
         <Icon name="ph:file-pdf-duotone" class="size-4 shrink-0" />
@@ -413,6 +435,9 @@ const viewOptions = computed(() => [
 
   <!-- ─── Export PDF dialog ─────────────────────────────────────────── -->
   <ExportPdfDialog v-if="exportPdfVisible" v-model="exportPdfVisible" />
+
+  <!-- ─── AI importer dialog ────────────────────────────────────────── -->
+  <AiImporterDialog v-if="aiImporterVisible" v-model="aiImporterVisible" />
 
   <!-- ─── Tools menu ────────────────────────────────────────────────── -->
   <ToolsMenu

@@ -26,7 +26,10 @@ export default [
       // safety
       'no-use-before-define': 'off', // handled by TS version
       'no-undef': 'off', // TypeScript handles this
-      'no-return-assign': ['error', 'always'],
+      // Vue event handlers and menu-item callbacks across the apps are written
+      // as `() => (someRef.value = true)`. The parenthesised form is explicit
+      // enough, so only flag a bare `return x = y`.
+      'no-return-assign': ['error', 'except-parens'],
       'prefer-promise-reject-errors': ['warn'],
 
       // imports

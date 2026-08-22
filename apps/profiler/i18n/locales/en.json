@@ -230,6 +230,12 @@
     "back": "Back",
     "menu": "Menu",
     "importSiagas": "Import from SIAGAS",
+    "aiImporter": {
+      "title": "AI Import",
+      "comingSoon": "This feature is coming soon.",
+      "description": "The AI Import will turn a well report — PDF, image, or document — into a .well profile automatically. It isn't available yet.",
+      "close": "Close"
+    },
     "toolsMenu": {
       "title": "Tools"
     },
