@@ -5,8 +5,8 @@ import TabGeneral from './_components/tabs/TabGeneral.vue';
 import TabConstruction from './_components/tabs/TabConstruction.vue';
 import TabGeological from './_components/tabs/TabGeological.vue';
 import TabSummary from './_components/tabs/TabSummary.vue';
-import TabHistorico from './_components/tabs/TabHistorico.vue';
-import TabHidrodynamica from './_components/tabs/TabHidrodynamica.vue';
+import TabHistoryLog from './_components/tabs/TabHistoryLog.vue';
+import TabHydrodynamicEvents from './_components/tabs/TabHydrodynamicEvents.vue';
 
 definePageMeta({ layout: 'editor' });
 
@@ -22,7 +22,7 @@ const viewport = useViewport();
 useSharedProfileLoader();
 
 const isMobile = computed(() => viewport.isLessThan('lg'));
-const mobileView = ref<'perfil' | 'dados'>('dados');
+const mobileView = ref<'profile' | 'data'>('data');
 const activeTabKey = ref<string>('0');
 
 const tabs = computed<
@@ -56,13 +56,13 @@ const tabs = computed<
   },
   {
     value: '4',
-    label: t('editor.tabs.historico'),
-    shortLabel: t('editor.tabs.historico'),
+    label: t('editor.tabs.historyLog'),
+    shortLabel: t('editor.tabs.historyLog'),
   },
   {
     value: '5',
-    label: t('editor.tabs.hidrodinamica'),
-    shortLabel: t('editor.tabs.hidro'),
+    label: t('editor.tabs.hydrodynamicEvents'),
+    shortLabel: t('editor.tabs.hydro'),
   },
 ]);
 </script>
@@ -72,11 +72,11 @@ const tabs = computed<
 
   <!-- ─── Content row: flex-row container for all panes ────────────── -->
   <div class="flex flex-1 min-h-0 overflow-hidden">
-    <!-- Profiler pane: sidebar on desktop, full-pane on mobile (perfil view) -->
+    <!-- Profiler pane: sidebar on desktop, full-pane on mobile (profile view) -->
     <div
       :class="[
         'flex-col overflow-hidden',
-        isMobile && mobileView !== 'perfil' ? 'hidden' : 'flex',
+        isMobile && mobileView !== 'profile' ? 'hidden' : 'flex',
         'flex-1 lg:flex-none lg:w-120 lg:shrink-0',
         'lg:border-r lg:border-surface-200/60',
       ]"
@@ -86,11 +86,11 @@ const tabs = computed<
       />
     </div>
 
-    <!-- Tabs: desktop right pane + mobile dados content -->
+    <!-- Tabs: desktop right pane + mobile data content -->
     <div
       :class="[
         'flex-1 flex-col overflow-hidden',
-        isMobile && mobileView === 'perfil' ? 'hidden' : 'flex',
+        isMobile && mobileView === 'profile' ? 'hidden' : 'flex',
       ]"
     >
       <Tabs v-model:value="activeTabKey">
@@ -117,8 +117,8 @@ const tabs = computed<
           <TabPanel value="1"><TabConstruction /></TabPanel>
           <TabPanel value="2"><TabGeological /></TabPanel>
           <TabPanel value="3"><TabSummary /></TabPanel>
-          <TabPanel value="4"><TabHistorico /></TabPanel>
-          <TabPanel value="5"><TabHidrodynamica /></TabPanel>
+          <TabPanel value="4"><TabHistoryLog /></TabPanel>
+          <TabPanel value="5"><TabHydrodynamicEvents /></TabPanel>
         </TabPanels>
       </Tabs>
     </div>

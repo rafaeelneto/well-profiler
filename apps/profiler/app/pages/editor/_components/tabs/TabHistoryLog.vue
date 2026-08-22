@@ -90,32 +90,32 @@ const form = reactive({
 
 const categoryOptions = computed(() => [
   {
-    label: t('editor.historico.logs.categories.maintenance'),
+    label: t('editor.historyLog.logs.categories.maintenance'),
     value: 'maintenance',
     icon: 'ph:wrench-duotone',
   },
   {
-    label: t('editor.historico.logs.categories.inspection'),
+    label: t('editor.historyLog.logs.categories.inspection'),
     value: 'inspection',
     icon: 'ph:eye-duotone',
   },
   {
-    label: t('editor.historico.logs.categories.incident'),
+    label: t('editor.historyLog.logs.categories.incident'),
     value: 'incident',
     icon: 'ph:warning-duotone',
   },
   {
-    label: t('editor.historico.logs.categories.event'),
+    label: t('editor.historyLog.logs.categories.event'),
     value: 'event',
     icon: 'ph:flag-duotone',
   },
 ]);
 
 const severityOptions = computed(() => [
-  { label: t('editor.historico.logs.severity.low'), value: 'low' },
-  { label: t('editor.historico.logs.severity.medium'), value: 'medium' },
-  { label: t('editor.historico.logs.severity.high'), value: 'high' },
-  { label: t('editor.historico.logs.severity.critical'), value: 'critical' },
+  { label: t('editor.historyLog.logs.severity.low'), value: 'low' },
+  { label: t('editor.historyLog.logs.severity.medium'), value: 'medium' },
+  { label: t('editor.historyLog.logs.severity.high'), value: 'high' },
+  { label: t('editor.historyLog.logs.severity.critical'), value: 'critical' },
 ]);
 
 function openAddDialog() {
@@ -182,8 +182,8 @@ function saveEntry() {
 function deleteEntry(id: string) {
   confirm.require({
     icon: 'ph:warning-duotone',
-    header: t('editor.historico.logs.deleteConfirm'),
-    message: t('editor.historico.logs.deleteConfirm'),
+    header: t('editor.historyLog.logs.deleteConfirm'),
+    message: t('editor.historyLog.logs.deleteConfirm'),
     acceptLabel: t('editor.confirmClear.accept'),
     rejectLabel: t('editor.confirmClear.reject'),
     acceptProps: { severity: 'danger' },
@@ -276,8 +276,8 @@ function saveAttachment() {
 function deleteAttachment(entryId: string, attachmentId: string) {
   confirm.require({
     icon: 'ph:warning-duotone',
-    header: t('editor.historico.logs.deleteAttachment'),
-    message: t('editor.historico.logs.deleteAttachment'),
+    header: t('editor.historyLog.logs.deleteAttachment'),
+    message: t('editor.historyLog.logs.deleteAttachment'),
     acceptLabel: t('editor.confirmClear.accept'),
     rejectLabel: t('editor.confirmClear.reject'),
     acceptProps: { severity: 'danger' },
@@ -354,7 +354,7 @@ function attachmentIcon(mediaType: string): string {
       <h3
         class="font-serif text-[22px] font-medium tracking-[-0.015em] text-content-0 m-0"
       >
-        {{ t('editor.historico.logs.title') }}
+        {{ t('editor.historyLog.logs.title') }}
       </h3>
       <span
         class="font-mono text-[10px] tracking-[0.08em] uppercase text-content-500 tabular-nums"
@@ -363,7 +363,7 @@ function attachmentIcon(mediaType: string): string {
         <span v-if="filteredLogs.length !== allLogs.length">
           / {{ allLogs.length }}</span
         >
-        {{ t('editor.historico.logs.registries') }}
+        {{ t('editor.historyLog.logs.registries') }}
       </span>
     </div>
 
@@ -376,7 +376,7 @@ function attachmentIcon(mediaType: string): string {
         />
         <InputText
           v-model="searchQuery"
-          :placeholder="t('editor.historico.logs.search')"
+          :placeholder="t('editor.historyLog.logs.search')"
           class="w-full pl-9"
         />
       </div>
@@ -385,7 +385,7 @@ function attachmentIcon(mediaType: string): string {
         class="add-entry-btn"
         type="button"
         @click="openAddDialog"
-        :label="t('editor.historico.logs.addEvent')"
+        :label="t('editor.historyLog.logs.addEvent')"
       >
         <template #icon>
           <Icon name="ph:plus" />
@@ -417,7 +417,7 @@ function attachmentIcon(mediaType: string): string {
         name="ph:clock-counter-clockwise-duotone"
         class="size-12 opacity-40"
       />
-      <p class="text-sm">{{ t('editor.historico.logs.empty') }}</p>
+      <p class="text-sm">{{ t('editor.historyLog.logs.empty') }}</p>
     </div>
 
     <!-- ── No results ────────────────────────────────────────────────────── -->
@@ -426,7 +426,7 @@ function attachmentIcon(mediaType: string): string {
       class="flex flex-col items-center gap-3 py-10 text-content-400"
     >
       <Icon name="ph:funnel-simple-duotone" class="size-10 opacity-40" />
-      <p class="text-sm">{{ t('editor.historico.logs.noResults') }}</p>
+      <p class="text-sm">{{ t('editor.historyLog.logs.noResults') }}</p>
     </div>
 
     <!-- ── Timeline ───────────────────────────────────────────────────────── -->
@@ -489,8 +489,8 @@ function attachmentIcon(mediaType: string): string {
             >
               {{
                 isDescriptionExpanded(entry.id)
-                  ? t('editor.historico.logs.showLess')
-                  : t('editor.historico.logs.showMore')
+                  ? t('editor.historyLog.logs.showLess')
+                  : t('editor.historyLog.logs.showMore')
               }}
             </button>
           </div>
@@ -503,7 +503,7 @@ function attachmentIcon(mediaType: string): string {
                 class="font-mono text-[10px] tracking-[0.08em] uppercase text-content-400"
               >
                 {{
-                  t('editor.historico.logs.attachments', {
+                  t('editor.historyLog.logs.attachments', {
                     n: (entry.attachments ?? []).length,
                   })
                 }}
@@ -514,7 +514,7 @@ function attachmentIcon(mediaType: string): string {
                 @click="openAddAttachment(entry.id)"
               >
                 <Icon name="ph:plus" class="size-3" />
-                {{ t('editor.historico.logs.addAttachment') }}
+                {{ t('editor.historyLog.logs.addAttachment') }}
               </button>
             </div>
 
@@ -541,7 +541,7 @@ function attachmentIcon(mediaType: string): string {
                   <button
                     class="thumb-action"
                     type="button"
-                    :aria-label="t('editor.historico.logs.editAttachment')"
+                    :aria-label="t('editor.historyLog.logs.editAttachment')"
                     @click="openEditAttachment(entry.id, att)"
                   >
                     <Icon name="ph:pencil-simple-duotone" class="size-3" />
@@ -549,7 +549,7 @@ function attachmentIcon(mediaType: string): string {
                   <button
                     class="thumb-action thumb-action--danger"
                     type="button"
-                    :aria-label="t('editor.historico.logs.deleteAttachment')"
+                    :aria-label="t('editor.historyLog.logs.deleteAttachment')"
                     @click="deleteAttachment(entry.id, att.id)"
                   >
                     <Icon name="ph:trash-duotone" class="size-3" />
@@ -566,9 +566,9 @@ function attachmentIcon(mediaType: string): string {
               >
                 <span v-if="!expandedAttachments.has(entry.id)">
                   +{{ (entry.attachments?.length ?? 0) - VISIBLE_ATTACHMENTS }}
-                  {{ t('editor.historico.logs.showMore') }}
+                  {{ t('editor.historyLog.logs.showMore') }}
                 </span>
-                <span v-else>{{ t('editor.historico.logs.showLess') }}</span>
+                <span v-else>{{ t('editor.historyLog.logs.showLess') }}</span>
               </button>
             </div>
           </div>
@@ -579,14 +579,14 @@ function attachmentIcon(mediaType: string): string {
               class="flex items-center gap-2 flex-1 text-xs text-content-400"
             >
               <span v-if="entry.author">
-                {{ t('editor.historico.logs.by') }} {{ entry.author }}
+                {{ t('editor.historyLog.logs.by') }} {{ entry.author }}
               </span>
               <span
                 v-if="showEditedAt(entry)"
                 :class="{ 'before:content-[\'·\'] before:mr-2': entry.author }"
               >
                 {{
-                  t('editor.historico.logs.editedAt', {
+                  t('editor.historyLog.logs.editedAt', {
                     date: formatDate(entry.updated_at, 'dd/MM/yyyy'),
                   })
                 }}
@@ -597,7 +597,7 @@ function attachmentIcon(mediaType: string): string {
               text
               size="small"
               :label="t('editor.edit')"
-              :aria-label="t('editor.historico.logs.editEvent')"
+              :aria-label="t('editor.historyLog.logs.editEvent')"
               @click="openEditDialog(entry)"
             >
               <template #icon>
@@ -608,7 +608,7 @@ function attachmentIcon(mediaType: string): string {
               severity="danger"
               text
               size="small"
-              :aria-label="t('editor.historico.logs.deleteConfirm')"
+              :aria-label="t('editor.historyLog.logs.deleteConfirm')"
               @click="deleteEntry(entry.id)"
             >
               <template #icon>
@@ -627,13 +627,13 @@ function attachmentIcon(mediaType: string): string {
     modal
     :header="
       editingId
-        ? t('editor.historico.logs.editEvent')
-        : t('editor.historico.logs.addEvent')
+        ? t('editor.historyLog.logs.editEvent')
+        : t('editor.historyLog.logs.addEvent')
     "
     :style="{ width: '100vw', maxWidth: '36rem' }"
   >
     <div class="flex flex-col gap-4 pt-2">
-      <Field :label="t('editor.historico.logs.fields.category')">
+      <Field :label="t('editor.historyLog.logs.fields.category')">
         <div class="flex flex-wrap gap-2">
           <label
             v-for="opt in categoryOptions"
@@ -654,7 +654,7 @@ function attachmentIcon(mediaType: string): string {
         </div>
       </Field>
 
-      <Field :label="t('editor.historico.logs.fields.datetime')">
+      <Field :label="t('editor.historyLog.logs.fields.datetime')">
         <DatePicker
           v-model="form.datetime"
           show-time
@@ -666,7 +666,7 @@ function attachmentIcon(mediaType: string): string {
         />
       </Field>
 
-      <Field :label="t('editor.historico.logs.fields.description')">
+      <Field :label="t('editor.historyLog.logs.fields.description')">
         <Textarea
           v-model="form.description"
           :rows="5"
@@ -674,11 +674,11 @@ function attachmentIcon(mediaType: string): string {
         />
       </Field>
 
-      <Field :label="t('editor.historico.logs.fields.author')">
+      <Field :label="t('editor.historyLog.logs.fields.author')">
         <InputText v-model="form.author" class="w-full" />
       </Field>
 
-      <Field :label="t('editor.historico.logs.fields.severity')">
+      <Field :label="t('editor.historyLog.logs.fields.severity')">
         <div class="flex flex-wrap gap-2">
           <label
             v-for="opt in severityOptions"
@@ -708,7 +708,7 @@ function attachmentIcon(mediaType: string): string {
       />
       <Button
         :label="
-          editingId ? t('editor.save') : t('editor.historico.logs.addEvent')
+          editingId ? t('editor.save') : t('editor.historyLog.logs.addEvent')
         "
         :disabled="!form.category || !form.datetime || !form.description.trim()"
         @click="saveEntry"
@@ -722,15 +722,15 @@ function attachmentIcon(mediaType: string): string {
     modal
     :header="
       attachmentDialog.editingAttachmentId
-        ? t('editor.historico.logs.editAttachment')
-        : t('editor.historico.logs.addAttachment')
+        ? t('editor.historyLog.logs.editAttachment')
+        : t('editor.historyLog.logs.addAttachment')
     "
     :style="{ width: '28rem' }"
   >
     <div class="flex flex-col gap-4 pt-2">
       <Field
         v-if="!attachmentDialog.editingAttachmentId"
-        :label="t('editor.historico.logs.fields.attachmentUrl')"
+        :label="t('editor.historyLog.logs.fields.attachmentUrl')"
       >
         <InputText
           v-model="attachmentDialog.form.url"
@@ -739,11 +739,11 @@ function attachmentIcon(mediaType: string): string {
         />
       </Field>
 
-      <Field :label="t('editor.historico.logs.fields.attachmentFilename')">
+      <Field :label="t('editor.historyLog.logs.fields.attachmentFilename')">
         <InputText v-model="attachmentDialog.form.filename" class="w-full" />
       </Field>
 
-      <Field :label="t('editor.historico.logs.fields.attachmentMediaType')">
+      <Field :label="t('editor.historyLog.logs.fields.attachmentMediaType')">
         <Select
           v-model="attachmentDialog.form.mediaType"
           :options="mediaTypeOptions"
@@ -765,7 +765,7 @@ function attachmentIcon(mediaType: string): string {
         :label="
           attachmentDialog.editingAttachmentId
             ? t('editor.save')
-            : t('editor.historico.logs.addAttachment')
+            : t('editor.historyLog.logs.addAttachment')
         "
         :disabled="
           !attachmentDialog.editingAttachmentId &&

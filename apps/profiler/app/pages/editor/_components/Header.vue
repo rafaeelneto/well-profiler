@@ -4,9 +4,9 @@ import SettingsModal from '~/components/SettingsModal.vue';
 import ExportPdfDialog from '~/components/ExportPdfDialog.vue';
 import ToolsMenu, { type ToolItem } from './ToolsMenu.vue';
 
-const props = defineProps<{ mobileView: 'perfil' | 'dados' }>();
+const props = defineProps<{ mobileView: 'profile' | 'data' }>();
 const emit = defineEmits<{
-  'update:mobileView': [value: 'perfil' | 'dados'];
+  'update:mobileView': [value: 'profile' | 'data'];
 }>();
 
 const { t } = useI18n();
@@ -200,11 +200,11 @@ const iconBtnPt = {
 
 const viewOptions = computed(() => [
   {
-    value: 'perfil',
+    value: 'profile',
     label: t('editor.viewProfile'),
     icon: 'ph:chart-bar-horizontal-duotone',
   },
-  { value: 'dados', label: t('editor.viewData'), icon: 'ph:table-duotone' },
+  { value: 'data', label: t('editor.viewData'), icon: 'ph:table-duotone' },
 ]);
 </script>
 
@@ -386,7 +386,7 @@ const viewOptions = computed(() => [
       </span>
     </div>
 
-    <!-- Row 3: Perfil / Dados view toggle -->
+    <!-- Row 3: Profile / Data view toggle -->
     <div class="flex items-center gap-2 px-4 pb-3">
       <SelectButton
         :model-value="props.mobileView"

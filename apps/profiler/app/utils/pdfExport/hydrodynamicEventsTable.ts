@@ -18,7 +18,7 @@ const KNOWN_EVENT_TYPES = [
 
 function eventTypeLabel(type: string, t: PdfTranslate): string {
   return KNOWN_EVENT_TYPES.includes(type)
-    ? t(`editor.hidrodinamica.eventTypes.${type}`)
+    ? t(`editor.hydrodynamicEvents.eventTypes.${type}`)
     : type;
 }
 
@@ -61,25 +61,25 @@ function buildEventStats(
   const fields: { label: string; value: string }[] = [];
   if (staticLevel != null) {
     fields.push({
-      label: t('editor.hidrodinamica.stats.ne'),
+      label: t('editor.hydrodynamicEvents.stats.ne'),
       value: formatLength(staticLevel),
     });
   }
   if (dynamicLevel != null) {
     fields.push({
-      label: t('editor.hidrodinamica.stats.nd'),
+      label: t('editor.hydrodynamicEvents.stats.nd'),
       value: formatLength(dynamicLevel),
     });
   }
   if (rate != null) {
     fields.push({
-      label: t('editor.hidrodinamica.stats.flowRate'),
+      label: t('editor.hydrodynamicEvents.stats.flowRate'),
       value: formatRate(rate),
     });
   }
   if (operator) {
     fields.push({
-      label: t('editor.hidrodinamica.fields.operator'),
+      label: t('editor.hydrodynamicEvents.fields.operator'),
       value: operator,
     });
   }
@@ -133,7 +133,7 @@ export function buildHydrodynamicEventsSection(
     {
       stack: [
         { text: ' ' },
-        { text: t('editor.hidrodinamica.title'), style: 'title' },
+        { text: t('editor.hydrodynamicEvents.title'), style: 'title' },
         buildEventHeader(first!, t),
       ],
       unbreakable: true,

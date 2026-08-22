@@ -104,10 +104,10 @@ const eventSchemas = {
 } as const;
 
 const missingFieldLabelKeys: Record<string, string> = {
-  datetime: 'editor.hidrodinamica.fields.datetime',
-  static_level: 'editor.hidrodinamica.fields.staticLevel',
-  steps: 'editor.hidrodinamica.fields.steps',
-  recovery: 'editor.hidrodinamica.fields.recovery',
+  datetime: 'editor.hydrodynamicEvents.fields.datetime',
+  static_level: 'editor.hydrodynamicEvents.fields.staticLevel',
+  steps: 'editor.hydrodynamicEvents.fields.steps',
+  recovery: 'editor.hydrodynamicEvents.fields.recovery',
 };
 
 const validation = computed(() => {
@@ -349,13 +349,13 @@ function saveEvent() {
 const stepReadingColumns = computed<WellGridColumn[]>(() => [
   {
     prop: 'elapsed',
-    label: t('editor.hidrodinamica.fields.elapsed'),
+    label: t('editor.hydrodynamicEvents.fields.elapsed'),
     type: 'number',
     size: 120,
   },
   {
     prop: 'depth',
-    label: t('editor.hidrodinamica.fields.depth'),
+    label: t('editor.hydrodynamicEvents.fields.depth'),
     type: 'number',
     size: 120,
   },
@@ -364,19 +364,19 @@ const stepReadingColumns = computed<WellGridColumn[]>(() => [
 const recoveryReadingColumns = computed<WellGridColumn[]>(() => [
   {
     prop: 'elapsed',
-    label: t('editor.hidrodinamica.fields.elapsed'),
+    label: t('editor.hydrodynamicEvents.fields.elapsed'),
     type: 'number',
     size: 120,
   },
   {
     prop: 'depth',
-    label: t('editor.hidrodinamica.fields.depth'),
+    label: t('editor.hydrodynamicEvents.fields.depth'),
     type: 'number',
     size: 120,
   },
   {
     prop: 'depthPrecision',
-    label: t('editor.hidrodinamica.fields.depthPrecision'),
+    label: t('editor.hydrodynamicEvents.fields.depthPrecision'),
     type: 'number',
     size: 90,
   },
@@ -452,14 +452,14 @@ function reorderRecoveryReading(from: number, to: number) {
     modal
     :header="
       editingId
-        ? t('editor.hidrodinamica.editEvent')
-        : t('editor.hidrodinamica.addEvent')
+        ? t('editor.hydrodynamicEvents.editEvent')
+        : t('editor.hydrodynamicEvents.addEvent')
     "
     :style="{ width: '100vw', maxWidth: '42rem' }"
   >
     <div class="flex flex-col gap-5 pt-2">
       <!-- Event type selector -->
-      <Field :label="t('editor.hidrodinamica.fields.type')">
+      <Field :label="t('editor.hydrodynamicEvents.fields.type')">
         <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
           <label
             v-for="opt in typeOptions"
@@ -481,7 +481,7 @@ function reorderRecoveryReading(from: number, to: number) {
       </Field>
 
       <!-- Date / time -->
-      <Field :label="t('editor.hidrodinamica.fields.datetime')">
+      <Field :label="t('editor.hydrodynamicEvents.fields.datetime')">
         <DatePicker
           v-model="form.datetime"
           show-time
@@ -495,24 +495,24 @@ function reorderRecoveryReading(from: number, to: number) {
 
       <!-- Operator / Equipment -->
       <div class="grid grid-cols-2 gap-3">
-        <Field :label="t('editor.hidrodinamica.fields.operator')">
+        <Field :label="t('editor.hydrodynamicEvents.fields.operator')">
           <InputText v-model="form.operator" class="w-full" />
         </Field>
-        <Field :label="t('editor.hidrodinamica.fields.equipment')">
+        <Field :label="t('editor.hydrodynamicEvents.fields.equipment')">
           <InputText v-model="form.equipment" class="w-full" />
         </Field>
       </div>
 
       <!-- Static level (spot / constant_rate / step_drawdown) -->
       <div v-if="showStaticLevel" class="grid grid-cols-2 gap-3">
-        <Field :label="t('editor.hidrodinamica.fields.staticLevel')">
+        <Field :label="t('editor.hydrodynamicEvents.fields.staticLevel')">
           <InputNumber
             v-model="form.staticLevel"
             :max-fraction-digits="3"
             class="w-full"
           />
         </Field>
-        <Field :label="t('editor.hidrodinamica.fields.staticLevelPrecision')">
+        <Field :label="t('editor.hydrodynamicEvents.fields.staticLevelPrecision')">
           <InputNumber
             v-model="form.staticLevelPrecision"
             :max-fraction-digits="3"
@@ -524,7 +524,7 @@ function reorderRecoveryReading(from: number, to: number) {
       <!-- Measurement method (spot_measurement) -->
       <Field
         v-if="showMeasurementMethod"
-        :label="t('editor.hidrodinamica.fields.measurementMethod')"
+        :label="t('editor.hydrodynamicEvents.fields.measurementMethod')"
       >
         <Select
           v-model="form.measurementMethod"
@@ -538,14 +538,14 @@ function reorderRecoveryReading(from: number, to: number) {
 
       <!-- Recovery only: estimated preceding params -->
       <div v-if="showRecoveryOnly" class="grid grid-cols-2 gap-3">
-        <Field :label="t('editor.hidrodinamica.fields.pumpingRate')">
+        <Field :label="t('editor.hydrodynamicEvents.fields.pumpingRate')">
           <InputNumber
             v-model="form.pumpingRate"
             :max-fraction-digits="2"
             class="w-full"
           />
         </Field>
-        <Field :label="t('editor.hidrodinamica.fields.pumpingDuration')">
+        <Field :label="t('editor.hydrodynamicEvents.fields.pumpingDuration')">
           <InputNumber
             v-model="form.pumpingDuration"
             :max-fraction-digits="1"
@@ -560,11 +560,11 @@ function reorderRecoveryReading(from: number, to: number) {
           <span
             class="text-[10px] font-semibold tracking-widest uppercase text-content-400"
           >
-            {{ t('editor.hidrodinamica.fields.steps') }}
+            {{ t('editor.hydrodynamicEvents.fields.steps') }}
           </span>
           <div class="flex items-center gap-3">
             <Field
-              :label="t('editor.hidrodinamica.fields.stepsDepthPrecision')"
+              :label="t('editor.hydrodynamicEvents.fields.stepsDepthPrecision')"
               class="mb-0 flex-row items-center"
             >
               <InputNumber
@@ -577,7 +577,7 @@ function reorderRecoveryReading(from: number, to: number) {
             <Button
               outlined
               size="small"
-              :label="t('editor.hidrodinamica.addStep')"
+              :label="t('editor.hydrodynamicEvents.addStep')"
               @click="addStep"
             >
               <template #icon>
@@ -614,7 +614,7 @@ function reorderRecoveryReading(from: number, to: number) {
                   <span
                     class="text-xs font-semibold tracking-wider uppercase text-content-100 whitespace-nowrap"
                   >
-                    {{ t('editor.hidrodinamica.stats.steps') }} {{ si + 1 }}
+                    {{ t('editor.hydrodynamicEvents.stats.steps') }} {{ si + 1 }}
                   </span>
                 </div>
 
@@ -625,7 +625,7 @@ function reorderRecoveryReading(from: number, to: number) {
                     @mousedown.stop
                   >
                     <span class="text-xs text-content-400 whitespace-nowrap">{{
-                      t('editor.hidrodinamica.fields.rate')
+                      t('editor.hydrodynamicEvents.fields.rate')
                     }}</span>
                     <InputNumber
                       v-model="step.rate"
@@ -643,7 +643,7 @@ function reorderRecoveryReading(from: number, to: number) {
                     @mousedown.stop
                   >
                     <span class="text-xs text-content-400 whitespace-nowrap">{{
-                      t('editor.hidrodinamica.fields.duration')
+                      t('editor.hydrodynamicEvents.fields.duration')
                     }}</span>
                     <InputNumber
                       v-if="!stepHasReadings(step.readings)"
@@ -657,7 +657,7 @@ function reorderRecoveryReading(from: number, to: number) {
                     <InputNumber
                       v-else
                       v-tooltip.top="
-                        t('editor.hidrodinamica.fields.durationDerivedHint')
+                        t('editor.hydrodynamicEvents.fields.durationDerivedHint')
                       "
                       :model-value="derivedStepDuration(step.readings)"
                       disabled
@@ -686,7 +686,7 @@ function reorderRecoveryReading(from: number, to: number) {
               <WellDataGrid
                 :rows="step.readings.map(r => ({ ...r }))"
                 :columns="stepReadingColumns"
-                :add-label="t('editor.hidrodinamica.addReading')"
+                :add-label="t('editor.hydrodynamicEvents.addReading')"
                 @add="addStepReading(si)"
                 @delete="ri => deleteStepReading(si, ri)"
                 @change="
@@ -706,7 +706,7 @@ function reorderRecoveryReading(from: number, to: number) {
             for="recovery-toggle"
             class="text-sm font-medium text-content-100 cursor-pointer"
           >
-            {{ t('editor.hidrodinamica.fields.includeRecovery') }}
+            {{ t('editor.hydrodynamicEvents.fields.includeRecovery') }}
           </label>
           <ToggleSwitch v-model="form.hasRecovery" input-id="recovery-toggle" />
         </div>
@@ -714,7 +714,7 @@ function reorderRecoveryReading(from: number, to: number) {
           <WellDataGrid
             :rows="form.recoveryReadings.map(r => ({ ...r }))"
             :columns="recoveryReadingColumns"
-            :add-label="t('editor.hidrodinamica.addReading')"
+            :add-label="t('editor.hydrodynamicEvents.addReading')"
             @add="addRecoveryReading"
             @delete="deleteRecoveryReading"
             @change="changeRecoveryReading"
@@ -728,12 +728,12 @@ function reorderRecoveryReading(from: number, to: number) {
         <span
           class="text-[10px] font-semibold tracking-widest uppercase text-content-400"
         >
-          {{ t('editor.hidrodinamica.fields.recovery') }}
+          {{ t('editor.hydrodynamicEvents.fields.recovery') }}
         </span>
         <WellDataGrid
           :rows="form.recoveryReadings.map(r => ({ ...r }))"
           :columns="recoveryReadingColumns"
-          :add-label="t('editor.hidrodinamica.addReading')"
+          :add-label="t('editor.hydrodynamicEvents.addReading')"
           @add="addRecoveryReading"
           @delete="deleteRecoveryReading"
           @change="changeRecoveryReading"
@@ -742,7 +742,7 @@ function reorderRecoveryReading(from: number, to: number) {
       </div>
 
       <!-- Notes -->
-      <Field :label="t('editor.hidrodinamica.fields.notes')">
+      <Field :label="t('editor.hydrodynamicEvents.fields.notes')">
         <Textarea
           v-model="form.notes"
           :rows="3"
@@ -762,7 +762,7 @@ function reorderRecoveryReading(from: number, to: number) {
           />
           <Button
             :label="
-              editingId ? t('editor.save') : t('editor.hidrodinamica.addEvent')
+              editingId ? t('editor.save') : t('editor.hydrodynamicEvents.addEvent')
             "
             :disabled="!isFormValid"
             @click="saveEvent"
@@ -774,7 +774,7 @@ function reorderRecoveryReading(from: number, to: number) {
         >
           <Icon name="ph:info" class="size-3.5 shrink-0" />
           {{
-            t('editor.hidrodinamica.validation.missing', {
+            t('editor.hydrodynamicEvents.validation.missing', {
               fields: missingFieldLabels.join(', '),
             })
           }}

@@ -258,9 +258,9 @@
       "constructionShort": "Constr.",
       "geological": "Geológico",
       "summary": "Sumário",
-      "historico": "Histórico",
-      "hidrodinamica": "Hidrodinâmica",
-      "hidro": "Hidro",
+      "historyLog": "Histórico",
+      "hydrodynamicEvents": "Hidrodinâmica",
+      "hydro": "Hidro",
       "inDevelopment": "Em dev"
     },
     "status": {
@@ -634,7 +634,7 @@
         "thickness": "Espessura"
       }
     },
-    "historico": {
+    "historyLog": {
       "tag": "Histórico · Poço",
       "logs": {
         "title": "Registro de Histórico",
@@ -684,7 +684,7 @@
         "comingSoon": "Edição disponível na aba Hidrodinâmica"
       }
     },
-    "hidrodinamica": {
+    "hydrodynamicEvents": {
       "title": "Eventos Hidrodinâmicos",
       "addEvent": "Adicionar evento",
       "ledgerNote": "Ledger cronológico — novos registros são adicionados, não sobrescritos.",
@@ -699,7 +699,7 @@
       "analyses": {
         "inDevBody": "A aba Análises permitirá inserir resultados de ensaios de aquífero (transmissividade, capacidade específica, coeficiente de armazenamento)."
       },
-      "estadoAtual": {
+      "currentState": {
         "title": "Estado Atual",
         "ne": "NE ATUAL",
         "specificCapacity": "CAP. ESPECÍFICA",

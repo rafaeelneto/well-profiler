@@ -14,8 +14,8 @@ const { eventTypeLabel, eventTypeSeverity } = useHydrodynamicEventTypes();
 function deleteEvent() {
   confirm.require({
     icon: 'ph:warning-duotone',
-    header: t('editor.hidrodinamica.deleteConfirm'),
-    message: t('editor.hidrodinamica.deleteConfirm'),
+    header: t('editor.hydrodynamicEvents.deleteConfirm'),
+    message: t('editor.hydrodynamicEvents.deleteConfirm'),
     acceptLabel: t('editor.confirmClear.accept'),
     rejectLabel: t('editor.confirmClear.reject'),
     acceptProps: { severity: 'danger' },
@@ -88,10 +88,10 @@ function deleteEvent() {
         </span>
         <span v-if="recoveryReadingsCount(event)">
           <strong class="font-semibold text-content-200">
-            {{ t('editor.hidrodinamica.stats.recovery') }}
+            {{ t('editor.hydrodynamicEvents.stats.recovery') }}
           </strong>
           {{ recoveryReadingsCount(event) }}
-          {{ t('editor.hidrodinamica.stats.readings') }}
+          {{ t('editor.hydrodynamicEvents.stats.readings') }}
         </span>
       </template>
       <div class="ml-auto shrink-0">

@@ -13,7 +13,7 @@ const event = computed(() => props.event as Record<string, unknown>);
   <!-- spot_measurement -->
   <div v-if="event.type === 'spot_measurement'" class="stats-row">
     <div class="stat-chip">
-      <span class="stat-chip-label">{{ t('editor.hidrodinamica.stats.ne') }}</span>
+      <span class="stat-chip-label">{{ t('editor.hydrodynamicEvents.stats.ne') }}</span>
       <span class="stat-chip-value">
         {{ event.static_level != null
           ? (event.static_level as number).toFixed(2)
@@ -21,7 +21,7 @@ const event = computed(() => props.event as Record<string, unknown>);
       </span>
     </div>
     <div v-if="event.measurement_method" class="stat-chip">
-      <span class="stat-chip-label">{{ t('editor.hidrodinamica.stats.method') }}</span>
+      <span class="stat-chip-label">{{ t('editor.hydrodynamicEvents.stats.method') }}</span>
       <span class="stat-chip-value">
         {{ measurementMethodLabel(event.measurement_method as string) }}
       </span>
@@ -31,7 +31,7 @@ const event = computed(() => props.event as Record<string, unknown>);
   <!-- constant_rate -->
   <div v-else-if="event.type === 'constant_rate'" class="stats-row">
     <div v-if="event.static_level != null" class="stat-chip">
-      <span class="stat-chip-label">{{ t('editor.hidrodinamica.stats.ne') }}</span>
+      <span class="stat-chip-label">{{ t('editor.hydrodynamicEvents.stats.ne') }}</span>
       <span class="stat-chip-value">
         {{ (event.static_level as number).toFixed(2)
         }}<span class="stat-chip-unit">m</span>
@@ -39,14 +39,14 @@ const event = computed(() => props.event as Record<string, unknown>);
     </div>
     <template v-if="lastReading(props.event)">
       <div class="stat-chip">
-        <span class="stat-chip-label">{{ t('editor.hidrodinamica.stats.nd') }}</span>
+        <span class="stat-chip-label">{{ t('editor.hydrodynamicEvents.stats.nd') }}</span>
         <span class="stat-chip-value">
           {{ lastReading(props.event)!.depth.toFixed(2)
           }}<sup class="stat-chip-final">f</sup><span class="stat-chip-unit">m</span>
         </span>
       </div>
       <div v-if="event.static_level != null" class="stat-chip stat-chip--accent">
-        <span class="stat-chip-label">{{ t('editor.hidrodinamica.stats.drawdown') }}</span>
+        <span class="stat-chip-label">{{ t('editor.hydrodynamicEvents.stats.drawdown') }}</span>
         <span class="stat-chip-value">
           {{
             (lastReading(props.event)!.depth - (event.static_level as number)).toFixed(2)
@@ -55,7 +55,7 @@ const event = computed(() => props.event as Record<string, unknown>);
       </div>
     </template>
     <div v-if="stepRate(props.event, 0) != null" class="stat-chip">
-      <span class="stat-chip-label">{{ t('editor.hidrodinamica.stats.flowRate') }}</span>
+      <span class="stat-chip-label">{{ t('editor.hydrodynamicEvents.stats.flowRate') }}</span>
       <span class="stat-chip-value">
         {{ stepRate(props.event, 0) }}<span class="stat-chip-unit">m³/h</span>
       </span>
@@ -68,7 +68,7 @@ const event = computed(() => props.event as Record<string, unknown>);
       "
       class="stat-chip stat-chip--accent"
     >
-      <span class="stat-chip-label">{{ t('editor.hidrodinamica.stats.specificCapacity') }}</span>
+      <span class="stat-chip-label">{{ t('editor.hydrodynamicEvents.stats.specificCapacity') }}</span>
       <span class="stat-chip-value">
         {{
           (
@@ -83,20 +83,20 @@ const event = computed(() => props.event as Record<string, unknown>);
   <!-- step_drawdown -->
   <div v-else-if="event.type === 'step_drawdown'" class="stats-row">
     <div class="stat-chip">
-      <span class="stat-chip-label">{{ t('editor.hidrodinamica.stats.steps') }}</span>
+      <span class="stat-chip-label">{{ t('editor.hydrodynamicEvents.stats.steps') }}</span>
       <span class="stat-chip-value">
         {{ (event.steps as unknown[])?.length ?? 0 }}
       </span>
     </div>
     <div v-if="event.static_level != null" class="stat-chip">
-      <span class="stat-chip-label">{{ t('editor.hidrodinamica.stats.ne') }}</span>
+      <span class="stat-chip-label">{{ t('editor.hydrodynamicEvents.stats.ne') }}</span>
       <span class="stat-chip-value">
         {{ (event.static_level as number).toFixed(2)
         }}<span class="stat-chip-unit">m</span>
       </span>
     </div>
     <div v-if="lastReading(props.event)" class="stat-chip">
-      <span class="stat-chip-label">{{ t('editor.hidrodinamica.stats.nd') }}</span>
+      <span class="stat-chip-label">{{ t('editor.hydrodynamicEvents.stats.nd') }}</span>
       <span class="stat-chip-value">
         {{ lastReading(props.event)!.depth.toFixed(2)
         }}<sup class="stat-chip-final">f</sup><span class="stat-chip-unit">m</span>
@@ -107,7 +107,7 @@ const event = computed(() => props.event as Record<string, unknown>);
   <!-- airlift -->
   <div v-else-if="event.type === 'airlift'" class="stats-row">
     <div v-if="stepRate(props.event, 0) != null" class="stat-chip">
-      <span class="stat-chip-label">{{ t('editor.hidrodinamica.stats.flowRate') }}</span>
+      <span class="stat-chip-label">{{ t('editor.hydrodynamicEvents.stats.flowRate') }}</span>
       <span class="stat-chip-value">
         {{ stepRate(props.event, 0) }}<span class="stat-chip-unit">m³/h</span>
       </span>
@@ -136,7 +136,7 @@ const event = computed(() => props.event as Record<string, unknown>);
       </span>
     </div>
     <div class="stat-chip">
-      <span class="stat-chip-label">{{ t('editor.hidrodinamica.fields.readings') }}</span>
+      <span class="stat-chip-label">{{ t('editor.hydrodynamicEvents.fields.readings') }}</span>
       <span class="stat-chip-value">{{ recoveryReadingsCount(props.event) }}</span>
     </div>
   </div>
