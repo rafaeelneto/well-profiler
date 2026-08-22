@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import type { DeepPartial, WellTheme } from '@welldot/render';
-import { WellRenderer, INTERACTIVE_RENDER_CONFIG, applyRenderLocale } from '@welldot/render';
+import {
+  WellRenderer,
+  INTERACTIVE_RENDER_CONFIG,
+  applyRenderLocale,
+} from '@welldot/render';
 import { isWellEmpty } from '@welldot/core';
 import { useDark } from '@vueuse/core';
 import ZoomControls from './ZoomControls.vue';
@@ -83,7 +87,10 @@ async function initRenderer() {
     {
       units: { length: uiStore.lengthUnit, diameter: uiStore.diameterUnit },
       locale: locale.value as 'en' | 'pt',
-      renderConfig: applyRenderLocale(INTERACTIVE_RENDER_CONFIG, locale.value === 'en' ? 'en' : 'pt'),
+      renderConfig: applyRenderLocale(
+        INTERACTIVE_RENDER_CONFIG,
+        locale.value === 'en' ? 'en' : 'pt',
+      ),
       onZoom: scale => {
         currentScale.value = scale;
       },

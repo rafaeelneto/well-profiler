@@ -19,7 +19,10 @@ export default [
       // reads and writes fields like `media_type` and `static_level` verbatim.
       camelcase: 'off',
       'prefer-template': ['error'],
-      'no-plusplus': ['error', { allowForLoopAfterthoughts: true }],
+      // Off, not relaxed: the codebase uses `++`/`--` idiomatically outside
+      // for-loop afterthoughts too (`while` cursors, undo/redo stack indices in
+      // `useImmer`). This is an airbnb stylistic relic, not a safety rule.
+      'no-plusplus': 'off',
       radix: ['error', 'as-needed'],
       'no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
 

@@ -110,6 +110,7 @@ The format captures:
 | Location            | `location`                                                                 | Lat/lng/elevation with explicit CRS and datum; default WGS84 (`EPSG:4326`)     |
 | Registry IDs        | `well_id[]`                                                                | Authority-scoped identifiers (e.g. SIAGAS, ANA, NGWD)                          |
 | Borehole            | `bore_hole[]`                                                              | Depth intervals and drilling method                                            |
+| Well depth          | `well_depth`                                                               | Current usable depth; may be less than drilled depth after siltation           |
 | Well casing         | `well_case[]`                                                              | Casing material, diameter, and depth                                           |
 | Reductions          | `reduction[]`                                                              | Diameter transitions between casing sections                                   |
 | Well screen         | `well_screen[]`                                                            | Screen type, slot size (`screen_slot`, mm), and depth                          |
@@ -186,6 +187,11 @@ pnpm install
 pnpm dev
 ```
 
+`pnpm dev` starts every workspace at once: the active Nuxt app on
+[localhost:3000](http://localhost:3000), the deprecated Next.js app on
+[localhost:5000](http://localhost:5000), and `tsup --watch` for the three libraries. To run just the
+active app, use `pnpm turbo dev --filter=profiler`.
+
 To use the libraries in your own project, install them individually — see the README in each package for usage details.
 
 ---
@@ -245,12 +251,15 @@ The `welldot-converter` skill for [Claude Code](https://claude.ai/code) converts
 
 **Install:**
 
-The skill is included in this repository under `.claude/skills/welldot-converter/`. If you cloned the repo, it is already available project-locally.
+The skill lives at `.agents/skills/welldot-converter/`, the vendor-neutral path that every
+skills-capable client discovers. `.claude/skills/welldot-converter` is a symlink to it, kept for
+back-compat. If you cloned the repo, the skill is already available project-locally.
 
-To make it available globally across all your projects, copy it to your personal skills directory:
+To make it available globally across all your projects, copy the real directory — not the symlink —
+into your personal skills directory:
 
 ```bash
-cp -r .claude/skills/welldot-converter ~/.claude/skills/
+cp -R .agents/skills/welldot-converter ~/.claude/skills/
 ```
 
 **Use:**

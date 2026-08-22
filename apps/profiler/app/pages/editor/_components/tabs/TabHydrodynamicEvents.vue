@@ -6,7 +6,8 @@ import EventDialog from './hydrodynamicEvents/EventDialog.vue';
 const { t } = useI18n();
 const profileStore = useProfileStore();
 const { typeOptions } = useHydrodynamicEventTypes();
-const eventDialogRef = useTemplateRef<InstanceType<typeof EventDialog>>('eventDialogRef');
+const eventDialogRef =
+  useTemplateRef<InstanceType<typeof EventDialog>>('eventDialogRef');
 
 // ─── Sub-tab ──────────────────────────────────────────────────────────────────
 
@@ -37,9 +38,16 @@ const currentState = computed(() => {
     (a, b) => new Date(b.datetime).getTime() - new Date(a.datetime).getTime(),
   );
 
-  const neEvent = events.find(e => 'static_level' in e && (e as Record<string, unknown>).static_level != null);
+  const neEvent = events.find(
+    e =>
+      'static_level' in e &&
+      (e as Record<string, unknown>).static_level != null,
+  );
   const ne = neEvent
-    ? { value: (neEvent as Record<string, unknown>).static_level as number, datetime: neEvent.datetime }
+    ? {
+        value: (neEvent as Record<string, unknown>).static_level as number,
+        datetime: neEvent.datetime,
+      }
     : null;
 
   const scAnalysis = analyses.find(a => a.specific_capacity != null);
@@ -61,7 +69,9 @@ const currentState = computed(() => {
   return { ne, specificCapacity, transmissivity, dynamicLevel, flowRate };
 });
 
-const analysesCount = computed(() => profileStore.well.aquifer_analysis?.length ?? 0);
+const analysesCount = computed(
+  () => profileStore.well.aquifer_analysis?.length ?? 0,
+);
 
 // ─── Display helpers ──────────────────────────────────────────────────────────
 
@@ -100,10 +110,14 @@ function toggleTypeFilter(type: string) {
     <!-- ── Current State ─────────────────────────────────────────────────────── -->
     <div class="px-6 pt-6 pb-5 border-b border-surface-200/60">
       <div class="flex items-baseline justify-between mb-4">
-        <h3 class="font-serif text-[22px] font-medium tracking-[-0.015em] text-content-0 m-0">
+        <h3
+          class="font-serif text-[22px] font-medium tracking-[-0.015em] text-content-0 m-0"
+        >
           {{ t('editor.hydrodynamicEvents.currentState.title') }}
         </h3>
-        <span class="font-mono text-[10px] tracking-[0.08em] uppercase text-content-500">
+        <span
+          class="font-mono text-[10px] tracking-[0.08em] uppercase text-content-500"
+        >
           CONSULTAS · § ESTADO
         </span>
       </div>
@@ -111,10 +125,13 @@ function toggleTypeFilter(type: string) {
       <div class="grid grid-cols-2 lg:grid-cols-3 gap-3">
         <!-- NE ATUAL -->
         <div class="stat-card">
-          <span class="stat-label">{{ t('editor.hydrodynamicEvents.currentState.ne') }}</span>
+          <span class="stat-label">{{
+            t('editor.hydrodynamicEvents.currentState.ne')
+          }}</span>
           <template v-if="currentState.ne">
             <div class="stat-value">
-              {{ currentState.ne.value.toFixed(2) }}<span class="stat-unit">m</span>
+              {{ currentState.ne.value.toFixed(2)
+              }}<span class="stat-unit">m</span>
             </div>
             <span class="stat-sub font-mono text-[10px] text-content-400">
               {{ formatDate(currentState.ne.datetime, 'dd MMM yyyy') }}
@@ -125,10 +142,13 @@ function toggleTypeFilter(type: string) {
 
         <!-- CAP. ESPECÍFICA -->
         <div class="stat-card">
-          <span class="stat-label">{{ t('editor.hydrodynamicEvents.currentState.specificCapacity') }}</span>
+          <span class="stat-label">{{
+            t('editor.hydrodynamicEvents.currentState.specificCapacity')
+          }}</span>
           <template v-if="currentState.specificCapacity">
             <div class="stat-value">
-              {{ currentState.specificCapacity.value.toFixed(1) }}<span class="stat-unit">m²/h</span>
+              {{ currentState.specificCapacity.value.toFixed(1)
+              }}<span class="stat-unit">m²/h</span>
             </div>
             <span v-if="currentState.specificCapacity.method" class="stat-sub">
               {{ methodLabel(currentState.specificCapacity.method) }}
@@ -139,12 +159,18 @@ function toggleTypeFilter(type: string) {
 
         <!-- TRANSMISSIVIDADE -->
         <div class="stat-card">
-          <span class="stat-label">{{ t('editor.hydrodynamicEvents.currentState.transmissivity') }}</span>
+          <span class="stat-label">{{
+            t('editor.hydrodynamicEvents.currentState.transmissivity')
+          }}</span>
           <template v-if="currentState.transmissivity">
             <div class="stat-value transmissivity-value">
-              {{ formatTransmissivityMantissa(currentState.transmissivity.value) }}
+              {{
+                formatTransmissivityMantissa(currentState.transmissivity.value)
+              }}
               <span class="stat-unit"> · 10</span>
-              <sup>{{ formatTransmissivityExp(currentState.transmissivity.value) }}</sup>
+              <sup>{{
+                formatTransmissivityExp(currentState.transmissivity.value)
+              }}</sup>
               <span class="stat-unit"> m²/s</span>
             </div>
             <span v-if="currentState.transmissivity.method" class="stat-sub">
@@ -156,25 +182,36 @@ function toggleTypeFilter(type: string) {
 
         <!-- ND (optional) -->
         <div v-if="currentState.dynamicLevel" class="stat-card">
-          <span class="stat-label">{{ t('editor.hydrodynamicEvents.currentState.dynamicLevel') }}</span>
+          <span class="stat-label">{{
+            t('editor.hydrodynamicEvents.currentState.dynamicLevel')
+          }}</span>
           <div class="stat-value">
-            {{ currentState.dynamicLevel.value.toFixed(2) }}<span class="stat-unit">m</span>
+            {{ currentState.dynamicLevel.value.toFixed(2)
+            }}<span class="stat-unit">m</span>
           </div>
         </div>
 
         <!-- VAZÃO Q (optional) -->
         <div v-if="currentState.flowRate" class="stat-card">
-          <span class="stat-label">{{ t('editor.hydrodynamicEvents.currentState.flowRate') }}</span>
+          <span class="stat-label">{{
+            t('editor.hydrodynamicEvents.currentState.flowRate')
+          }}</span>
           <div class="stat-value">
-            {{ currentState.flowRate.value.toFixed(0) }}<span class="stat-unit">m³/h</span>
+            {{ currentState.flowRate.value.toFixed(0)
+            }}<span class="stat-unit">m³/h</span>
           </div>
         </div>
       </div>
     </div>
 
     <!-- ── Ledger note ──────────────────────────────────────────────────────── -->
-    <div class="flex items-center gap-2 px-6 py-2.5 text-[11px] text-content-400 border-b border-surface-200/40 bg-surface-50">
-      <Icon name="ph:clock-counter-clockwise-duotone" class="size-3.5 shrink-0 opacity-70" />
+    <div
+      class="flex items-center gap-2 px-6 py-2.5 text-[11px] text-content-400 border-b border-surface-200/40 bg-surface-50"
+    >
+      <Icon
+        name="ph:clock-counter-clockwise-duotone"
+        class="size-3.5 shrink-0 opacity-70"
+      />
       {{ t('editor.hydrodynamicEvents.ledgerNote') }}
     </div>
 
@@ -247,7 +284,9 @@ function toggleTypeFilter(type: string) {
               class="flex flex-col items-center gap-4 py-10 text-content-400"
             >
               <Icon name="ph:chart-line-duotone" class="size-12 opacity-40" />
-              <p class="text-sm m-0">{{ t('editor.hydrodynamicEvents.empty') }}</p>
+              <p class="text-sm m-0">
+                {{ t('editor.hydrodynamicEvents.empty') }}
+              </p>
             </div>
 
             <!-- no results -->
@@ -255,8 +294,13 @@ function toggleTypeFilter(type: string) {
               v-else-if="!filteredEvents.length"
               class="flex flex-col items-center gap-3 py-10 text-content-400"
             >
-              <Icon name="ph:funnel-simple-duotone" class="size-10 opacity-40" />
-              <p class="text-sm m-0">{{ t('editor.hydrodynamicEvents.noResults') }}</p>
+              <Icon
+                name="ph:funnel-simple-duotone"
+                class="size-10 opacity-40"
+              />
+              <p class="text-sm m-0">
+                {{ t('editor.hydrodynamicEvents.noResults') }}
+              </p>
             </div>
 
             <!-- event cards -->
@@ -279,7 +323,9 @@ function toggleTypeFilter(type: string) {
               class="size-14 text-content-300 opacity-30"
             />
             <div class="flex flex-col gap-2">
-              <p class="font-serif text-xl text-content-100 m-0">Análises de Aquífero</p>
+              <p class="font-serif text-xl text-content-100 m-0">
+                Análises de Aquífero
+              </p>
               <p class="text-sm text-content-400 max-w-sm m-0">
                 {{ t('editor.hydrodynamicEvents.analyses.inDevBody') }}
               </p>
@@ -409,7 +455,8 @@ function toggleTypeFilter(type: string) {
 
 .add-entry-btn:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary-500) 25%, transparent);
+  box-shadow: 0 0 0 3px
+    color-mix(in srgb, var(--color-primary-500) 25%, transparent);
   border-color: var(--color-primary-500);
 }
 </style>

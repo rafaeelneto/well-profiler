@@ -1,53 +1,53 @@
 <script setup lang="ts">
 const props = defineProps<{
-  val?: unknown
-  save: (value: any, preventFocus?: boolean) => void
-  close: (focusNext?: boolean) => void
-  unitType: 'length' | 'diameter'
-}>()
+  val?: unknown;
+  save: (value: any, preventFocus?: boolean) => void;
+  close: (focusNext?: boolean) => void;
+  unitType: 'length' | 'diameter';
+}>();
 
-const { toDisplay, toCanonical } = useUnitDisplay(props.unitType)
+const { toDisplay, toCanonical } = useUnitDisplay(props.unitType);
 
-const numRef = ref<{ $el: HTMLElement } | null>(null)
+const numRef = ref<{ $el: HTMLElement } | null>(null);
 
 const raw =
   props.val !== undefined && props.val !== null && props.val !== ''
     ? Number(props.val)
-    : 0
+    : 0;
 
-const localValue = ref<number | null>(toDisplay(raw))
+const localValue = ref<number | null>(toDisplay(raw));
 
 onMounted(() =>
   nextTick(() => {
-    const el = numRef.value?.$el
-    ;(el?.querySelector('input') as HTMLInputElement | null)?.focus()
+    const el = numRef.value?.$el;
+    (el?.querySelector('input') as HTMLInputElement | null)?.focus();
   }),
-)
+);
 
-let lastKeyWasEnter = false
+let lastKeyWasEnter = false;
 
 function onKeydownCapture(e: KeyboardEvent) {
-  lastKeyWasEnter = e.key === 'Enter'
+  lastKeyWasEnter = e.key === 'Enter';
 }
 
 function commit() {
-  if (localValue.value === null) return
-  props.save(toCanonical(localValue.value), !lastKeyWasEnter)
+  if (localValue.value === null) return;
+  props.save(toCanonical(localValue.value), !lastKeyWasEnter);
 }
 
 function onKeydown(e: KeyboardEvent) {
   if (e.key === 'Enter') {
-    e.stopPropagation()
-    commit()
+    e.stopPropagation();
+    commit();
   } else if (e.key === 'Escape') {
-    e.stopPropagation()
-    props.close()
+    e.stopPropagation();
+    props.close();
   }
 }
 
 function update(value: number) {
-  localValue.value = value
-  commit()
+  localValue.value = value;
+  commit();
 }
 </script>
 
@@ -56,12 +56,12 @@ function update(value: number) {
     <WellInputNumber
       ref="numRef"
       :model-value="localValue"
-      @update:model-value="update"
       :max-fraction-digits="4"
       :pt="{
         root: 'well-cell-input-number',
         pcInput: { root: 'well-cell-input well-cell-input-number text-right' },
       }"
+      @update:model-value="update"
       @keydown="onKeydown"
     />
   </div>

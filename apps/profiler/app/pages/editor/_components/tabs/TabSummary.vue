@@ -43,10 +43,18 @@ const boreHoleGroups = computed<SummaryGroup[]>(() => {
 // ─── Tubo de Boca (surface_case) ───────────────────────────────────────────
 
 const surfaceCaseColumns = computed<SummaryColumn[]>(() => [
-  { key: 'diameter', label: t('editor.summary.surfaceCase.diameter'), lead: true },
+  {
+    key: 'diameter',
+    label: t('editor.summary.surfaceCase.diameter'),
+    lead: true,
+  },
   { key: 'from', label: t('editor.summary.surfaceCase.from'), align: 'right' },
   { key: 'to', label: t('editor.summary.surfaceCase.to'), align: 'right' },
-  { key: 'length', label: t('editor.summary.surfaceCase.length'), align: 'right' },
+  {
+    key: 'length',
+    label: t('editor.summary.surfaceCase.length'),
+    align: 'right',
+  },
 ]);
 
 const surfaceCaseGroups = computed<SummaryGroup[]>(() => {
@@ -106,7 +114,10 @@ const casingGroups = computed<SummaryGroup[]>(() => {
       length: formatLength(item.to - item.from),
     },
   }));
-  const totalLength = items.reduce((sum, item) => sum + (item.to - item.from), 0);
+  const totalLength = items.reduce(
+    (sum, item) => sum + (item.to - item.from),
+    0,
+  );
   return [
     {
       rows,
@@ -146,7 +157,11 @@ const reductionGroups = computed<SummaryGroup[]>(() => {
 // ─── Espaço Anular (hole_fill) ──────────────────────────────────────────────
 
 const holeFillColumns = computed<SummaryColumn[]>(() => [
-  { key: 'description', label: t('editor.summary.holeFill.description'), lead: true },
+  {
+    key: 'description',
+    label: t('editor.summary.holeFill.description'),
+    lead: true,
+  },
   { key: 'diameter', label: t('editor.summary.holeFill.diameter') },
   { key: 'from', label: t('editor.summary.holeFill.from'), align: 'right' },
   { key: 'to', label: t('editor.summary.holeFill.to'), align: 'right' },
@@ -158,7 +173,10 @@ const holeFillGroups = computed<SummaryGroup[]>(() => {
   const sorted = [...well.hole_fill].sort((a, b) => a.from - b.from);
   const groupTypes: { type: 'seal' | 'gravel_pack'; label: string }[] = [
     { type: 'seal', label: t('editor.summary.holeFill.groupSeal') },
-    { type: 'gravel_pack', label: t('editor.summary.holeFill.groupGravelPack') },
+    {
+      type: 'gravel_pack',
+      label: t('editor.summary.holeFill.groupGravelPack'),
+    },
   ];
 
   return groupTypes.map(({ type, label }) => {
@@ -189,15 +207,26 @@ const holeFillGroups = computed<SummaryGroup[]>(() => {
 
 const lithologyColumns = computed<SummaryColumn[]>(() => [
   { key: 'unit', label: t('editor.summary.lithology.unit'), lead: true },
-  { key: 'layers', label: t('editor.summary.lithology.layers'), align: 'right' },
+  {
+    key: 'layers',
+    label: t('editor.summary.lithology.layers'),
+    align: 'right',
+  },
   { key: 'from', label: t('editor.summary.lithology.from'), align: 'right' },
   { key: 'to', label: t('editor.summary.lithology.to'), align: 'right' },
-  { key: 'thickness', label: t('editor.summary.lithology.thickness'), align: 'right' },
+  {
+    key: 'thickness',
+    label: t('editor.summary.lithology.thickness'),
+    align: 'right',
+  },
 ]);
 
 const lithologyGroups = computed<SummaryGroup[]>(() => {
   const order: string[] = [];
-  const buckets = new Map<string, { from: number; to: number; color: string; count: number }>();
+  const buckets = new Map<
+    string,
+    { from: number; to: number; color: string; count: number }
+  >();
 
   for (const layer of profileStore.well.lithology) {
     const existing = buckets.get(layer.geologic_unit);
@@ -238,10 +267,14 @@ const lithologyGroups = computed<SummaryGroup[]>(() => {
   <div class="flex flex-col gap-8 p-6">
     <div>
       <div class="flex items-baseline justify-between">
-        <h3 class="font-serif text-[22px] font-medium tracking-[-0.015em] text-content-0 m-0">
+        <h3
+          class="font-serif text-[22px] font-medium tracking-[-0.015em] text-content-0 m-0"
+        >
           {{ t('editor.tabs.summary') }}
         </h3>
-        <span class="font-mono text-[10px] tracking-[0.08em] uppercase text-content-500">
+        <span
+          class="font-mono text-[10px] tracking-[0.08em] uppercase text-content-500"
+        >
           {{ t('editor.summary.tag') }}
         </span>
       </div>
@@ -252,10 +285,14 @@ const lithologyGroups = computed<SummaryGroup[]>(() => {
 
     <section class="flex flex-col gap-5">
       <div class="flex items-baseline justify-between">
-        <h3 class="font-serif text-[22px] font-medium tracking-[-0.015em] text-content-0 m-0">
+        <h3
+          class="font-serif text-[22px] font-medium tracking-[-0.015em] text-content-0 m-0"
+        >
           {{ t('editor.summary.boreHole.title') }}
         </h3>
-        <span class="font-mono text-[10px] tracking-[0.08em] uppercase text-content-500">
+        <span
+          class="font-mono text-[10px] tracking-[0.08em] uppercase text-content-500"
+        >
           {{ t('editor.summary.boreHole.tag') }}
         </span>
       </div>
@@ -264,10 +301,14 @@ const lithologyGroups = computed<SummaryGroup[]>(() => {
 
     <section class="flex flex-col gap-5">
       <div class="flex items-baseline justify-between">
-        <h3 class="font-serif text-[22px] font-medium tracking-[-0.015em] text-content-0 m-0">
+        <h3
+          class="font-serif text-[22px] font-medium tracking-[-0.015em] text-content-0 m-0"
+        >
           {{ t('editor.summary.surfaceCase.title') }}
         </h3>
-        <span class="font-mono text-[10px] tracking-[0.08em] uppercase text-content-500">
+        <span
+          class="font-mono text-[10px] tracking-[0.08em] uppercase text-content-500"
+        >
           {{ t('editor.summary.surfaceCase.tag') }}
         </span>
       </div>
@@ -276,10 +317,14 @@ const lithologyGroups = computed<SummaryGroup[]>(() => {
 
     <section class="flex flex-col gap-5">
       <div class="flex items-baseline justify-between">
-        <h3 class="font-serif text-[22px] font-medium tracking-[-0.015em] text-content-0 m-0">
+        <h3
+          class="font-serif text-[22px] font-medium tracking-[-0.015em] text-content-0 m-0"
+        >
           {{ t('editor.summary.casing.title') }}
         </h3>
-        <span class="font-mono text-[10px] tracking-[0.08em] uppercase text-content-500">
+        <span
+          class="font-mono text-[10px] tracking-[0.08em] uppercase text-content-500"
+        >
           {{ t('editor.summary.casing.tag') }}
         </span>
       </div>
@@ -288,10 +333,14 @@ const lithologyGroups = computed<SummaryGroup[]>(() => {
 
     <section class="flex flex-col gap-5">
       <div class="flex items-baseline justify-between">
-        <h3 class="font-serif text-[22px] font-medium tracking-[-0.015em] text-content-0 m-0">
+        <h3
+          class="font-serif text-[22px] font-medium tracking-[-0.015em] text-content-0 m-0"
+        >
           {{ t('editor.summary.reduction.title') }}
         </h3>
-        <span class="font-mono text-[10px] tracking-[0.08em] uppercase text-content-500">
+        <span
+          class="font-mono text-[10px] tracking-[0.08em] uppercase text-content-500"
+        >
           {{ t('editor.summary.reduction.tag') }}
         </span>
       </div>
@@ -300,10 +349,14 @@ const lithologyGroups = computed<SummaryGroup[]>(() => {
 
     <section class="flex flex-col gap-5">
       <div class="flex items-baseline justify-between">
-        <h3 class="font-serif text-[22px] font-medium tracking-[-0.015em] text-content-0 m-0">
+        <h3
+          class="font-serif text-[22px] font-medium tracking-[-0.015em] text-content-0 m-0"
+        >
           {{ t('editor.summary.holeFill.title') }}
         </h3>
-        <span class="font-mono text-[10px] tracking-[0.08em] uppercase text-content-500">
+        <span
+          class="font-mono text-[10px] tracking-[0.08em] uppercase text-content-500"
+        >
           {{ t('editor.summary.holeFill.tag') }}
         </span>
       </div>
@@ -312,10 +365,14 @@ const lithologyGroups = computed<SummaryGroup[]>(() => {
 
     <section class="flex flex-col gap-5">
       <div class="flex items-baseline justify-between">
-        <h3 class="font-serif text-[22px] font-medium tracking-[-0.015em] text-content-0 m-0">
+        <h3
+          class="font-serif text-[22px] font-medium tracking-[-0.015em] text-content-0 m-0"
+        >
           {{ t('editor.summary.lithology.title') }}
         </h3>
-        <span class="font-mono text-[10px] tracking-[0.08em] uppercase text-content-500">
+        <span
+          class="font-mono text-[10px] tracking-[0.08em] uppercase text-content-500"
+        >
           {{ t('editor.summary.lithology.tag') }}
         </span>
       </div>

@@ -76,13 +76,13 @@ export {
 
 // Format utilities (serialise/deserialise .well format only)
 export {
+  SECTION_KEYS,
   checkIfProfileIsEmpty,
   convertProfileFromJSON,
   deserializeWell,
   isWellEmpty,
   profileToWell,
   redactWell,
-  SECTION_KEYS,
   serializeWell,
 } from './utils/well.utils';
 

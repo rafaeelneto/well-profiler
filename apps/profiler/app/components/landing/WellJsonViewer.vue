@@ -12,16 +12,14 @@ const contentRef = ref<HTMLElement>();
 const filename = computed(() => {
   try {
     const name: string = JSON.parse(props.json)?.name ?? 'well';
-    return (
-      name
-        .normalize('NFD')
-        .replace(/[̀-ͯ]/g, '')
-        .toLowerCase()
-        .replace(/^poco\s*/i, '')
-        .trim()
-        .replace(/\s+/g, '-')
-        .replace(/[^a-z0-9-]/g, '') + '.well'
-    );
+    return `${name
+      .normalize('NFD')
+      .replace(/[̀-ͯ]/g, '')
+      .toLowerCase()
+      .replace(/^poco\s*/i, '')
+      .trim()
+      .replace(/\s+/g, '-')
+      .replace(/[^a-z0-9-]/g, '')}.well`;
   } catch {
     return 'well.well';
   }
@@ -39,17 +37,17 @@ function highlight(raw: string): string {
   );
   // string values
   s = s.replace(
-    /([:\[,]\s*)"((?:[^"\\]|\\.)*)"/g,
+    /([:[,]\s*)"((?:[^"\\]|\\.)*)"/g,
     (_, pre, v) => `${pre}<span class="s">"${v}"</span>`,
   );
   // numbers
   s = s.replace(
-    /([:\[,]\s*)(-?\d+\.?\d*)/g,
+    /([:[,]\s*)(-?\d+\.?\d*)/g,
     (_, pre, n) => `${pre}<span class="n">${n}</span>`,
   );
   // booleans / null
   s = s.replace(
-    /([:\[,]\s*)(true|false|null)\b/g,
+    /([:[,]\s*)(true|false|null)\b/g,
     (_, pre, v) => `${pre}<span class="b">${v}</span>`,
   );
   return s;

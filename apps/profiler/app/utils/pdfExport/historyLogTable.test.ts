@@ -1,4 +1,3 @@
-/* eslint-disable camelcase -- .well schema fields (history_logs, ...) are intentionally snake_case */
 import type { HistoryLogEntry, Well } from '@welldot/core';
 import { describe, expect, it } from 'vitest';
 import { buildHistoryLogSection } from './historyLogTable';

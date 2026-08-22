@@ -111,7 +111,7 @@ function saveEntry() {
     :style="{ width: '100vw', maxWidth: '36rem' }"
   >
     <div class="flex flex-col gap-4 pt-2">
-      <Field :label="t('editor.historyLog.logs.fields.category')">
+      <FormField :label="t('editor.historyLog.logs.fields.category')">
         <div class="flex flex-wrap gap-2">
           <label
             v-for="opt in categoryOptions"
@@ -122,7 +122,7 @@ function saveEntry() {
           >
             <RadioButton
               v-model="form.category"
-              :inputId="`cat-${opt.value}`"
+              :input-id="`cat-${opt.value}`"
               :value="opt.value"
               class="sr-only"
             />
@@ -130,9 +130,9 @@ function saveEntry() {
             <span>{{ opt.label }}</span>
           </label>
         </div>
-      </Field>
+      </FormField>
 
-      <Field :label="t('editor.historyLog.logs.fields.datetime')">
+      <FormField :label="t('editor.historyLog.logs.fields.datetime')">
         <DatePicker
           v-model="form.datetime"
           show-time
@@ -142,22 +142,22 @@ function saveEntry() {
           class="w-full"
           :pt="{ pcInput: { root: 'font-mono text-sm w-full' } }"
         />
-      </Field>
+      </FormField>
 
-      <Field :label="t('editor.historyLog.logs.fields.description')">
+      <FormField :label="t('editor.historyLog.logs.fields.description')">
         <Textarea
           v-model="form.description"
           :rows="5"
           class="w-full font-mono text-sm"
         />
-      </Field>
+      </FormField>
 
-      <Field :label="t('editor.historyLog.logs.fields.author')">
+      <FormField :label="t('editor.historyLog.logs.fields.author')">
         <InputText v-model="form.author" class="w-full" />
-      </Field>
+      </FormField>
 
       <!-- ── Attachments ────────────────────────────────────────────────── -->
-      <Field :label="t('editor.historyLog.logs.fields.attachments')">
+      <FormField :label="t('editor.historyLog.logs.fields.attachments')">
         <div class="flex flex-col gap-2">
           <div
             v-for="att in form.attachments"
@@ -234,9 +234,9 @@ function saveEntry() {
             {{ t('editor.historyLog.logs.addAttachment') }}
           </button>
         </div>
-      </Field>
+      </FormField>
 
-      <Field :label="t('editor.historyLog.logs.fields.severity')">
+      <FormField :label="t('editor.historyLog.logs.fields.severity')">
         <div class="flex flex-wrap gap-2">
           <label
             v-for="opt in severityOptions"
@@ -247,14 +247,14 @@ function saveEntry() {
           >
             <RadioButton
               v-model="form.severity"
-              :inputId="`sev-${opt.value}`"
+              :input-id="`sev-${opt.value}`"
               :value="opt.value"
               class="sr-only"
             />
             <span>{{ opt.label }}</span>
           </label>
         </div>
-      </Field>
+      </FormField>
     </div>
 
     <template #footer>

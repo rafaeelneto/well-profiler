@@ -1,4 +1,3 @@
-/* eslint-disable camelcase -- .well schema fields (bore_hole, well_case, ...) are intentionally snake_case */
 import type { Well } from '@welldot/core';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useProfileShare } from './useProfileShare';

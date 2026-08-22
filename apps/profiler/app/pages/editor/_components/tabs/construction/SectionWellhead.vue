@@ -87,7 +87,7 @@ const cementPadTypeOptions = computed(() => [
     </div>
 
     <template v-if="hasCementPad">
-      <Field :label="t('editor.construction.wellhead.type')">
+      <FormField :label="t('editor.construction.wellhead.type')">
         <Select
           v-model="profileStore.well.cement_pad!.type"
           :options="cementPadTypeOptions"
@@ -95,39 +95,39 @@ const cementPadTypeOptions = computed(() => [
           option-value="value"
           class="w-full"
         />
-      </Field>
+      </FormField>
 
       <div class="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-4">
-        <Field :label="widthLabel">
+        <FormField :label="widthLabel">
           <UnitInput
-            unit-type="length"
             v-model="profileStore.well.cement_pad!.width"
-            :min="0"
-            class="w-full"
-            :pt="{ pcInput: { root: 'w-full font-mono text-sm' } }"
-          />
-        </Field>
-        <Field :label="lengthLabel">
-          <UnitInput
             unit-type="length"
-            v-model="profileStore.well.cement_pad!.length"
             :min="0"
             class="w-full"
             :pt="{ pcInput: { root: 'w-full font-mono text-sm' } }"
           />
-        </Field>
+        </FormField>
+        <FormField :label="lengthLabel">
+          <UnitInput
+            v-model="profileStore.well.cement_pad!.length"
+            unit-type="length"
+            :min="0"
+            class="w-full"
+            :pt="{ pcInput: { root: 'w-full font-mono text-sm' } }"
+          />
+        </FormField>
       </div>
 
       <div class="grid grid-cols-2 gap-4">
-        <Field :label="thicknessLabel">
+        <FormField :label="thicknessLabel">
           <UnitInput
-            unit-type="length"
             v-model="profileStore.well.cement_pad!.thickness"
+            unit-type="length"
             :min="0"
             class="w-full"
             :pt="{ pcInput: { root: 'w-full font-mono text-sm' } }"
           />
-        </Field>
+        </FormField>
       </div>
     </template>
   </section>

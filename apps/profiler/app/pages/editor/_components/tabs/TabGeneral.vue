@@ -92,16 +92,16 @@ const wellTypeOptions = computed(() =>
       </div>
 
       <!-- Name -->
-      <Field :label="t('editor.general.name')">
+      <FormField :label="t('editor.general.name')">
         <InputText v-model="profileStore.well.name" class="w-full" />
-      </Field>
+      </FormField>
 
       <!-- Driller + Construction Date -->
       <div class="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-4">
-        <Field :label="t('editor.general.driller')">
+        <FormField :label="t('editor.general.driller')">
           <InputText v-model="profileStore.well.well_driller" class="w-full" />
-        </Field>
-        <Field :label="t('editor.general.constructionDate')">
+        </FormField>
+        <FormField :label="t('editor.general.constructionDate')">
           <DatePicker
             v-model="constructionDate"
             show-button-bar
@@ -109,12 +109,12 @@ const wellTypeOptions = computed(() =>
             class="w-full"
             :pt="{ pcInput: { root: 'font-mono text-sm w-full' } }"
           />
-        </Field>
+        </FormField>
       </div>
 
       <!-- Well Type (half-width) -->
       <div class="grid grid-cols-2 gap-4">
-        <Field :label="t('editor.general.wellType')">
+        <FormField :label="t('editor.general.wellType')">
           <Select
             v-model="profileStore.well.well_type"
             :options="wellTypeOptions"
@@ -123,7 +123,7 @@ const wellTypeOptions = computed(() =>
             :placeholder="t('editor.general.wellType')"
             class="w-full"
           />
-        </Field>
+        </FormField>
       </div>
     </section>
 
@@ -142,10 +142,7 @@ const wellTypeOptions = computed(() =>
         </span>
       </div>
 
-      <div
-        v-if="profileStore.well.well_id?.length"
-        class="flex flex-col gap-2"
-      >
+      <div v-if="profileStore.well.well_id?.length" class="flex flex-col gap-2">
         <div
           v-for="(entry, index) in profileStore.well.well_id"
           :key="index"
@@ -238,13 +235,13 @@ const wellTypeOptions = computed(() =>
         </span>
       </div>
 
-      <Field :label="t('editor.general.observationsLabel')">
+      <FormField :label="t('editor.general.observationsLabel')">
         <Textarea
           v-model="profileStore.well.obs"
           class="w-full font-mono text-sm"
           :rows="5"
         />
-      </Field>
+      </FormField>
     </section>
   </div>
 </template>
@@ -285,7 +282,8 @@ const wellTypeOptions = computed(() =>
 
 .well-ids-add-btn:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary-500) 25%, transparent);
+  box-shadow: 0 0 0 3px
+    color-mix(in srgb, var(--color-primary-500) 25%, transparent);
   border-color: var(--color-primary-500);
 }
 </style>

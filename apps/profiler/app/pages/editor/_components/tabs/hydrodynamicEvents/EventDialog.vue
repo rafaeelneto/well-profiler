@@ -459,7 +459,7 @@ function reorderRecoveryReading(from: number, to: number) {
   >
     <div class="flex flex-col gap-5 pt-2">
       <!-- Event type selector -->
-      <Field :label="t('editor.hydrodynamicEvents.fields.type')">
+      <FormField :label="t('editor.hydrodynamicEvents.fields.type')">
         <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
           <label
             v-for="opt in typeOptions"
@@ -470,7 +470,7 @@ function reorderRecoveryReading(from: number, to: number) {
           >
             <RadioButton
               v-model="form.type"
-              :inputId="`evtype-${opt.value}`"
+              :input-id="`evtype-${opt.value}`"
               :value="opt.value"
               class="sr-only"
             />
@@ -478,10 +478,10 @@ function reorderRecoveryReading(from: number, to: number) {
             <span>{{ opt.label }}</span>
           </label>
         </div>
-      </Field>
+      </FormField>
 
       <!-- Date / time -->
-      <Field :label="t('editor.hydrodynamicEvents.fields.datetime')">
+      <FormField :label="t('editor.hydrodynamicEvents.fields.datetime')">
         <DatePicker
           v-model="form.datetime"
           show-time
@@ -491,38 +491,40 @@ function reorderRecoveryReading(from: number, to: number) {
           class="w-full"
           :pt="{ pcInput: { root: { class: 'font-mono text-sm w-full' } } }"
         />
-      </Field>
+      </FormField>
 
       <!-- Operator / Equipment -->
       <div class="grid grid-cols-2 gap-3">
-        <Field :label="t('editor.hydrodynamicEvents.fields.operator')">
+        <FormField :label="t('editor.hydrodynamicEvents.fields.operator')">
           <InputText v-model="form.operator" class="w-full" />
-        </Field>
-        <Field :label="t('editor.hydrodynamicEvents.fields.equipment')">
+        </FormField>
+        <FormField :label="t('editor.hydrodynamicEvents.fields.equipment')">
           <InputText v-model="form.equipment" class="w-full" />
-        </Field>
+        </FormField>
       </div>
 
       <!-- Static level (spot / constant_rate / step_drawdown) -->
       <div v-if="showStaticLevel" class="grid grid-cols-2 gap-3">
-        <Field :label="t('editor.hydrodynamicEvents.fields.staticLevel')">
+        <FormField :label="t('editor.hydrodynamicEvents.fields.staticLevel')">
           <InputNumber
             v-model="form.staticLevel"
             :max-fraction-digits="3"
             class="w-full"
           />
-        </Field>
-        <Field :label="t('editor.hydrodynamicEvents.fields.staticLevelPrecision')">
+        </FormField>
+        <FormField
+          :label="t('editor.hydrodynamicEvents.fields.staticLevelPrecision')"
+        >
           <InputNumber
             v-model="form.staticLevelPrecision"
             :max-fraction-digits="3"
             class="w-full"
           />
-        </Field>
+        </FormField>
       </div>
 
       <!-- Measurement method (spot_measurement) -->
-      <Field
+      <FormField
         v-if="showMeasurementMethod"
         :label="t('editor.hydrodynamicEvents.fields.measurementMethod')"
       >
@@ -534,24 +536,26 @@ function reorderRecoveryReading(from: number, to: number) {
           show-clear
           class="w-full"
         />
-      </Field>
+      </FormField>
 
       <!-- Recovery only: estimated preceding params -->
       <div v-if="showRecoveryOnly" class="grid grid-cols-2 gap-3">
-        <Field :label="t('editor.hydrodynamicEvents.fields.pumpingRate')">
+        <FormField :label="t('editor.hydrodynamicEvents.fields.pumpingRate')">
           <InputNumber
             v-model="form.pumpingRate"
             :max-fraction-digits="2"
             class="w-full"
           />
-        </Field>
-        <Field :label="t('editor.hydrodynamicEvents.fields.pumpingDuration')">
+        </FormField>
+        <FormField
+          :label="t('editor.hydrodynamicEvents.fields.pumpingDuration')"
+        >
           <InputNumber
             v-model="form.pumpingDuration"
             :max-fraction-digits="1"
             class="w-full"
           />
-        </Field>
+        </FormField>
       </div>
 
       <!-- Pumping steps -->
@@ -563,17 +567,17 @@ function reorderRecoveryReading(from: number, to: number) {
             {{ t('editor.hydrodynamicEvents.fields.steps') }}
           </span>
           <div class="flex items-center gap-3">
-            <Field
+            <FormField
               :label="t('editor.hydrodynamicEvents.fields.stepsDepthPrecision')"
               class="mb-0 flex-row items-center"
             >
               <InputNumber
-                fluid
                 v-model="form.stepsDepthPrecision"
+                fluid
                 :max-fraction-digits="3"
                 class="precision-input"
               />
-            </Field>
+            </FormField>
             <Button
               outlined
               size="small"
@@ -588,8 +592,8 @@ function reorderRecoveryReading(from: number, to: number) {
         </div>
 
         <Accordion
-          multiple
           v-model:value="expandedSteps"
+          multiple
           class="flex flex-col gap-3"
         >
           <AccordionPanel
@@ -614,7 +618,8 @@ function reorderRecoveryReading(from: number, to: number) {
                   <span
                     class="text-xs font-semibold tracking-wider uppercase text-content-100 whitespace-nowrap"
                   >
-                    {{ t('editor.hydrodynamicEvents.stats.steps') }} {{ si + 1 }}
+                    {{ t('editor.hydrodynamicEvents.stats.steps') }}
+                    {{ si + 1 }}
                   </span>
                 </div>
 
@@ -657,7 +662,9 @@ function reorderRecoveryReading(from: number, to: number) {
                     <InputNumber
                       v-else
                       v-tooltip.top="
-                        t('editor.hydrodynamicEvents.fields.durationDerivedHint')
+                        t(
+                          'editor.hydrodynamicEvents.fields.durationDerivedHint',
+                        )
                       "
                       :model-value="derivedStepDuration(step.readings)"
                       disabled
@@ -742,13 +749,13 @@ function reorderRecoveryReading(from: number, to: number) {
       </div>
 
       <!-- Notes -->
-      <Field :label="t('editor.hydrodynamicEvents.fields.notes')">
+      <FormField :label="t('editor.hydrodynamicEvents.fields.notes')">
         <Textarea
           v-model="form.notes"
           :rows="3"
           class="w-full font-mono text-sm"
         />
-      </Field>
+      </FormField>
     </div>
 
     <template #footer>
@@ -762,7 +769,9 @@ function reorderRecoveryReading(from: number, to: number) {
           />
           <Button
             :label="
-              editingId ? t('editor.save') : t('editor.hydrodynamicEvents.addEvent')
+              editingId
+                ? t('editor.save')
+                : t('editor.hydrodynamicEvents.addEvent')
             "
             :disabled="!isFormValid"
             @click="saveEvent"

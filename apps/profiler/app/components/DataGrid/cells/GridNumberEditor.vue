@@ -50,12 +50,12 @@ function update(value: number) {
     <WellInputNumber
       ref="numRef"
       :model-value="localValue"
-      @update:model-value="update"
       :max-fraction-digits="4"
       :pt="{
         root: 'well-cell-input-number',
         pcInput: { root: 'well-cell-input well-cell-input-number text-right' },
       }"
+      @update:model-value="update"
       @keydown="onKeydown"
     />
   </div>

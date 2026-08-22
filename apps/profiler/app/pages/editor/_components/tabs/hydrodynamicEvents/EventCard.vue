@@ -23,7 +23,9 @@ function deleteEvent() {
     defaultFocus: 'reject',
     accept: () => {
       profileStore.updateWell(draft => {
-        draft.hydrodynamic_events = draft.hydrodynamic_events?.filter(e => e.id !== props.event.id);
+        draft.hydrodynamic_events = draft.hydrodynamic_events?.filter(
+          e => e.id !== props.event.id,
+        );
       });
     },
   });
@@ -76,8 +78,12 @@ function deleteEvent() {
     </svg>
 
     <!-- footer -->
-    <div class="flex items-center gap-3 pt-2 border-t border-surface-100 text-[11px] text-content-400 flex-wrap">
-      <template v-if="event.operator || event.equipment || recoveryReadingsCount(event)">
+    <div
+      class="flex items-center gap-3 pt-2 border-t border-surface-100 text-[11px] text-content-400 flex-wrap"
+    >
+      <template
+        v-if="event.operator || event.equipment || recoveryReadingsCount(event)"
+      >
         <span v-if="event.operator">
           <strong class="font-semibold text-content-200">Operador</strong>
           {{ event.operator }}
@@ -95,12 +101,7 @@ function deleteEvent() {
         </span>
       </template>
       <div class="ml-auto shrink-0">
-        <Button
-          severity="danger"
-          text
-          size="small"
-          @click="deleteEvent"
-        >
+        <Button severity="danger" text size="small" @click="deleteEvent">
           <template #icon>
             <Icon name="ph:x-bold" />
           </template>

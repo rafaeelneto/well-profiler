@@ -17,6 +17,10 @@ function handleChange(checked: boolean) {
     @click.stop
     @mousedown.stop
   >
-    <Checkbox :model-value="!!value" binary @update:model-value="handleChange" />
+    <Checkbox
+      :model-value="!!value"
+      binary
+      @update:model-value="handleChange"
+    />
   </span>
 </template>
