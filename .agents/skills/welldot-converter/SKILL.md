@@ -1,7 +1,7 @@
 ---
 name: welldot-converter
 metadata:
-  version: 2.0.0
+  version: '2.1.0'
 description: >
   Converts water well reports (PDF, DOCX, image, text) into a valid `.well` JSON file
   for welldot.org and @welldot/core. Works with reports in any language (PT, EN, ES, etc.).
@@ -24,15 +24,39 @@ Extracts data from a water well report (any format) and produces a valid `.well`
 per the **welldot** spec (https://github.com/rafaeelneto/welldot) for upload to **welldot.org**
 or use with `@welldot/core`.
 
+**You are the extractor.** Read the document yourself and write the JSON yourself — do not
+delegate extraction to another model or API.
+
+---
+
+## Platform notes
+
+This procedure is vendor-neutral. Only the file I/O differs:
+
+- **Claude Code / Claude.ai** — uploaded files land in `/mnt/user-data/uploads/`. Use the
+  `pdf-reading` skill (`/mnt/skills/public/pdf-reading/SKILL.md`) for PDFs and `file-reading`
+  (`/mnt/skills/public/file-reading/SKILL.md`) for DOCX. Write the result to
+  `/mnt/user-data/outputs/`.
+- **Codex, Gemini CLI, Cursor, Copilot and other CLI/IDE agents** — read the document with your
+  own file and vision tooling, and write `<well_name>.well` into the working directory unless
+  the user says otherwise.
+- **ChatGPT web / Gemini Gems** — use your own file-attachment and vision handling. If browsing
+  is unavailable, rely on `well-spec.md` from your knowledge files. Return the JSON in the chat
+  inside a fenced block, and offer the file as a download if you can produce one.
+- **Anything else** — read the document with whatever capability you have; write the file if you
+  can, otherwise print the JSON.
+
+See `README.md` next to this file for per-client setup.
+
 ---
 
 ## ⚠️ Source of truth: official docs
 
-**Always fetch the latest docs before extracting or validating data.** The `.well` format
-may evolve; anything in this SKILL.md is secondary to the live spec.
+**Always consult the latest spec before extracting or validating data.** The `.well` format may
+evolve; anything in this SKILL.md is secondary to the live spec.
 
-This skill targets **spec version 2** — welldot.org / `@welldot/core` do not accept `version: 1` files
-for new conversions. Required sources (web_fetch each session):
+This skill targets **spec version 2** — welldot.org / `@welldot/core` do not accept `version: 1`
+files for new conversions.
 
 | Doc              | URL                                                                                             |
 | ---------------- | ----------------------------------------------------------------------------------------------- |
@@ -42,14 +66,19 @@ for new conversions. Required sources (web_fetch each session):
 | Interoperability | https://github.com/rafaeelneto/welldot/blob/main/packages/core/docs/spec/v2/interoperability.md |
 | FGDC textures    | https://github.com/rafaeelneto/welldot/blob/main/packages/core/docs/reference/fgdc-textures.md  |
 
-If this SKILL.md conflicts with the GitHub spec, **the GitHub spec wins**.
+Fetch these if you can browse. **If you cannot browse**, `references/well-spec.md` — bundled
+alongside this file, and uploaded with it into a ChatGPT Project or Gemini Gem — is a full
+offline copy of the v2 spec. Use it, and say in your summary that you worked from the offline
+copy rather than the live spec.
+
+If this SKILL.md conflicts with the published spec, **the published spec wins**.
 
 ### Doc caching across files
 
-When processing multiple files in one session (batch conversion, cross-well comparison),
-reuse the already-fetched docs from context — **1 fetch per session is enough**.
-Still do a quick sanity check before each extraction: confirm required fields and vocabulary
-match what you read. Re-fetch if the session is long or you suspect spec changes.
+When processing multiple files in one session (batch conversion, cross-well comparison), reuse
+the already-fetched docs from context — **1 fetch per session is enough**. Still do a quick
+sanity check before each extraction: confirm required fields and vocabulary match what you read.
+Re-fetch if the session is long or you suspect spec changes.
 
 ---
 
@@ -87,24 +116,15 @@ Accepted conversions (only when original unit is explicit in the document):
 - DMS → decimal degrees: convert precisely
 - SIRGAS 2000 UTM → WGS84 decimal: convert precisely or ask the user
 
----
-
-## Input formats
-
-| Format               | How to read                                               |
-| -------------------- | --------------------------------------------------------- |
-| PDF                  | Use `pdf-reading` skill; rasterize pages for scanned PDFs |
-| DOCX                 | Use `file-reading` skill → docx extraction                |
-| Image (JPG/PNG/TIFF) | Pass as base64 to Anthropic vision API                    |
-| Plain text / CSV     | Read directly from context                                |
-
-Check `/mnt/user-data/uploads/` for uploaded files.
+Use empty arrays (`[]`) for array fields the document has nothing for. **Omit** `cement_pad`,
+`location`, `well_id`, `hydrodynamic_events`, `aquifer_analysis`, and `history_logs` entirely
+rather than emitting empty placeholders.
 
 ---
 
-## Step 1 — Fetch the latest docs
+## Step 1 — Get the spec
 
-web_fetch the five URLs above. Pay attention to:
+Read the five docs above (browse, or fall back to `references/well-spec.md`). Pay attention to:
 
 - Required fields per object type
 - Which "type"-like fields are recommended-but-free-text vs. pure free text vs. a real closed enum —
@@ -117,167 +137,145 @@ web_fetch the five URLs above. Pay attention to:
 
 ---
 
-## Step 2 — Read the report file
+## Step 2 — Read the report
 
-Identify format and extract content:
+Read the document with whatever file and vision capability you have.
 
-- PDF → consult `/mnt/skills/public/pdf-reading/SKILL.md`
-- DOCX → consult `/mnt/skills/public/file-reading/SKILL.md`
-- Image → load as base64, send to Anthropic API with vision (Step 3)
-- Multiple files → process each, merge results
+| Format               | How to read                                                                   |
+| -------------------- | ----------------------------------------------------------------------------- |
+| PDF                  | Extract the text layer; **rasterize pages and read them visually** if scanned |
+| DOCX                 | Extract document text, including tables                                       |
+| Image (JPG/PNG/TIFF) | Read visually                                                                 |
+| Plain text / CSV     | Read directly                                                                 |
+
+Well logs are heavily tabular and often hand-annotated — when the text layer looks garbled,
+misaligned, or suspiciously sparse, look at the page image instead of trusting the extraction.
+Depth columns in particular are easy to shear across rows.
+
+Multiple files → process each, then merge results.
 
 ---
 
-## Step 3 — Extract well data via AI
+## Step 3 — Extract the well data
 
-Send extracted text (or image bytes) to the Anthropic API. Model must return **raw JSON only**
-conforming to the `.well` spec fetched in Step 1.
+Produce a single JSON object conforming to the v2 spec you read in Step 1, applying
+§ Language and free-text preservation and § Metric fidelity above, plus the rules below.
 
-### Extraction system prompt
+### Vocabulary tiers — these fields are NOT uniformly enums
 
+**Tier 1 — recommended example values, not enforced.** Use the example term ONLY when the report's
+own wording maps to it losslessly (no dropped nuance/brand/equipment/shape detail); otherwise
+transcribe the report's own phrase verbatim, in its own language:
+
+- `bore_hole[].drilling_method`: rotary, percussion, cable_tool, auger, air_hammer
+- `cement_pad.type`: material and/or shape, e.g. "concrete", "circular" (may combine both)
+- `well_type`: tubular, artesian, hand_dug, horizontal, infiltration_gallery (use `x-` prefix if none fit)
+
+**Tier 2 — pure free text, NO recommended vocabulary exists for these at all.** Never invent or
+apply an enum. Always transcribe the report's own wording verbatim, in its own language:
+
+- `well_case[].type` (casing material — do NOT use steel/pvc/hdpe/fiberglass as an enum)
+- `reduction[].type`
+- `well_screen[].type` (do NOT use wire_wound/bridge_slot/louvered/pvc_slotted as an enum)
+
+**Tier 3 — real closed enum, must classify into exactly one value:**
+
+- `hole_fill[].type`: `gravel_pack` or `seal` only. (`hole_fill[].description` carries the
+  near-verbatim material detail instead.)
+
+### Texture — `lithology[].texture`
+
+An object, not a bare string or code:
+
+```json
+{ "code": 607, "vocabulary": "fgdc" }
 ```
-You are a technical assistant specialized in water well data extraction.
 
-Extract all available well data from the provided document and return ONLY a valid JSON object
-conforming to the .well format specification v2:
-https://github.com/rafaeelneto/welldot/blob/main/packages/core/docs/spec/v2/object-schemas.md
-(also see format-reference.md in the same directory for top-level structure, units, and datetime rules)
-
-No explanation, no markdown fences, no preamble — raw JSON only.
-
-LANGUAGE AND FREE-TEXT PRESERVATION:
-- Preserve the source document's language in every free-text field (description, obs, notes,
-  geologic_unit, aquifer_unit, names, history_logs[].description, and the freetext "type" fields below).
-  Do not translate unless explicitly requested.
-- Stay near-verbatim. Light trimming of filler words is fine. Summarizing is only acceptable when it
-  drops ZERO detail or data (measurements, materials, brand/equipment names, qualifiers). When in doubt,
-  transcribe closer to the original rather than condense.
-
-METRIC FIDELITY (critical):
-- Transcribe ONLY values explicitly in the document. If absent, OMIT the field. Never infer.
-- Applies to: location.lat, location.lng, location.elevation, from, to, diameter, screen_slot, dip,
-  azimuth, all numerics in hydrodynamic_events/aquifer_analysis, and every other numeric field.
-- Unit conversions (only when source unit is explicit): ft→m ×0.3048, in→mm ×25.4, cm→mm ×10,
-  DMS→decimal degrees (precise), projected CRS (e.g. SIRGAS UTM)→WGS84 decimal (precise).
-- Empty arrays for missing array fields: []. Omit cement_pad, location, well_id, hydrodynamic_events,
-  aquifer_analysis, history_logs entirely (not empty placeholders) if the document has nothing for them.
-- If a pump-test report gives only a final drawdown value and not a time series, record a single
-  LevelReading — never fabricate intermediate readings to fill out a curve.
-
-VOCABULARY TIERS — read carefully, these fields are NOT uniformly enums:
-
-Tier 1 — recommended example values, not enforced. Use the example term ONLY when the report's own
-wording maps to it losslessly (no dropped nuance/brand/equipment/shape detail); otherwise transcribe the
-report's own phrase verbatim, in its own language:
-  - bore_hole[].drilling_method: rotary, percussion, cable_tool, auger, air_hammer
-  - cement_pad.type: material and/or shape, e.g. "concrete", "circular" (may combine both)
-  - well_type: tubular, artesian, hand_dug, horizontal, infiltration_gallery (use x- prefix if none fit)
-
-Tier 2 — pure free text, NO recommended vocabulary exists for these at all. Never invent or apply an
-enum. Always transcribe the report's own wording verbatim, in its own language:
-  - well_case[].type (casing material — do NOT use steel/pvc/hdpe/fiberglass as an enum)
-  - reduction[].type
-  - well_screen[].type (do NOT use wire_wound/bridge_slot/louvered/pvc_slotted as an enum)
-
-Tier 3 — real closed enum, must classify into exactly one value:
-  - hole_fill[].type: "gravel_pack" or "seal" only. (hole_fill[].description carries the near-verbatim
-    material detail instead — see LANGUAGE AND FREE-TEXT PRESERVATION.)
-
-TEXTURE (lithology[].texture) — an object, not a bare string or code:
-  { "code": 607, "vocabulary": "fgdc" }
-- vocabulary defaults to "fgdc" (integer codes). Only use a different vocabulary (cgi/custom/an HTTPS
-  URI) when the source document itself explicitly cites that alternative standard.
-- texture is REQUIRED on every lithology entry — never omit it.
-- Match description to the best FGDC code. Prefer Series 600 (sedimentary) and 700 (metamorphic/
-  igneous) — the only series with rendered patterns today. Between two comparably good candidates,
-  prefer the non-pending one; but geological accuracy comes first — never force-fit a poorly-matching
-  Series 600/700 code just to avoid a pending Series 100-500 code.
-- Common mappings (verify against the full fgdc-textures.md list):
+- `vocabulary` defaults to `"fgdc"` (integer codes). Only use a different vocabulary (`cgi`,
+  `custom`, or an HTTPS URI) when the source document itself explicitly cites that standard.
+- `texture` is **REQUIRED** on every lithology entry — never omit it.
+- Match the description to the best FGDC code. Prefer Series 600 (sedimentary) and 700
+  (metamorphic/igneous) — the only series with rendered patterns today. Between two comparably
+  good candidates, prefer the non-pending one; but geological accuracy comes first — never
+  force-fit a poorly-matching Series 600/700 code just to avoid a pending Series 100–500 code.
+- Common mappings (verify against the full `fgdc-textures.md` list):
   Sand/Areia=607, Gravel/Cascalho=601, Clay/Argila=620, Silt/Silte=616,
   Limestone/Calcário=627, Granite/Granito=718, Gneiss=708, Schist/Xisto=705,
   Quartzite/Quartzito=702, Basaltic flows/Basalto=717, Sandstone/Arenito=607-608,
   Shale/Folhelho=619-620, Chalk=626, Coal/Carvão=658, Gypsum/Gesso=667
 - Codes 120, 123, 132 are non-pending but have meaningless placeholder labels — never use them.
 
-LITHOLOGY COLOR: geologically plausible CSS hex. Examples:
-  clay=#8B7355, sand=#F5DEB3, granite=#A9A9A9, basalt=#696969,
-  limestone=#FFFACD, gneiss=#B8860B, schist=#9E8B6E
+### Lithology color
 
-fracture required: depth, water_intake (bool), description, swarm (bool), azimuth, dip
-cave required: from, to, water_intake (bool), description
+Geologically plausible CSS hex. Examples: clay=`#8B7355`, sand=`#F5DEB3`, granite=`#A9A9A9`,
+basalt=`#696969`, limestone=`#FFFACD`, gneiss=`#B8860B`, schist=`#9E8B6E`.
 
-HYDRODYNAMIC_EVENTS (pumping tests, static/dynamic level measurements) — array, each entry:
-  Common: id (uuid), type, datetime (RFC 3339 WITH UTC offset — never a naked timestamp), sequence,
-  operator, equipment, notes.
-  type is one of:
-  - spot_measurement: static_level (required), static_level_precision, measurement_method
-    (electric_probe/pressure_transducer/air_line/tape), steps (0 or 1), recovery (optional)
-  - constant_rate: static_level (optional), steps (exactly 1), recovery (optional)
-  - step_drawdown: static_level (optional), steps (>=2, ascending rate order), recovery (optional)
-  - airlift: steps (>=1) required, recovery optional. NEVER let an airlift event's id appear in any
-    aquifer_analysis[].source_event_ids — refuse and flag to the user if the report implies otherwise.
-  - recovery_only: pumping_rate (optional), pumping_duration (optional), recovery REQUIRED
-  PumpingStep: { rate (m3/h, required), rate_precision, duration (min), readings: LevelReading[] }
-  LevelReading: { elapsed (min, required), depth (m, required), depth_precision, pressure (kPa) }
-  RecoveryPhase: { readings: LevelReading[] (required) }
+### Fractures and caves
 
-AQUIFER_ANALYSIS — only populate when the report states an actual interpreted result (transmissivity,
-specific capacity, etc.); never compute these yourself from raw readings. Fields: id, datetime (RFC 3339
-with offset), analyst, source_event_ids (required, references hydrodynamic_events ids, never airlift),
-method (cooper_jacob/theis/neuman/hantush/birsoy_summers/eden_hazel/visual_inspection), static_level(+
-_precision, _source_id), dynamic_level(+_precision), flow_rate(+_precision), max_flow_rate(+_precision,
-_basis), specific_capacity, transmissivity, storativity, hydraulic_conductivity, aquifer_thickness,
-jacob_b, jacob_c, well_efficiency_pct, notes.
+- `fracture` required: `depth`, `water_intake` (bool), `description`, `swarm` (bool), `azimuth`, `dip`
+- `cave` required: `from`, `to`, `water_intake` (bool), `description`
 
-HISTORY_LOGS — interventions/inspections/incidents distinct from hydrodynamic_events. Each entry: id,
-datetime (RFC 3339 with offset, when it happened), updated_at (RFC 3339 with offset, when the record was
-made/edited — NEVER synthesize this if the report doesn't distinguish it from datetime, omit instead),
-category (maintenance/inspection/incident/event, open vocab), description (near-verbatim), author,
-severity (low/medium/high/critical), attachments (only if the report references an actual retrievable
-URL — Attachment: id, uri (https, required), media_type (required), filename, description, sha256).
+### `hydrodynamic_events` — pumping tests, static/dynamic level measurements
 
-TOP-LEVEL v2 STRUCTURE: well_id[] ({authority, id, primary?}), location ({lat, lng, elevation?,
-properties?}) replacing v1's flat lat/lng/elevation, profiles[] (only if the report explicitly declares
-conformance to a named profile schema — usually omit).
+Array. Common fields per entry: `id` (uuid), `type`, `datetime` (RFC 3339 **with UTC offset** —
+never a naked timestamp), `sequence`, `operator`, `equipment`, `notes`.
 
-well_depth (number, meters, optional): the well's CURRENT/USABLE depth, distinct from the as-drilled
-depth (which goes in bore_hole[].to). Most reports state only ONE depth figure — the drilled/total
-depth — which belongs in bore_hole, NOT well_depth. Only populate well_depth when the report explicitly
-distinguishes a current/usable/measured depth from the original drilled depth (e.g. a re-survey noting
-siltation, debris, or partial backfill reduced the depth; SIAGAS-style records with a separate
-"profundidade útil"). Never copy the same total-depth figure into both bore_hole[].to and well_depth.
+`type` is one of:
 
-version: 2 (integer)
-```
+- `spot_measurement` — `static_level` (required), `static_level_precision`, `measurement_method`
+  (electric_probe/pressure_transducer/air_line/tape), `steps` (0 or 1), `recovery` (optional)
+- `constant_rate` — `static_level` (optional), `steps` (exactly 1), `recovery` (optional)
+- `step_drawdown` — `static_level` (optional), `steps` (≥2, ascending rate order), `recovery` (optional)
+- `airlift` — `steps` (≥1) required, `recovery` optional. NEVER let an airlift event's `id` appear in
+  any `aquifer_analysis[].source_event_ids` — refuse and flag to the user if the report implies otherwise.
+- `recovery_only` — `pumping_rate` (optional), `pumping_duration` (optional), `recovery` REQUIRED
 
-### API call
+Nested shapes:
 
-````javascript
-const response = await fetch('https://api.anthropic.com/v1/messages', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    model: 'claude-sonnet-4-20250514',
-    max_tokens: 4000,
-    system: EXTRACTION_SYSTEM_PROMPT,
-    messages: [
-      {
-        role: 'user',
-        content: [
-          { type: 'text', text: extractedText },
-          // image: { type: "image", source: { type: "base64", media_type: "image/jpeg", data: b64 } }
-        ],
-      },
-    ],
-  }),
-});
-const data = await response.json();
-const raw = data.content
-  .filter(b => b.type === 'text')
-  .map(b => b.text)
-  .join('');
-const wellData = JSON.parse(raw.replace(/```json|```/g, '').trim());
-````
+- `PumpingStep`: `{ rate (m3/h, required), rate_precision, duration (min), readings: LevelReading[] }`
+- `LevelReading`: `{ elapsed (min, required), depth (m, required), depth_precision, pressure (kPa) }`
+- `RecoveryPhase`: `{ readings: LevelReading[] (required) }`
+
+### `aquifer_analysis`
+
+Only populate when the report states an actual **interpreted result** (transmissivity, specific
+capacity, etc.) — never compute these yourself from raw readings.
+
+Fields: `id`, `datetime` (RFC 3339 with offset), `analyst`, `source_event_ids` (required,
+references `hydrodynamic_events` ids, never `airlift`), `method`
+(cooper_jacob/theis/neuman/hantush/birsoy_summers/eden_hazel/visual_inspection), `static_level`
+(+`_precision`, `_source_id`), `dynamic_level` (+`_precision`), `flow_rate` (+`_precision`),
+`max_flow_rate` (+`_precision`, `_basis`), `specific_capacity`, `transmissivity`, `storativity`,
+`hydraulic_conductivity`, `aquifer_thickness`, `jacob_b`, `jacob_c`, `well_efficiency_pct`, `notes`.
+
+### `history_logs`
+
+Interventions/inspections/incidents distinct from `hydrodynamic_events`. Each entry: `id`,
+`datetime` (RFC 3339 with offset, when it happened), `updated_at` (RFC 3339 with offset, when the
+record was made/edited — **NEVER synthesize this** if the report doesn't distinguish it from
+`datetime`; omit instead), `category` (maintenance/inspection/incident/event, open vocab),
+`description` (near-verbatim), `author`, `severity` (low/medium/high/critical), `attachments`
+(only if the report references an actual retrievable URL — `Attachment`: `id`, `uri` (https,
+required), `media_type` (required), `filename`, `description`, `sha256`).
+
+### Top-level v2 structure
+
+- `version`: `2` (integer)
+- `well_id[]`: `{ authority, id, primary? }`
+- `location`: `{ lat, lng, elevation?, properties? }` — replaces v1's flat `lat`/`lng`/`elevation`
+- `profiles[]`: only if the report explicitly declares conformance to a named profile schema —
+  usually omit
+
+### `well_depth`
+
+Number, meters, optional: the well's **CURRENT/USABLE** depth, distinct from the as-drilled depth
+(which goes in `bore_hole[].to`).
+
+Most reports state only ONE depth figure — the drilled/total depth — which belongs in `bore_hole`,
+NOT `well_depth`. Only populate `well_depth` when the report explicitly distinguishes a
+current/usable/measured depth from the original drilled depth (e.g. a re-survey noting siltation,
+debris, or partial backfill reduced the depth; SIAGAS-style records with a separate "profundidade
+útil"). **Never copy the same total-depth figure into both `bore_hole[].to` and `well_depth`.**
 
 ---
 
@@ -305,11 +303,12 @@ const wellData = JSON.parse(raw.replace(/```json|```/g, '').trim());
 
 ---
 
-## Step 5 — Save and present
+## Step 5 — Deliver and summarize
 
-Save to `/mnt/user-data/outputs/<well_name>.well` (sanitized from well name; default: `well.well`).
+Write the file as `<sanitized_well_name>.well` if you can write files (see § Platform notes for
+where). If you cannot, return the complete JSON in a fenced block instead.
 
-Present the file with a brief summary:
+Present it with a brief summary:
 
 - Sections found: constructive (bore_hole, casing, screen, etc.) / geologic (lithology, fractures) /
   hydrodynamic (pumping tests, aquifer analysis) / history (maintenance, inspections, incidents)
@@ -318,6 +317,7 @@ Present the file with a brief summary:
 - Any freetext "type" field (drilling_method, well_case/reduction/well_screen.type, cement_pad.type)
   that was kept as the report's original wording rather than mapped to a recommended value
 - Fields absent in the report (intentionally omitted) that may need manual completion
+- Whether you worked from the live spec or the bundled offline copy
 
 ---
 
