@@ -161,10 +161,19 @@ npm install @welldot/utils
 
 ## App Features
 
-- Visual well profile rendering with borehole geometry, casing strings, lithological column, fractures, and caves
-- Import and export `.well` files
-- Export printable PDF reports
-- Quantitative construction data useful for cost estimation
+The editor at [welldot.org](https://welldot.org) covers the full `.well` v2 schema:
+
+- **Live profile canvas** — borehole geometry, surface casing, casing and screen strings, reducers, annular space, wellhead, lithological column, fractures, and caves, rendered as you type, with pan and zoom
+- **Construction data** — borehole, surface casing, casing, screen, reduction, hole fill, and wellhead sections in editable data grids
+- **Geology** — lithology by geologic unit, plus fractures and caves, with FGDC texture pickers
+- **Hydrodynamic events** — constant-rate, step-drawdown, airlift, and recovery pumping tests with time-series readings and derived aquifer statistics
+- **History log** — timestamped maintenance, inspection, and incident records with attachments
+- **Well identity and location** — multi-registry `well_id` entries and a map-based location picker with elevation
+- **Summary and volumes** — depth, layer, and screen KPIs plus per-section tables with grout and pre-filter volumes for cost estimation
+- **Open and save** — native file handles where the File System Access API is available, with `Cmd/Ctrl+S` and unsaved-change guards
+- **Shareable links** — publish a profile with per-section visibility control
+- **Printable PDF reports** — configurable sections and info items
+- **Preferences** — length (m / ft) and diameter (mm / in) units, coordinate format, light/dark theme, and EN / PT interface
 
 ---
 
@@ -218,7 +227,8 @@ The following were delivered in `.well` v2.0 (shipped in `@welldot/core` v0.2.0)
 ### Ecosystem
 
 - **`.LAS` file import** — support for the industry-standard Log ASCII Standard format used in oil, gas, and water-well logging
-- **Better internationalization** — unit system switching (SI / imperial), multi-language UI, and locale-aware date and number formats
+- **SIAGAS import** — pull well records from the Brazilian Geological Survey's groundwater database
+- **Locale-aware dates** — dates still render ISO-style; numbers and units are already localized and switchable
 
 ---
 
