@@ -2,6 +2,10 @@
 import type { Attachment, HistoryLogEntry } from '@welldot/core';
 import AttachmentDialog from './AttachmentDialog.vue';
 
+/** The entry being edited. `null` means "adding a new one". */
+const model = defineModel<HistoryLogEntry | null>({ default: null });
+const visible = defineModel<boolean>('visible', { default: false });
+
 const emit = defineEmits<{ save: [entry: HistoryLogEntry] }>();
 
 const { t } = useI18n();
@@ -12,18 +16,8 @@ const {
   copiedAttachmentId,
   copyAttachmentPath,
 } = useAttachmentDisplay();
-const attachmentDialogRef = useTemplateRef<
-  InstanceType<typeof AttachmentDialog>
->('attachmentDialogRef');
 
-const visible = ref(false);
-/**
- * Local copy of the entry being edited — the dialog never touches the store, it
- * returns the edited entry through `save`. Kept whole so fields the form does
- * not cover survive a round-trip.
- */
-const original = ref<HistoryLogEntry | null>(null);
-
+/** Local copy — edits never reach the bound value until Save. */
 const form = reactive({
   category: '' as string,
   datetime: null as Date | null,
@@ -37,31 +31,33 @@ const isFormValid = computed(
   () => !!form.category && !!form.datetime && !!form.description.trim(),
 );
 
-function openAdd() {
-  original.value = null;
-  form.category = 'event';
-  form.datetime = new Date();
-  form.description = '';
-  form.author = '';
-  form.severity = '';
-  form.attachments = [];
-  visible.value = true;
-}
+watch(visible, open => {
+  if (open) seedForm(model.value);
+});
 
-function openEdit(entry: HistoryLogEntry) {
-  original.value = { ...entry };
-  form.category = entry.category;
-  form.datetime = new Date(entry.datetime);
-  form.description = entry.description;
-  form.author = entry.author ?? '';
-  form.severity = entry.severity ?? '';
-  form.attachments = (entry.attachments ?? []).map(a => ({ ...a }));
-  visible.value = true;
+function seedForm(entry: HistoryLogEntry | null) {
+  form.category = entry?.category ?? 'event';
+  form.datetime = entry ? new Date(entry.datetime) : new Date();
+  form.description = entry?.description ?? '';
+  form.author = entry?.author ?? '';
+  form.severity = entry?.severity ?? '';
+  form.attachments = (entry?.attachments ?? []).map(a => ({ ...a }));
 }
-
-defineExpose({ openAdd, openEdit });
 
 // ─── Draft attachments — local until the entry is saved ───────────────────────
+
+const attachmentDraft = ref<Attachment | null>(null);
+const attachmentDialogVisible = ref(false);
+
+function addAttachment() {
+  attachmentDraft.value = null;
+  attachmentDialogVisible.value = true;
+}
+
+function editAttachment(attachment: Attachment) {
+  attachmentDraft.value = attachment;
+  attachmentDialogVisible.value = true;
+}
 
 function upsertDraftAttachment(attachment: Attachment) {
   const idx = form.attachments.findIndex(a => a.id === attachment.id);
@@ -75,27 +71,30 @@ function removeDraftAttachment(attachmentId: string) {
 
 // ─── Save ─────────────────────────────────────────────────────────────────────
 
-function draftAttachments(): Attachment[] | undefined {
-  return form.attachments.length
-    ? form.attachments.map(a => ({ ...a }))
-    : undefined;
-}
-
+/**
+ * Writes the edited copy back through the model and signals the commit with
+ * `save`. The bound entry is spread first so fields the form does not cover
+ * survive the round-trip.
+ */
 function saveEntry() {
   if (!isFormValid.value) return;
 
-  emit('save', {
-    ...original.value,
-    id: original.value?.id ?? crypto.randomUUID(),
+  const next: HistoryLogEntry = {
+    ...model.value,
+    id: model.value?.id ?? crypto.randomUUID(),
     category: form.category,
     datetime: form.datetime!.toISOString(),
     description: form.description.trim(),
     author: form.author.trim() || undefined,
     severity: form.severity || undefined,
-    attachments: draftAttachments(),
+    attachments: form.attachments.length
+      ? form.attachments.map(a => ({ ...a }))
+      : undefined,
     updated_at: new Date().toISOString(),
-  });
+  };
 
+  model.value = next;
+  emit('save', next);
   visible.value = false;
 }
 </script>
@@ -105,7 +104,7 @@ function saveEntry() {
     v-model:visible="visible"
     modal
     :header="
-      original
+      model
         ? t('editor.historyLog.logs.editEvent')
         : t('editor.historyLog.logs.addEvent')
     "
@@ -204,7 +203,7 @@ function saveEntry() {
                 class="thumb-action"
                 type="button"
                 :aria-label="t('editor.historyLog.logs.editAttachment')"
-                @click="attachmentDialogRef?.openEdit(att)"
+                @click="editAttachment(att)"
               >
                 <Icon name="ph:pencil-simple-duotone" class="size-3.5" />
               </button>
@@ -229,7 +228,7 @@ function saveEntry() {
           <button
             class="add-attachment-btn"
             type="button"
-            @click="attachmentDialogRef?.openAdd()"
+            @click="addAttachment"
           >
             <Icon name="ph:plus" class="size-3" />
             {{ t('editor.historyLog.logs.addAttachment') }}
@@ -266,16 +265,18 @@ function saveEntry() {
         @click="visible = false"
       />
       <Button
-        :label="
-          original ? t('editor.save') : t('editor.historyLog.logs.addEvent')
-        "
+        :label="model ? t('editor.save') : t('editor.historyLog.logs.addEvent')"
         :disabled="!isFormValid"
         @click="saveEntry"
       />
     </template>
   </Dialog>
 
-  <AttachmentDialog ref="attachmentDialogRef" @save="upsertDraftAttachment" />
+  <AttachmentDialog
+    v-model="attachmentDraft"
+    v-model:visible="attachmentDialogVisible"
+    @save="upsertDraftAttachment"
+  />
 </template>
 
 <style scoped>

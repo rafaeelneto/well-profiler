@@ -22,11 +22,38 @@ const {
   copyAttachmentPath,
 } = useAttachmentDisplay();
 
-const logEntryDialogRef =
-  useTemplateRef<InstanceType<typeof LogEntryDialog>>('logEntryDialogRef');
-const attachmentDialogRef = useTemplateRef<
-  InstanceType<typeof AttachmentDialog>
->('attachmentDialogRef');
+// ─── Dialog bindings — the dialogs edit a copy and hand it back on save ──────
+
+/** Entry passed to the entry dialog; null opens it in "add" mode. */
+const entryDraft = ref<HistoryLogEntry | null>(null);
+const entryDialogVisible = ref(false);
+
+/** Attachment passed to the file dialog, plus the entry it belongs to. */
+const attachmentDraft = ref<Attachment | null>(null);
+const attachmentDialogVisible = ref(false);
+const attachmentTargetEntryId = ref<string>('');
+
+function addEntry() {
+  entryDraft.value = null;
+  entryDialogVisible.value = true;
+}
+
+function editEntry(entry: HistoryLogEntry) {
+  entryDraft.value = entry;
+  entryDialogVisible.value = true;
+}
+
+function addAttachment(entryId: string) {
+  attachmentTargetEntryId.value = entryId;
+  attachmentDraft.value = null;
+  attachmentDialogVisible.value = true;
+}
+
+function editAttachment(entryId: string, attachment: Attachment) {
+  attachmentTargetEntryId.value = entryId;
+  attachmentDraft.value = attachment;
+  attachmentDialogVisible.value = true;
+}
 
 // ─── Filter / search ──────────────────────────────────────────────────────────
 
@@ -129,19 +156,6 @@ function deleteEntry(id: string) {
 
 // ─── Attachments on saved entries ─────────────────────────────────────────────
 
-/** Entry the attachment dialog is currently editing a file for. */
-const attachmentTargetEntryId = ref<string>('');
-
-function addAttachment(entryId: string) {
-  attachmentTargetEntryId.value = entryId;
-  attachmentDialogRef.value?.openAdd();
-}
-
-function editAttachment(entryId: string, attachment: Attachment) {
-  attachmentTargetEntryId.value = entryId;
-  attachmentDialogRef.value?.openEdit(attachment);
-}
-
 function upsertStoredAttachment(attachment: Attachment) {
   profileStore.updateWell(draft => {
     const entry = draft.history_logs?.find(
@@ -228,7 +242,7 @@ function showEditedAt(entry: HistoryLogEntry): boolean {
         class="add-entry-btn"
         type="button"
         :label="t('editor.historyLog.logs.addEvent')"
-        @click="logEntryDialogRef?.openAdd()"
+        @click="addEntry"
       >
         <template #icon>
           <Icon name="ph:plus" />
@@ -462,7 +476,7 @@ function showEditedAt(entry: HistoryLogEntry): boolean {
               size="small"
               :label="t('editor.edit')"
               :aria-label="t('editor.historyLog.logs.editEvent')"
-              @click="logEntryDialogRef?.openEdit(entry)"
+              @click="editEntry(entry)"
             >
               <template #icon>
                 <Icon name="ph:pencil-simple-duotone" />
@@ -485,8 +499,18 @@ function showEditedAt(entry: HistoryLogEntry): boolean {
     </div>
   </div>
 
-  <LogEntryDialog ref="logEntryDialogRef" @save="upsertEntry" />
-  <AttachmentDialog ref="attachmentDialogRef" @save="upsertStoredAttachment" />
+  <LogEntryDialog
+    v-if="entryDialogVisible"
+    v-model="entryDraft"
+    v-model:visible="entryDialogVisible"
+    @save="upsertEntry"
+  />
+  <AttachmentDialog
+    v-if="attachmentDialogVisible"
+    v-model="attachmentDraft"
+    v-model:visible="attachmentDialogVisible"
+    @save="upsertStoredAttachment"
+  />
 </template>
 
 <style scoped>

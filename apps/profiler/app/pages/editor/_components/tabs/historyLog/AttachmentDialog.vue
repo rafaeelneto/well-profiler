@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import type { Attachment } from '@welldot/core';
 
+/** The attachment being edited. `null` means "adding a new one". */
+const model = defineModel<Attachment | null>({ default: null });
+const visible = defineModel<boolean>('visible', { default: false });
+
 const emit = defineEmits<{ save: [attachment: Attachment] }>();
 
 const { t } = useI18n();
@@ -13,39 +17,28 @@ const mediaTypeOptions = [
   { label: 'Other', value: 'application/octet-stream' },
 ];
 
-const visible = ref(false);
-/** The attachment being edited, or null when adding a new one. */
-const editing = ref<Attachment | null>(null);
-
+/** Local copy — edits never reach the bound value until Save. */
 const form = reactive({
   url: '',
   filename: '',
   mediaType: 'application/pdf',
 });
 
-function openAdd() {
-  editing.value = null;
-  form.url = '';
-  form.filename = '';
-  form.mediaType = 'application/pdf';
-  visible.value = true;
-}
+watch(visible, open => {
+  if (open) seedForm(model.value);
+});
 
-function openEdit(attachment: Attachment) {
-  editing.value = { ...attachment };
-  form.url = attachment.uri;
-  form.filename = attachment.filename ?? '';
-  form.mediaType = attachment.media_type;
-  visible.value = true;
+function seedForm(attachment: Attachment | null) {
+  form.url = attachment?.uri ?? '';
+  form.filename = attachment?.filename ?? '';
+  form.mediaType = attachment?.media_type ?? 'application/pdf';
 }
-
-defineExpose({ openAdd, openEdit });
 
 /**
- * Emits a complete attachment — the original id when editing, a fresh one when
- * adding — so every caller can handle the result the same way: upsert by id.
- * `sha256` is dropped when the URI changed: the old hash no longer describes
- * the target.
+ * Writes the edited copy back through the model and signals the commit with
+ * `save`. The result always carries an id — the original when updating, a fresh
+ * one when adding — so callers can handle it uniformly: upsert by id. `sha256`
+ * is dropped when the URI changed: the old hash no longer describes the target.
  */
 function save() {
   const uri = form.url.trim();
@@ -56,20 +49,19 @@ function save() {
     media_type: form.mediaType,
     filename: form.filename.trim() || undefined,
   };
-  const existing = editing.value;
+  const current = model.value;
 
-  emit(
-    'save',
-    existing
-      ? {
-          id: existing.id,
-          description: existing.description,
-          sha256: existing.uri === uri ? existing.sha256 : undefined,
-          ...patch,
-        }
-      : { id: crypto.randomUUID(), ...patch },
-  );
+  const next: Attachment = current
+    ? {
+        id: current.id,
+        description: current.description,
+        sha256: current.uri === uri ? current.sha256 : undefined,
+        ...patch,
+      }
+    : { id: crypto.randomUUID(), ...patch };
 
+  model.value = next;
+  emit('save', next);
   visible.value = false;
 }
 </script>
@@ -79,7 +71,7 @@ function save() {
     v-model:visible="visible"
     modal
     :header="
-      editing
+      model
         ? t('editor.historyLog.logs.editAttachment')
         : t('editor.historyLog.logs.addAttachment')
     "
@@ -118,7 +110,7 @@ function save() {
       />
       <Button
         :label="
-          editing ? t('editor.save') : t('editor.historyLog.logs.addAttachment')
+          model ? t('editor.save') : t('editor.historyLog.logs.addAttachment')
         "
         :disabled="!form.url.trim()"
         @click="save"
