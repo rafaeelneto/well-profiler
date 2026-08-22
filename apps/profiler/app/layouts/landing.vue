@@ -29,6 +29,12 @@ const togglePt = {
     ],
   },
 };
+
+// Same 32px bordered box as the theme toggle, so the two drawer rows align.
+const localeBtnClass =
+  'size-8 rounded-lg border flex items-center justify-center cursor-pointer ' +
+  'font-mono text-xs uppercase transition-colors duration-200 outline-none ' +
+  'focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-1';
 </script>
 
 <template>
@@ -192,6 +198,26 @@ const togglePt = {
             />
           </Transition>
         </ToggleButton>
+      </div>
+
+      <div class="flex items-center gap-2 px-1 mt-3">
+        <span class="text-xs text-content-400 font-mono uppercase mr-auto">{{
+          t('nav.language')
+        }}</span>
+        <button
+          v-for="loc in locales"
+          :key="loc.code"
+          :class="[
+            localeBtnClass,
+            locale === loc.code
+              ? 'border-primary-500 text-content-0'
+              : 'border-surface-200 text-content-400 hover:border-surface-300 hover:text-content-0',
+          ]"
+          :aria-pressed="locale === loc.code"
+          @click="changeLocale(loc.code)"
+        >
+          {{ loc.code }}
+        </button>
       </div>
 
       <template #footer>

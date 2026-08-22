@@ -18,6 +18,7 @@
     "openEditor": "Open editor",
     "openEditorMobile": "Editor",
     "menu": "Menu",
+    "language": "Language",
     "theme": {
       "light": "Light mode",
       "dark": "Dark mode"
