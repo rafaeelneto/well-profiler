@@ -31,6 +31,10 @@ export const nuxtConfig = [
   },
   {
     rules: {
+      // Nuxt's `#`-prefixed aliases (`#components`, `#imports`, `#app`,
+      // `#build`, ...) are virtual modules generated into `.nuxt` at dev/build
+      // time, so there is nothing on disk for the resolver to find.
+      'import-x/no-unresolved': ['error', { ignore: ['^#'] }],
       'vue/no-unused-vars': 'off',
       'vue/no-multiple-template-root': 'off',
       '@typescript-eslint/ban-ts-comment': 'off',
