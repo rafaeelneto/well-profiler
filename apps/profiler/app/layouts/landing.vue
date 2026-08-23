@@ -30,6 +30,11 @@ const togglePt = {
   },
 };
 
+// Shared by the topbar and drawer "coming soon" markers.
+const soonPillClass =
+  'text-xs font-semibold uppercase tracking-wider px-1.5 py-0.5 ' +
+  'rounded-full bg-surface-100 text-content-400';
+
 // Same 32px bordered box as the theme toggle, so the two drawer rows align.
 const localeBtnClass =
   'size-8 rounded-lg border flex items-center justify-center cursor-pointer ' +
@@ -59,6 +64,14 @@ const localeBtnClass =
           >
             {{ t('nav.editor') }}
           </NuxtLink>
+          <span
+            v-tooltip.bottom="t('nav.managerTooltip')"
+            class="flex items-center gap-2 text-content-500 font-medium cursor-not-allowed select-none"
+            aria-disabled="true"
+          >
+            {{ t('nav.manager') }}
+            <span :class="soonPillClass">{{ t('nav.comingSoon') }}</span>
+          </span>
           <NuxtLink
             to="https://github.com/rafaeelneto/welldot"
             target="_blank"
@@ -155,6 +168,17 @@ const localeBtnClass =
           <Icon name="heroicons:pencil-square" class="size-4 shrink-0" />
           {{ t('nav.editor') }}
         </NuxtLink>
+        <div
+          v-tooltip.top="t('nav.managerTooltip')"
+          class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-content-400 cursor-not-allowed select-none"
+          aria-disabled="true"
+        >
+          <Icon name="heroicons:squares-2x2" class="size-4 shrink-0" />
+          {{ t('nav.manager') }}
+          <span :class="[soonPillClass, 'ml-auto']">{{
+            t('nav.comingSoon')
+          }}</span>
+        </div>
         <NuxtLink
           to="https://github.com/rafaeelneto/welldot"
           target="_blank"

@@ -14,6 +14,9 @@
   },
   "nav": {
     "editor": "Editor",
+    "manager": "Gerenciador",
+    "comingSoon": "Em breve",
+    "managerTooltip": "Gerenciador de poços — em breve",
     "github": "GitHub",
     "openEditor": "Abrir editor",
     "openEditorMobile": "Editor",
