@@ -167,7 +167,9 @@ const endInfoCount = computed(() =>
                 input-id="pdf-use-custom-visibility"
               />
             </div>
-            <ShareVisibilityChecklist v-if="pdfExportStore.useCustomVisibility" />
+            <ShareVisibilityChecklist
+              v-if="pdfExportStore.useCustomVisibility"
+            />
           </section>
 
           <!-- Scale -->
@@ -283,6 +285,6 @@ const endInfoCount = computed(() =>
       </div>
     </div>
 
-    <div ref="draftContainerRef" v-show="false" />
+    <div v-show="false" ref="draftContainerRef" />
   </Dialog>
 </template>

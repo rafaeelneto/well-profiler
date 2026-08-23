@@ -15,7 +15,7 @@ const showPending = ref(false);
 const filteredOptions = computed(() =>
   showPending.value
     ? FGDC_TEXTURES_OPTIONS
-    : FGDC_TEXTURES_OPTIONS.filter((option) => !option.pending),
+    : FGDC_TEXTURES_OPTIONS.filter(option => !option.pending),
 );
 
 const overlayFocusGuard = useGridOverlayFocusGuard();

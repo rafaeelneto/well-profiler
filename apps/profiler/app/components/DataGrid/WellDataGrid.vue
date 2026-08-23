@@ -104,8 +104,8 @@ function handleRowOrderChanged(
       unstyled
       class="well-grid-add-btn"
       type="button"
-      @click="emit('add')"
       :label="addLabel ?? 'Add row'"
+      @click="emit('add')"
     >
       <template #icon>
         <Icon name="ph:plus" />

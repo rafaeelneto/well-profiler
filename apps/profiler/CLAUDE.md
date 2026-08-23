@@ -76,6 +76,7 @@ pnpm lint       # eslint
 ## Documentation requirements
 
 Update this `CLAUDE.md` when:
+
 - A new Nuxt module is added (Stack section + any config file it introduces)
 - A new top-level directory appears under `app/` (Directory layout section)
 - A significant pattern changes (state management, i18n, deploy target, theme system)
@@ -89,14 +90,15 @@ Two mirrored scales — `surface` (backgrounds) and `content` (text, borders, ic
 
 **Pairing rule:** `surface-N` and `content-N` at the same index always contrast, because the scales are inverses. Mixing distant indexes breaks contrast in one mode (`surface-100 + text-content-900` = near-black on near-black in dark mode).
 
-| Scale | Role | Normal range |
-|---|---|---|
-| `surface` | Backgrounds only — never text/icons | `0–200`; higher only for intentional inversion |
-| `content` | Text, borders, icon strokes | `0` (body) → `300` (muted) → `600` (subtle border); `800+` almost always wrong |
-| `primary` | CTAs, active states, focus rings, interactive highlights | varies |
-| `error/warning/success/info` | State communication | `500` default; `50–100` for bg, `700–800` for text on light bg |
+| Scale                        | Role                                                     | Normal range                                                                   |
+| ---------------------------- | -------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| `surface`                    | Backgrounds only — never text/icons                      | `0–200`; higher only for intentional inversion                                 |
+| `content`                    | Text, borders, icon strokes                              | `0` (body) → `300` (muted) → `600` (subtle border); `800+` almost always wrong |
+| `primary`                    | CTAs, active states, focus rings, interactive highlights | varies                                                                         |
+| `error/warning/success/info` | State communication                                      | `500` default; `50–100` for bg, `700–800` for text on light bg                 |
 
 Key rules:
+
 - `surface` for backgrounds exclusively; `content` for everything neutral on top of it.
 - Pair at the same index. Slight offset toward higher values for hierarchy is fine; a large gap (>400 steps) is a bug.
 - High `surface` values (`400+`) signal a deliberate inversion (dark hero, inverted sidebar) — rare. High `content` values (`800+`) are nearly always wrong.

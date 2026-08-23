@@ -1001,6 +1001,20 @@ const MyPreset = definePreset(Aura, {
         },
       },
     },
+    accordion: {
+      colorScheme: {
+        light: {
+          content: {
+            background: '{surface.0}',
+          },
+        },
+        dark: {
+          content: {
+            background: '{surface.0}',
+          },
+        },
+      },
+    },
   } as ComponentsDesignTokens,
 } as Preset);
 

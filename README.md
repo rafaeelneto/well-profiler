@@ -110,6 +110,7 @@ The format captures:
 | Location            | `location`                                                                 | Lat/lng/elevation with explicit CRS and datum; default WGS84 (`EPSG:4326`)     |
 | Registry IDs        | `well_id[]`                                                                | Authority-scoped identifiers (e.g. SIAGAS, ANA, NGWD)                          |
 | Borehole            | `bore_hole[]`                                                              | Depth intervals and drilling method                                            |
+| Well depth          | `well_depth`                                                               | Current usable depth; may be less than drilled depth after siltation           |
 | Well casing         | `well_case[]`                                                              | Casing material, diameter, and depth                                           |
 | Reductions          | `reduction[]`                                                              | Diameter transitions between casing sections                                   |
 | Well screen         | `well_screen[]`                                                            | Screen type, slot size (`screen_slot`, mm), and depth                          |
@@ -161,10 +162,19 @@ npm install @welldot/utils
 
 ## App Features
 
-- Visual well profile rendering with borehole geometry, casing strings, lithological column, fractures, and caves
-- Import and export `.well` files
-- Export printable PDF reports
-- Quantitative construction data useful for cost estimation
+The editor at [welldot.org](https://welldot.org) covers the full `.well` v2 schema:
+
+- **Live profile canvas** — borehole geometry, surface casing, casing and screen strings, reducers, annular space, wellhead, lithological column, fractures, and caves, rendered as you type, with pan and zoom
+- **Construction data** — borehole, surface casing, casing, screen, reduction, hole fill, and wellhead sections in editable data grids
+- **Geology** — lithology by geologic unit, plus fractures and caves, with FGDC texture pickers
+- **Hydrodynamic events** — constant-rate, step-drawdown, airlift, and recovery pumping tests with time-series readings and derived aquifer statistics
+- **History log** — timestamped maintenance, inspection, and incident records with attachments
+- **Well identity and location** — multi-registry `well_id` entries and a map-based location picker with elevation
+- **Summary and volumes** — depth, layer, and screen KPIs plus per-section tables with grout and pre-filter volumes for cost estimation
+- **Open and save** — native file handles where the File System Access API is available, with `Cmd/Ctrl+S` and unsaved-change guards
+- **Shareable links** — publish a profile with per-section visibility control
+- **Printable PDF reports** — configurable sections and info items
+- **Preferences** — length (m / ft) and diameter (mm / in) units, coordinate format, light/dark theme, and EN / PT interface
 
 ---
 
@@ -176,6 +186,11 @@ To run the Well Profiler app locally:
 pnpm install
 pnpm dev
 ```
+
+`pnpm dev` starts every workspace at once: the active Nuxt app on
+[localhost:3000](http://localhost:3000), the deprecated Next.js app on
+[localhost:5000](http://localhost:5000), and `tsup --watch` for the three libraries. To run just the
+active app, use `pnpm turbo dev --filter=profiler`.
 
 To use the libraries in your own project, install them individually — see the README in each package for usage details.
 
@@ -218,7 +233,8 @@ The following were delivered in `.well` v2.0 (shipped in `@welldot/core` v0.2.0)
 ### Ecosystem
 
 - **`.LAS` file import** — support for the industry-standard Log ASCII Standard format used in oil, gas, and water-well logging
-- **Better internationalization** — unit system switching (SI / imperial), multi-language UI, and locale-aware date and number formats
+- **SIAGAS import** — pull well records from the Brazilian Geological Survey's groundwater database
+- **Locale-aware dates** — dates still render ISO-style; numbers and units are already localized and switchable
 
 ---
 
@@ -235,12 +251,15 @@ The `welldot-converter` skill for [Claude Code](https://claude.ai/code) converts
 
 **Install:**
 
-The skill is included in this repository under `.claude/skills/welldot-converter/`. If you cloned the repo, it is already available project-locally.
+The skill lives at `.agents/skills/welldot-converter/`, the vendor-neutral path that every
+skills-capable client discovers. `.claude/skills/welldot-converter` is a symlink to it, kept for
+back-compat. If you cloned the repo, the skill is already available project-locally.
 
-To make it available globally across all your projects, copy it to your personal skills directory:
+To make it available globally across all your projects, copy the real directory — not the symlink —
+into your personal skills directory:
 
 ```bash
-cp -r .claude/skills/welldot-converter ~/.claude/skills/
+cp -R .agents/skills/welldot-converter ~/.claude/skills/
 ```
 
 **Use:**
@@ -255,10 +274,18 @@ Then attach or describe the well report you want to convert. Claude will extract
 
 ---
 
-## Licensing
+## Contributing
 
-This project is licensed under the [Apache 2.0](./LICENCE.md) license.
+Contributions are welcome — see [CONTRIBUTING.md](./CONTRIBUTING.md) for development setup, the
+repository layout, and the process for proposing a change to the `.well` format.
+
+If you are building a tool that reads or writes `.well` files, you don't need permission and you
+don't need to use these libraries — the format is open and the spec is complete enough to implement
+from scratch. Please open an issue to tell us about it; we want to keep a list of compatible
+implementations.
 
 ---
 
-Suggestions, issues, and contributions are welcome. If you are building a tool that reads or writes `.well` files, feel free to open an issue — we would like to know about compatible implementations.
+## Licensing
+
+This project is licensed under the [Apache 2.0](./LICENCE.md) license.

@@ -59,6 +59,14 @@ jobs:
       - name: Test @welldot/core
         run: pnpm turbo test --filter=@welldot/core
 
+      # The committed JSON Schema is the machine-readable artifact third-party
+      # implementations `$ref`, so it must never drift from the Zod validators.
+      - name: Check JSON Schema is in sync with the Zod source
+        run: |
+          pnpm --filter=@welldot/core generate:schema
+          git diff --exit-code -- packages/core/docs/schema/ \
+            || { echo "::error::well.schema.json is stale — run 'pnpm --filter=@welldot/core generate:schema' and commit the result."; exit 1; }
+
       - name: Publish stable to npm (tag)
         if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
         run: pnpm publish --filter=@welldot/core --no-git-checks --access public

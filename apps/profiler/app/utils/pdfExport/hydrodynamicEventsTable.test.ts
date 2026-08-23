@@ -1,4 +1,3 @@
-/* eslint-disable camelcase -- .well schema fields (static_level, hydrodynamic_events, ...) are intentionally snake_case */
 import type { HydrodynamicEvent, Well } from '@welldot/core';
 import { describe, expect, it } from 'vitest';
 import { buildHydrodynamicEventsSection } from './hydrodynamicEventsTable';

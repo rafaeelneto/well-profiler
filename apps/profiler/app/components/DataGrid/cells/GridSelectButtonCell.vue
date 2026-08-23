@@ -25,7 +25,6 @@ function handleChange(newValue: string) {
       option-value="value"
       :allow-empty="false"
       size="small"
-      @update:model-value="handleChange"
       :pt="{
         root: 'inline-flex items-center bg-surface-100 rounded-full p-0.5 gap-0.5',
         pcToggleButton: {
@@ -41,6 +40,7 @@ function handleChange(newValue: string) {
           },
         },
       }"
+      @update:model-value="handleChange"
     />
   </span>
 </template>

@@ -11,7 +11,7 @@ const props = defineProps<{ progress: number }>();
 const { t, locale } = useI18n();
 
 const svgId = `hero-well-${Math.random().toString(36).slice(2, 8)}`;
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 let wellRenderer: any = null;
 let ro: ResizeObserver | null = null;
 let io: IntersectionObserver | null = null;

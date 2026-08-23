@@ -27,7 +27,7 @@ const currentLocale = computed({
   set: (val: string) => setLocale(val as 'en' | 'pt'),
 });
 
-const localeOptions = locales.value.map((l) => l.code);
+const localeOptions = locales.value.map(l => l.code);
 
 const togglePt = {
   root: {

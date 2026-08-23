@@ -78,9 +78,7 @@ function reorderBoreHole(from: number, to: number) {
   profileStore.reorderWellFeature('bore_hole', from, to);
 }
 
-const calculatedDepth = computed(() =>
-  calculatedWellDepth(profileStore.well),
-);
+const calculatedDepth = computed(() => calculatedWellDepth(profileStore.well));
 const calculatedDepthText = computed(
   () =>
     `${formatNumber(toDisplay(calculatedDepth.value), { fractionDigits: 2 })} ${lengthUnit.value}`,
@@ -119,7 +117,7 @@ function syncWellDepth() {
       @change="updateBoreHole"
       @reorder="reorderBoreHole"
     />
-    <Field :label="t('editor.construction.boreHole.wellDepth')">
+    <FormField :label="t('editor.construction.boreHole.wellDepth')">
       <UnitInput
         unit-type="length"
         :model-value="profileStore.well.well_depth ?? null"
@@ -146,6 +144,6 @@ function syncWellDepth() {
           @click="syncWellDepth"
         />
       </div>
-    </Field>
+    </FormField>
   </section>
 </template>

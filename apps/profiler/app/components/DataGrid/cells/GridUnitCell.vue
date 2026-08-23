@@ -12,7 +12,10 @@ const display = computed((): string => {
   if (raw === null || raw === undefined || raw === '') return '—';
   const canonical = Number(raw);
   if (isNaN(canonical)) return '—';
-  return formatNumber(toDisplay(canonical), { maximumFractionDigits: 4, suffix: unit.value });
+  return formatNumber(toDisplay(canonical), {
+    maximumFractionDigits: 4,
+    suffix: unit.value,
+  });
 });
 </script>
 

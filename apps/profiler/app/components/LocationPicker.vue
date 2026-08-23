@@ -75,7 +75,7 @@ const elevationLabel = computed(
 
 <template>
   <div class="flex flex-col gap-5">
-    <Field :label="t('editor.general.coordinatesLabel')">
+    <FormField :label="t('editor.general.coordinatesLabel')">
       <div class="flex items-center">
         <SelectButton
           v-model="uiStore.coordinateFormat"
@@ -95,10 +95,10 @@ const elevationLabel = computed(
           size="small"
         />
       </div>
-    </Field>
+    </FormField>
 
     <div class="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-4">
-      <Field :label="t('editor.general.latitude')">
+      <FormField :label="t('editor.general.latitude')">
         <InputText
           v-model="rawLat"
           class="w-full font-mono"
@@ -106,9 +106,9 @@ const elevationLabel = computed(
           @blur="commitLat"
           @keydown.enter="commitLat"
         />
-      </Field>
+      </FormField>
 
-      <Field :label="t('editor.general.longitude')">
+      <FormField :label="t('editor.general.longitude')">
         <InputText
           v-model="rawLng"
           class="w-full font-mono"
@@ -116,16 +116,16 @@ const elevationLabel = computed(
           @blur="commitLng"
           @keydown.enter="commitLng"
         />
-      </Field>
+      </FormField>
 
-      <Field :label="elevationLabel">
+      <FormField :label="elevationLabel">
         <UnitInput
-          unit-type="length"
           v-model="elevation"
+          unit-type="length"
           class="w-full"
           :max-fraction-digits="3"
         />
-      </Field>
+      </FormField>
     </div>
 
     <div class="flex flex-col gap-1">

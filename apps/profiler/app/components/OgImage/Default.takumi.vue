@@ -24,16 +24,10 @@ const LOGO_DATA_URI = `data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAY
       padding: 88px;
     "
   >
-    <div
-      style="
-        display: flex;
-        align-items: center;
-        margin-bottom: 36px;
-      "
-    >
+    <div style="display: flex; align-items: center; margin-bottom: 36px">
       <img
         :src="LOGO_DATA_URI"
-        style="width: 40px; height: 40px; margin-right: 14px;"
+        style="width: 40px; height: 40px; margin-right: 14px"
       />
       <div
         style="
@@ -75,7 +69,9 @@ const LOGO_DATA_URI = `data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAY
       "
     >
       <span>{{ headline1 || 'Well profiles, in' }}&nbsp;</span>
-      <span style="font-style: italic; color: #2f5fae;">{{ headlineEm || 'open format' }}</span>
+      <span style="font-style: italic; color: #2f5fae">{{
+        headlineEm || 'open format'
+      }}</span>
       <span>{{ headline2 || '.' }}</span>
     </div>
 
@@ -89,10 +85,13 @@ const LOGO_DATA_URI = `data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAY
         max-width: 780px;
       "
     >
-      {{ tagline || 'Free editor to create, visualize, and export geological and construction profiles.' }}
+      {{
+        tagline ||
+        'Free editor to create, visualize, and export geological and construction profiles.'
+      }}
     </div>
 
-    <div style="display: flex; flex-grow: 1;" />
+    <div style="display: flex; flex-grow: 1" />
 
     <div
       style="
@@ -106,15 +105,19 @@ const LOGO_DATA_URI = `data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAY
         color: #7888a0;
       "
     >
-      <div style="display: flex;">
-        <span style="color: #0d1218; font-weight: 500; margin-right: 6px;">v2.0</span>
+      <div style="display: flex">
+        <span style="color: #0d1218; font-weight: 500; margin-right: 6px"
+          >v2.0</span
+        >
         <span>{{ badgeSpec || 'spec' }}</span>
       </div>
-      <div style="display: flex;">
-        <span style="color: #0d1218; font-weight: 500; margin-right: 6px;">Apache 2.0</span>
+      <div style="display: flex">
+        <span style="color: #0d1218; font-weight: 500; margin-right: 6px"
+          >Apache 2.0</span
+        >
         <span>{{ badgeLicense || 'license' }}</span>
       </div>
-      <div style="display: flex; color: #0d1218; font-weight: 500;">
+      <div style="display: flex; color: #0d1218; font-weight: 500">
         {{ badgeSite || 'welldot.org' }}
       </div>
     </div>

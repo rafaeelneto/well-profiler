@@ -1,4 +1,8 @@
 {
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/rafaeelneto/welldot/main/packages/core/docs/schema/v2/well.schema.json",
+  "title": "well",
+  "description": "The .well open format — a JSON standard for water well data. Depths in meters, diameters in millimeters, measured from ground level.",
   "type": "object",
   "properties": {
     "version": {
@@ -114,6 +118,9 @@
       "type": "number"
     },
     "elevation": {
+      "type": "number"
+    },
+    "well_depth": {
       "type": "number"
     },
     "bore_hole": {
@@ -579,11 +586,9 @@
                     "type": "array",
                     "minItems": 1,
                     "maxItems": 1,
-                    "items": [
-                      {
-                        "$ref": "#/properties/hydrodynamic_events/items/anyOf/0/anyOf/0/properties/steps/items"
-                      }
-                    ]
+                    "items": {
+                      "$ref": "#/properties/hydrodynamic_events/items/anyOf/0/anyOf/0/properties/steps/items"
+                    }
                   },
                   "recovery": {
                     "$ref": "#/properties/hydrodynamic_events/items/anyOf/0/anyOf/0/properties/recovery"

@@ -40,7 +40,13 @@ const reductionColumns = computed<WellGridColumn[]>(() => [
 ]);
 
 function addReduction() {
-  profileStore.well.reduction.push({ from: 0, to: 0, diam_from: 0, diam_to: 0, type: '' });
+  profileStore.well.reduction.push({
+    from: 0,
+    to: 0,
+    diam_from: 0,
+    diam_to: 0,
+    type: '',
+  });
 }
 
 function deleteReduction(index: number) {

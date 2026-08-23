@@ -4,27 +4,27 @@ export function useHydrodynamicEventTypes() {
   const typeOptions = computed(() => [
     {
       value: 'spot_measurement',
-      label: t('editor.hidrodinamica.eventTypes.spot_measurement'),
+      label: t('editor.hydrodynamicEvents.eventTypes.spot_measurement'),
       icon: 'ph:drop-duotone',
     },
     {
       value: 'constant_rate',
-      label: t('editor.hidrodinamica.eventTypes.constant_rate'),
+      label: t('editor.hydrodynamicEvents.eventTypes.constant_rate'),
       icon: 'ph:clock-duotone',
     },
     {
       value: 'step_drawdown',
-      label: t('editor.hidrodinamica.eventTypes.step_drawdown'),
+      label: t('editor.hydrodynamicEvents.eventTypes.step_drawdown'),
       icon: 'ph:chart-bar-duotone',
     },
     {
       value: 'airlift',
-      label: t('editor.hidrodinamica.eventTypes.airlift'),
+      label: t('editor.hydrodynamicEvents.eventTypes.airlift'),
       icon: 'ph:fan-duotone',
     },
     {
       value: 'recovery_only',
-      label: t('editor.hidrodinamica.eventTypes.recovery_only'),
+      label: t('editor.hydrodynamicEvents.eventTypes.recovery_only'),
       icon: 'ph:arrow-up-duotone',
     },
   ]);
@@ -32,17 +32,22 @@ export function useHydrodynamicEventTypes() {
   const measurementMethodOptions = computed(() => [
     {
       value: 'electric_probe',
-      label: t('editor.hidrodinamica.measurementMethods.electric_probe'),
+      label: t('editor.hydrodynamicEvents.measurementMethods.electric_probe'),
     },
     {
       value: 'pressure_transducer',
-      label: t('editor.hidrodinamica.measurementMethods.pressure_transducer'),
+      label: t(
+        'editor.hydrodynamicEvents.measurementMethods.pressure_transducer',
+      ),
     },
     {
       value: 'air_line',
-      label: t('editor.hidrodinamica.measurementMethods.air_line'),
+      label: t('editor.hydrodynamicEvents.measurementMethods.air_line'),
     },
-    { value: 'tape', label: t('editor.hidrodinamica.measurementMethods.tape') },
+    {
+      value: 'tape',
+      label: t('editor.hydrodynamicEvents.measurementMethods.tape'),
+    },
   ]);
 
   function eventTypeLabel(type: string): string {

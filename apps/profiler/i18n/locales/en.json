@@ -14,10 +14,14 @@
   },
   "nav": {
     "editor": "Editor",
+    "manager": "Manager",
+    "comingSoon": "Soon",
+    "managerTooltip": "Well manager — coming soon",
     "github": "GitHub",
     "openEditor": "Open editor",
     "openEditorMobile": "Editor",
     "menu": "Menu",
+    "language": "Language",
     "theme": {
       "light": "Light mode",
       "dark": "Dark mode"
@@ -230,6 +234,12 @@
     "back": "Back",
     "menu": "Menu",
     "importSiagas": "Import from SIAGAS",
+    "aiImporter": {
+      "title": "AI Import",
+      "comingSoon": "This feature is coming soon.",
+      "description": "The AI Import will turn a well report — PDF, image, or document — into a .well profile automatically. It isn't available yet.",
+      "close": "Close"
+    },
     "toolsMenu": {
       "title": "Tools"
     },
@@ -258,9 +268,9 @@
       "constructionShort": "Constr.",
       "geological": "Geological",
       "summary": "Summary",
-      "historico": "History",
-      "hidrodinamica": "Hydrodynamic",
-      "hidro": "Hydro",
+      "historyLog": "History",
+      "hydrodynamicEvents": "Hydrodynamic",
+      "hydro": "Hydro",
       "inDevelopment": "In dev"
     },
     "status": {
@@ -634,7 +644,7 @@
         "thickness": "Thickness"
       }
     },
-    "historico": {
+    "historyLog": {
       "tag": "History · Well",
       "logs": {
         "title": "History Logs",
@@ -654,6 +664,9 @@
         "by": "by",
         "deleteAttachment": "Remove attachment?",
         "editAttachment": "Edit attachment",
+        "copyPath": "Copy path",
+        "copied": "Copied",
+        "noAttachments": "No files attached",
         "categories": {
           "maintenance": "Maintenance",
           "inspection": "Inspection",
@@ -672,6 +685,7 @@
           "description": "Description",
           "author": "Author",
           "severity": "Severity",
+          "attachments": "Attachments",
           "attachmentUrl": "File URL",
           "attachmentFilename": "Display name",
           "attachmentMediaType": "File type"
@@ -684,7 +698,7 @@
         "comingSoon": "Full editing available in the Hydrodynamic tab"
       }
     },
-    "hidrodinamica": {
+    "hydrodynamicEvents": {
       "title": "Hydrodynamic Events",
       "addEvent": "Add event",
       "ledgerNote": "Chronological ledger — new records are appended, not overwritten.",
@@ -699,7 +713,7 @@
       "analyses": {
         "inDevBody": "The Analyses tab will allow entering aquifer test results (transmissivity, specific capacity, storage coefficient)."
       },
-      "estadoAtual": {
+      "currentState": {
         "title": "Current State",
         "ne": "CURRENT SWL",
         "specificCapacity": "SPEC. CAPACITY",

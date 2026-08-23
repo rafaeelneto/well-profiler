@@ -14,10 +14,14 @@
   },
   "nav": {
     "editor": "Editor",
+    "manager": "Gerenciador",
+    "comingSoon": "Em breve",
+    "managerTooltip": "Gerenciador de poços — em breve",
     "github": "GitHub",
     "openEditor": "Abrir editor",
     "openEditorMobile": "Editor",
     "menu": "Menu",
+    "language": "Idioma",
     "theme": {
       "light": "Modo claro",
       "dark": "Modo escuro"
@@ -230,6 +234,12 @@
     "back": "Voltar",
     "menu": "Menu",
     "importSiagas": "Importar do SIAGAS",
+    "aiImporter": {
+      "title": "Importar com IA",
+      "comingSoon": "Este recurso estará disponível em breve.",
+      "description": "O Importar com IA vai transformar um relatório de poço — PDF, imagem ou documento — em um perfil .well automaticamente. Ainda não está disponível.",
+      "close": "Fechar"
+    },
     "toolsMenu": {
       "title": "Ferramentas"
     },
@@ -258,9 +268,9 @@
       "constructionShort": "Constr.",
       "geological": "Geológico",
       "summary": "Sumário",
-      "historico": "Histórico",
-      "hidrodinamica": "Hidrodinâmica",
-      "hidro": "Hidro",
+      "historyLog": "Histórico",
+      "hydrodynamicEvents": "Hidrodinâmica",
+      "hydro": "Hidro",
       "inDevelopment": "Em dev"
     },
     "status": {
@@ -634,7 +644,7 @@
         "thickness": "Espessura"
       }
     },
-    "historico": {
+    "historyLog": {
       "tag": "Histórico · Poço",
       "logs": {
         "title": "Registro de Histórico",
@@ -654,6 +664,9 @@
         "by": "por",
         "deleteAttachment": "Remover anexo?",
         "editAttachment": "Editar anexo",
+        "copyPath": "Copiar caminho",
+        "copied": "Copiado",
+        "noAttachments": "Nenhum arquivo anexado",
         "categories": {
           "maintenance": "Manutenção",
           "inspection": "Inspeção",
@@ -672,6 +685,7 @@
           "description": "Descrição",
           "author": "Autor",
           "severity": "Severidade",
+          "attachments": "Anexos",
           "attachmentUrl": "URL do arquivo",
           "attachmentFilename": "Nome exibido",
           "attachmentMediaType": "Tipo de arquivo"
@@ -684,7 +698,7 @@
         "comingSoon": "Edição disponível na aba Hidrodinâmica"
       }
     },
-    "hidrodinamica": {
+    "hydrodynamicEvents": {
       "title": "Eventos Hidrodinâmicos",
       "addEvent": "Adicionar evento",
       "ledgerNote": "Ledger cronológico — novos registros são adicionados, não sobrescritos.",
@@ -699,7 +713,7 @@
       "analyses": {
         "inDevBody": "A aba Análises permitirá inserir resultados de ensaios de aquífero (transmissividade, capacidade específica, coeficiente de armazenamento)."
       },
-      "estadoAtual": {
+      "currentState": {
         "title": "Estado Atual",
         "ne": "NE ATUAL",
         "specificCapacity": "CAP. ESPECÍFICA",

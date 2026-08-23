@@ -9,6 +9,7 @@
     "preview": "npx wrangler dev",
     "postinstall": "nuxt prepare",
     "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "test": "vitest run"
   },
   "dependencies": {

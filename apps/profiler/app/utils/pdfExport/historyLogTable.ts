@@ -9,13 +9,13 @@ const KNOWN_SEVERITIES = ['low', 'medium', 'high', 'critical'];
 
 function categoryLabel(category: string, t: PdfTranslate): string {
   return KNOWN_CATEGORIES.includes(category)
-    ? t(`editor.historico.logs.categories.${category}`)
+    ? t(`editor.historyLog.logs.categories.${category}`)
     : category;
 }
 
 function severityLabel(severity: string, t: PdfTranslate): string {
   return KNOWN_SEVERITIES.includes(severity)
-    ? t(`editor.historico.logs.severity.${severity}`)
+    ? t(`editor.historyLog.logs.severity.${severity}`)
     : severity;
 }
 
@@ -77,7 +77,7 @@ function buildLogEntryBody(entry: HistoryLogEntry, t: PdfTranslate): Content[] {
 
   if (entry.author) {
     blocks.push({
-      text: `${t('editor.historico.logs.by')} ${entry.author}`,
+      text: `${t('editor.historyLog.logs.by')} ${entry.author}`,
       style: 'metadataLabel',
       margin: [0, 4, 0, 0],
     });
@@ -121,7 +121,7 @@ export function buildHistoryLogSection(
     {
       stack: [
         { text: ' ' },
-        { text: t('editor.historico.logs.title'), style: 'title' },
+        { text: t('editor.historyLog.logs.title'), style: 'title' },
         buildLogEntryHeader(first!, t),
       ],
       unbreakable: true,
